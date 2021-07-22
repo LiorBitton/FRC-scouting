@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ThemeProvider extends ChangeNotifier {
   ThemeMode themeMode = ThemeMode.light;
@@ -9,12 +10,15 @@ class ThemeProvider extends ChangeNotifier {
 class CustomTheme {
   static ThemeData get darkTheme {
     return ThemeData(
+        brightness: Brightness.dark,
         colorScheme: ColorScheme.dark(),
         dividerColor: Colors.white,
-        primaryColor: Color.fromRGBO(18, 18, 18, 1),
+        primaryColor: Color.fromARGB(255, 107, 181, 46),
         scaffoldBackgroundColor: Colors.black,
-        fontFamily: 'Montserrat',
-        textTheme: ThemeData.dark().textTheme,
+        // fontFamily: ,
+        textTheme: TextTheme(
+            bodyText1: GoogleFonts.roboto(
+                fontWeight: FontWeight.bold)), //ThemeData.dark().textTheme,
         iconTheme: IconThemeData(color: Colors.white70, opacity: 100),
         buttonTheme: ButtonThemeData(
           shape: RoundedRectangleBorder(
@@ -25,14 +29,15 @@ class CustomTheme {
         floatingActionButtonTheme: FloatingActionButtonThemeData(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
-          backgroundColor: Colors.greenAccent,
+          backgroundColor: Color.fromARGB(255, 107, 181, 46),
         ));
   }
 
   static ThemeData get lightTheme {
     //1
-    
+
     return ThemeData(
+        brightness: Brightness.light,
         colorScheme: ColorScheme.light(),
         primaryColor: Colors.purple,
         scaffoldBackgroundColor: Colors.white,

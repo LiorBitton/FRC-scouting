@@ -3,80 +3,53 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:scouting_application/screens/analysis_home.dart';
 import 'package:scouting_application/screens/scouting/scout_home.dart';
-import 'package:scouting_application/screens/settings.dart';
-import 'package:scouting_application/themes/custom_themes.dart';
 
 class Menu extends StatelessWidget {
   const Menu({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Row(
-      //mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.max,
-      children: [
-        Center(
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                SizedBox(
-                  height: 50,
-                ),
-                Center(
-                    child: Text(
-                  'EverScout',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Colors.lightGreen,
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold),
-                )),
-                Expanded(
-                  child: Image(
-                      image: AssetImage('eg_logo_white.png'), height: 200),
-                ),
-                Expanded(
-                    child: Column(
-                  children: [
-                    MenuButton(
-                      title: 'scout',
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ScoutHome()));
-                      },
-                    ),
-                    MenuButton(
-                      title: 'analysis',
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => AnalysisHome()));
-                      },
-                    ),
-                  ],
-                ))
-              ]),
+        body: Center(
+      child:
+          Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+        SizedBox(
+          height: 50,
         ),
-        // Column(
-        //   mainAxisAlignment: MainAxisAlignment.start,
-        //   mainAxisSize: MainAxisSize.min,
-        //   children: [
-        //     Container(
-        //       color: CustomTheme
-        //           .darkTheme.floatingActionButtonTheme.backgroundColor,
-        //       child: IconButton(
-        //           splashRadius: 0.01,
-        //           onPressed: () {Navigator.push(context,
-        //           MaterialPageRoute(builder: (context) => Settings()));},
-        //           icon: Icon(Icons.settings)),
-        //       alignment: Alignment.topRight,
-        //     ),
-        //   ],
-        // ),
-      ],
+        Center(
+            child: Text(
+          'EverScout',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              color: Colors.lightGreen,
+              fontSize: 30,
+              fontWeight: FontWeight.bold),
+        )),
+        Expanded(
+          child: Image.asset(
+            'assets/eg_logo_white.png',
+            height: 200,
+          ),
+        ),
+        Expanded(
+            child: Column(
+          children: [
+            MenuButton(
+              title: 'scout',
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => ScoutHome()));
+              },
+            ),
+            MenuButton(
+              title: 'analysis',
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => AnalysisHome()));
+              },
+            ),
+          ],
+        ))
+      ]),
     ));
   }
 }

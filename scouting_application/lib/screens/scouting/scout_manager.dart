@@ -17,6 +17,7 @@ class _ScoutManagerState extends State<ScoutManager> {
       length: 3,
       child: Scaffold(
           appBar: AppBar(
+            automaticallyImplyLeading: false,
             bottom: TabBar(
               tabs: [
                 Tab(text: "אוטונומי", icon: Icon(Icons.do_not_touch)),

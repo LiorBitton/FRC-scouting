@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
+import 'package:scouting_application/themes/custom_themes.dart';
 
 class CustomSwitch extends StatefulWidget {
   CustomSwitch({Key? key, required this.title, required this.isSwitched})
@@ -22,16 +23,16 @@ class _CustomSwitchState extends State<CustomSwitch> {
           value: widget.isSwitched,
           borderRadius: 30.0,
           padding: 2.0,
-          toggleColor: Color.fromRGBO(225, 225, 225, 1),
+          toggleColor: Color.fromRGBO(107, 181, 46, 0.5),
           switchBorder: Border.all(
-            color: Color.fromRGBO(2, 107, 206, 1),
+            color: Color.fromARGB(255, 107, 181, 46),
             width: 6.0,
           ),
           toggleBorder: Border.all(
-            color: Color.fromRGBO(2, 107, 206, 1),
+            color: Color.fromARGB(255, 107, 181, 46),
             width: 5.0,
           ),
-          activeColor: Color.fromRGBO(51, 226, 255, 1),
+          activeColor: Color.fromRGBO(107, 181, 46, 0.5),
           inactiveColor: Colors.black38,
           onToggle: (val) {
             setState(() {
@@ -39,7 +40,9 @@ class _CustomSwitchState extends State<CustomSwitch> {
             });
           },
         ),
-        Center(child: Text('${widget.title}'))
+        Center(
+            child: Text('${widget.title}',
+                style: CustomTheme.darkTheme.textTheme.bodyText1))
       ],
     );
   }
