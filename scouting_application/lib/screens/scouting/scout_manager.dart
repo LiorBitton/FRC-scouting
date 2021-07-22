@@ -11,8 +11,14 @@ class ScoutManager extends StatefulWidget {
 }
 
 class _ScoutManagerState extends State<ScoutManager> {
+  late Widget autonomous;
+  late Widget teleoperated;
+  late Widget endgame;
   @override
   Widget build(BuildContext context) {
+    autonomous = new ScoutAutonomous();
+    teleoperated =new  ScoutTeleoperated();
+    endgame = new ScoutEndgame();
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -26,11 +32,7 @@ class _ScoutManagerState extends State<ScoutManager> {
               ],
             ),
           ),
-          body: TabBarView(children: [
-            ScoutAutonomous(),
-            ScoutTeleoperated(),
-            ScoutEndgame()
-          ])),
+          body: TabBarView(children: [autonomous, teleoperated, endgame])),
     );
   }
 }

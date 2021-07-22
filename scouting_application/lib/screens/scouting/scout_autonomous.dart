@@ -19,30 +19,38 @@ class _ScoutAutonomousState extends State<ScoutAutonomous>
     super.initState();
   }
 
-  bool _isSwitched = false;
+  bool didMove = false;
   int inner_counter = 0;
   int outer_counter = 0;
   int lower_counter = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: GridView(
+        body: Row(
       children: [
-        PlusMinusButton(
-          title: "inner",
-          counter: inner_counter,
-        ),
-        PlusMinusButton(title: "outer", counter: outer_counter),
-        PlusMinusButton(title: "lower", counter: lower_counter),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CustomSwitch(title: 'moved', isSwitched: _isSwitched),
-          ],
+        Expanded(
+          child: GridView(
+            children: [
+              PlusMinusButton(
+                title: "inner",
+                counter: inner_counter,
+              ),
+              PlusMinusButton(title: "outer", counter: outer_counter),
+              PlusMinusButton(title: "lower", counter: lower_counter),
+              SizedBox(height: 1, width: 1),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  CustomSwitch(title: 'moved', isSwitched: didMove),
+                ],
+              ),
+            ],
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3, mainAxisSpacing: 0, crossAxisSpacing: 0),
+          ),
         ),
       ],
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3, mainAxisSpacing: 0, crossAxisSpacing: 0),
     ));
   }
 }

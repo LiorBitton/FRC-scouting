@@ -26,12 +26,12 @@ class _PlusMinusButtonState extends State<PlusMinusButton> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: Column(mainAxisAlignment: MainAxisAlignment.center,crossAxisAlignment: CrossAxisAlignment.center,mainAxisSize: MainAxisSize.min,
         children: [
           Container(
               decoration: BoxDecoration(
                   border:
-                      Border.all(width: 1.0, color: const Color(0xFFFFFFFF))),
+                      Border.all(width: 2.0, color: const Color(0xFFFFFFFF))),
               // color: Color.fromARGB(0, 211,211,211),
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -39,32 +39,32 @@ class _PlusMinusButtonState extends State<PlusMinusButton> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(widget.title, style: TextStyle(fontSize: 20.0)),
-                    Divider(),
                     Text('${widget.counter}', style: TextStyle(fontSize: 38)),
-                    Divider(),
                     Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        //  mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          VerticalDivider(color: Colors.white),
-                          IconButton(
-                              onPressed: _decrement,
-                              splashRadius: 20,
-                              //iconSize: 16.0,
-                              icon: Icon(
-                                Icons.remove,
-                                size: 32.0,
-                              )),
-                          VerticalDivider(color: Colors.white),
-                          IconButton(
-                              splashRadius: 20,
-                              onPressed: _increment,
-                              iconSize: 16.0,
-                              icon: Icon(Icons.add, size: 32.0)),
-                          RotatedBox(
-                              quarterTurns: 3,
-                              child: VerticalDivider(color: Colors.white)),
+                          // VerticalDivider(color: Colors.white),
+                          SizedBox(height: 40,width:40,
+                            child: IconButton(
+                                onPressed: _decrement,
+                                splashRadius: 20,
+                                //iconSize: 16.0,
+                                icon: Icon(
+                                  Icons.remove,
+                                  size: 32.0,
+                                )),
+                          ),
+                          // VerticalDivider(color: Colors.white),
+                          SizedBox(height: 40,width:40,
+                            child: IconButton(
+                                splashRadius: 20,
+                                onPressed: _increment,
+                                iconSize: 16.0,
+                                icon: Icon(Icons.add, size: 32.0)),
+                          ),
+                         
                         ]),
                   ])),
         ],
