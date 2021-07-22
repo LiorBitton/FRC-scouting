@@ -11,6 +11,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'EverScout', theme: CustomTheme.darkTheme, home: Menu());
+      title: 'EverScout',
+      themeMode: ThemeMode.system,
+      theme: CustomTheme.darkTheme,
+      home: Menu(),
+      darkTheme: CustomTheme.darkTheme,
+    );
   }
 }

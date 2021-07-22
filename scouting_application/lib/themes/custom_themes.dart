@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 
+class ThemeProvider extends ChangeNotifier {
+  ThemeMode themeMode = ThemeMode.light;
+
+  bool get isLightMode => themeMode == ThemeMode.light;
+}
+
 class CustomTheme {
   static ThemeData get darkTheme {
     return ThemeData(
+        colorScheme: ColorScheme.dark(),
+        dividerColor: Colors.white,
         primaryColor: Color.fromRGBO(18, 18, 18, 1),
         scaffoldBackgroundColor: Colors.black,
         fontFamily: 'Montserrat',
@@ -23,8 +31,9 @@ class CustomTheme {
 
   static ThemeData get lightTheme {
     //1
+    
     return ThemeData(
-        //2
+        colorScheme: ColorScheme.light(),
         primaryColor: Colors.purple,
         scaffoldBackgroundColor: Colors.white,
         fontFamily: 'Montserrat', //3
