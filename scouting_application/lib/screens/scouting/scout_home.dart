@@ -15,11 +15,11 @@ class _ScoutHomeState extends State<ScoutHome> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         FloatingActionButton(onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => ScoutManager()));
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => ScoutManager()));
         }),
       ],
     ));

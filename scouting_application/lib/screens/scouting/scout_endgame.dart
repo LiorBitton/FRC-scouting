@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 class ScoutEndgame extends StatefulWidget {
   ScoutEndgame({Key? key}) : super(key: key);
 

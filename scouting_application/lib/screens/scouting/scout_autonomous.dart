@@ -9,7 +9,16 @@ class ScoutAutonomous extends StatefulWidget {
   _ScoutAutonomousState createState() => _ScoutAutonomousState();
 }
 
-class _ScoutAutonomousState extends State<ScoutAutonomous> {
+class _ScoutAutonomousState extends State<ScoutAutonomous>
+    with AutomaticKeepAliveClientMixin<ScoutAutonomous> {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   bool _isSwitched = false;
   int inner_counter = 0;
   int outer_counter = 0;
