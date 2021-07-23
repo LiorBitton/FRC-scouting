@@ -19,3 +19,4 @@ doc/api/
 *.js_
 *.js.deps
 *.js.map
+scouting_application/android/google-services.json
