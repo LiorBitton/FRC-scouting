@@ -26,7 +26,10 @@ class _PlusMinusButtonState extends State<PlusMinusButton> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(mainAxisAlignment: MainAxisAlignment.center,crossAxisAlignment: CrossAxisAlignment.center,mainAxisSize: MainAxisSize.min,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
               decoration: BoxDecoration(
@@ -46,7 +49,9 @@ class _PlusMinusButtonState extends State<PlusMinusButton> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           // VerticalDivider(color: Colors.white),
-                          SizedBox(height: 40,width:40,
+                          SizedBox(
+                            height: 40,
+                            width: 40,
                             child: IconButton(
                                 onPressed: _decrement,
                                 splashRadius: 20,
@@ -57,14 +62,15 @@ class _PlusMinusButtonState extends State<PlusMinusButton> {
                                 )),
                           ),
                           // VerticalDivider(color: Colors.white),
-                          SizedBox(height: 40,width:40,
+                          SizedBox(
+                            height: 40,
+                            width: 40,
                             child: IconButton(
                                 splashRadius: 20,
                                 onPressed: _increment,
                                 iconSize: 16.0,
                                 icon: Icon(Icons.add, size: 32.0)),
                           ),
-                         
                         ]),
                   ])),
         ],

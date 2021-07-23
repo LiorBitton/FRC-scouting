@@ -42,8 +42,10 @@ class _ScoutEndgameState extends State<ScoutEndgame>
                 crossAxisCount: 3, mainAxisSpacing: 0, crossAxisSpacing: 0),
           ),
         ),
-        FloatingActionButton(onPressed: (){Navigator.push(context,
-        MaterialPageRoute(builder: (context) => ScoutSubmission()));})
+        FloatingActionButton(onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ScoutSubmission()));
+        })
       ],
     ));
   }

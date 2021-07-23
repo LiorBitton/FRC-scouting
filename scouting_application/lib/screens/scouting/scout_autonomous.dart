@@ -4,7 +4,10 @@ import '../../widgets/custom_switch.dart';
 
 class ScoutAutonomous extends StatefulWidget {
   ScoutAutonomous({Key? key}) : super(key: key);
-
+  bool didMove = false;
+  int inner_counter = 0;
+  int outer_counter = 0;
+  int lower_counter = 0;
   @override
   _ScoutAutonomousState createState() => _ScoutAutonomousState();
 }
@@ -19,10 +22,6 @@ class _ScoutAutonomousState extends State<ScoutAutonomous>
     super.initState();
   }
 
-  bool didMove = false;
-  int inner_counter = 0;
-  int outer_counter = 0;
-  int lower_counter = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,16 +32,16 @@ class _ScoutAutonomousState extends State<ScoutAutonomous>
             children: [
               PlusMinusButton(
                 title: "inner",
-                counter: inner_counter,
+                counter: widget.inner_counter,
               ),
-              PlusMinusButton(title: "outer", counter: outer_counter),
-              PlusMinusButton(title: "lower", counter: lower_counter),
+              PlusMinusButton(title: "outer", counter: widget.outer_counter),
+              PlusMinusButton(title: "lower", counter: widget.lower_counter),
               SizedBox(height: 1, width: 1),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  CustomSwitch(title: 'moved', isSwitched: didMove),
+                  CustomSwitch(title: 'moved', isSwitched: widget.didMove),
                 ],
               ),
             ],
