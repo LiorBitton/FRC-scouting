@@ -24,7 +24,7 @@ class _ScoutEndgameState extends State<ScoutEndgame>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Row(
+        body: Column(
       children: [
         Expanded(
           child: GridView(
