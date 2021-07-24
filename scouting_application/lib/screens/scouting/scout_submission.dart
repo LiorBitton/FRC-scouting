@@ -13,7 +13,7 @@ class _ScoutSubmissionState extends State<ScoutSubmission> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-    body: Column(
+        body: Column(
       children: [
         Expanded(
           child: GridView(

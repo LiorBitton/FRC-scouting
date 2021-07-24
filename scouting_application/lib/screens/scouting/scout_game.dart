@@ -27,8 +27,8 @@ class _ScoutGameState extends State<ScoutGame> {
         length: 4,
         child: Scaffold(
             appBar: AppBar(
-              title:
-                  Text('match: #${widget.matchNumber} | team: #${widget.teamNumber}'),
+              title: Text(
+                  'match: #${widget.matchNumber} | team: #${widget.teamNumber}'),
               automaticallyImplyLeading: false,
               bottom: TabBar(
                 indicatorColor: Color.fromARGB(255, 50, 50, 35),

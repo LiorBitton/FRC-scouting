@@ -4,6 +4,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:scouting_application/screens/analysis_home.dart';
 import 'package:scouting_application/screens/scouting/scout_lobby.dart';
+import 'package:scouting_application/widgets/menu_button.dart';
 
 class Menu extends StatelessWidget {
   const Menu({Key? key}) : super(key: key);
@@ -41,7 +42,7 @@ class Menu extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => ScoutLobby()));
               },
             ),
-            SizedBox(height:5,width: 5),
+            SizedBox(height: 5, width: 5),
             MenuButton(
               title: 'analysis',
               onPressed: () {
@@ -49,40 +50,9 @@ class Menu extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => AnalysisHome()));
               },
             ),
-            //  ? MenuButton( 
-            //     title: "firebase test",
-            //     onPressed: () {
-            //       final fb = FirebaseDatabase.instance;
-            //       final ref = fb.reference();
-            //       ref.child('the test').set("is work");
-            //     })
           ],
         ))
       ]),
     ));
-  }
-}
-
-class MenuButton extends StatelessWidget {
-  const MenuButton({Key? key, required this.title, required this.onPressed})
-      : super(key: key);
-  final String title;
-  final void Function()? onPressed;
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-        height: 50,
-        width: 100,
-        child: FloatingActionButton(
-          onPressed: onPressed,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          child: Text(
-            '$title',
-            style: TextStyle(fontSize: 20.0),
-            maxLines: 1,
-          ),
-        ));
   }
 }
