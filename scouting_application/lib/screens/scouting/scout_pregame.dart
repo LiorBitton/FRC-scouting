@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:scouting_application/screens/scouting/scout_game.dart';
 import 'package:scouting_application/widgets/digit_text_field.dart';
 import 'package:scouting_application/widgets/menu_button.dart';
-
+import 'package:scouting_application/widgets/show_alert_dialog.dart';
 
 class ScoutPregame extends StatefulWidget {
   ScoutPregame({Key? key}) : super(key: key);
@@ -45,7 +45,8 @@ class _ScoutPregameState extends State<ScoutPregame> {
                     if (teamNumberController.text.length < 4 ||
                         matchNumberController.text.isEmpty) {
                       setState(() {
-                        showAlertDialog(context);
+                        showAlertDialog(
+                            context, "חסרים פרטים🥶", "תוסיפו פרטים🎩");
                       });
                       return;
                     }
@@ -63,32 +64,5 @@ class _ScoutPregameState extends State<ScoutPregame> {
             ],
           ),
         ));
-  }
-
-  showAlertDialog(BuildContext context) {
-    // Create button
-    Widget okButton = FloatingActionButton(
-      child: Text("OK"),
-      onPressed: () {
-        Navigator.of(context).pop();
-      },
-    );
-
-    // Create AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: Text("חסרים פרטים🥶"),
-      content: Text("תוסיפו פרטים🎩"),
-      actions: [
-        okButton,
-      ],
-    );
-
-    // show the dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
   }
 }
