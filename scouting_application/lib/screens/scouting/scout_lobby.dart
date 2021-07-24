@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:scouting_application/screens/scouting/scout_general.dart';
 import 'package:scouting_application/screens/scouting/scout_pregame.dart';
@@ -13,30 +12,22 @@ class ScoutLobby extends StatelessWidget {
       appBar: AppBar(title:Text('Scouting')),
         body: Center(
       child:
-          Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-        SizedBox(
-          height: 50,
-        ),
+          Column(mainAxisAlignment: MainAxisAlignment.center,crossAxisAlignment: CrossAxisAlignment.center, children: [
 
-        Expanded(
-            child: Column(
-          children: [
-            MenuButton(
-              title: 'game',
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => ScoutPregame()));
-              },
-            ),
-            MenuButton(
-              title: 'general',
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => ScoutGeneral()));
-              },
-            ),
-          ],
-        ))
+        MenuButton(
+          title: 'game',
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ScoutPregame()));
+          },
+        ),SizedBox(height: 5,width: 5,),
+        MenuButton(
+          title: 'general',
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ScoutGeneral()));
+          },
+        )
       ]),
     ));
   }

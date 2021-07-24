@@ -41,6 +41,7 @@ class Menu extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => ScoutLobby()));
               },
             ),
+            SizedBox(height:5,width: 5),
             MenuButton(
               title: 'analysis',
               onPressed: () {
