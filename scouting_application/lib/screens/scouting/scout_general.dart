@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -51,9 +50,9 @@ class _ScoutGeneralState extends State<ScoutGeneral> {
             ),
             CircleAvatar(
               backgroundColor: CustomTheme.darkTheme.primaryColor,
-              radius: 20,
+              radius: 30,
               child: IconButton(
-                iconSize: 20,
+                iconSize: 30,
                 onPressed: () async {
                   await _showSelectionDialog(context);
                   debugPrint(imageFile?.path);
@@ -61,7 +60,7 @@ class _ScoutGeneralState extends State<ScoutGeneral> {
                 icon: Icon(Icons.add_a_photo_rounded),
               ),
             ),
-            SizedBox(height: 5,width:1),
+            SizedBox(height: 5, width: 1),
             MenuButton(
                 title: 'submit',
                 onPressed: () {
@@ -120,7 +119,7 @@ class _ScoutGeneralState extends State<ScoutGeneral> {
     File file = File(imageFile?.path ?? 'okay');
     firebase_storage.FirebaseStorage.instance
         .ref()
-        .child('teams/${teamNumberController.text}')
+        .child('teams/${teamNumberController.text}/${file.path.split("/").last}')
         .putFile(file);
   }
 }

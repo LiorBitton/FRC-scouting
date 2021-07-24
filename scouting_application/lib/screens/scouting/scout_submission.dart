@@ -9,7 +9,14 @@ class ScoutSubmission extends StatefulWidget {
   _ScoutSubmissionState createState() => _ScoutSubmissionState();
 }
 
-class _ScoutSubmissionState extends State<ScoutSubmission> {
+class _ScoutSubmissionState extends State<ScoutSubmission> with AutomaticKeepAliveClientMixin<ScoutSubmission> {
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,7 +24,7 @@ class _ScoutSubmissionState extends State<ScoutSubmission> {
       children: [
         TextField(
           decoration: InputDecoration(
-              border: OutlineInputBorder(), hintText: 'comment'),
+              border: OutlineInputBorder(), hintText: 'Comment'),
         )
       ],
     ));
