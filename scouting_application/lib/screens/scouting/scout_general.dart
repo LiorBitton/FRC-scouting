@@ -8,6 +8,7 @@ import 'package:scouting_application/screens/menu.dart';
 import 'package:scouting_application/themes/custom_themes.dart';
 import 'package:scouting_application/widgets/digit_text_field.dart';
 import 'package:scouting_application/widgets/menu_button.dart';
+import 'package:scouting_application/widgets/show_alert_dialog.dart';
 
 class ScoutGeneral extends StatefulWidget {
   ScoutGeneral({Key? key}) : super(key: key);
@@ -60,11 +61,16 @@ class _ScoutGeneralState extends State<ScoutGeneral> {
                 icon: Icon(Icons.add_a_photo_rounded),
               ),
             ),
-            SizedBox(height: 5),
+            SizedBox(height: 5,width:1),
             MenuButton(
                 title: 'submit',
                 onPressed: () {
-                  uploadImageToFirebase(context);
+                  if (teamNumberController.text.length < 4) {
+                    showAlertDialog(
+                        context, '😨חסר מספר קבוצה😨', 'תמלאו אחד בהולללל');
+                    return;
+                  }
+                  if (imageFile != null) uploadImageToFirebase(context);
                   Navigator.push(
                       context, MaterialPageRoute(builder: (context) => Menu()));
                 })
