@@ -4,6 +4,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:scouting_application/screens/menu.dart';
+import 'package:scouting_application/widgets/digit_text_field.dart';
+import 'package:scouting_application/widgets/menu_button.dart';
 
 class ScoutGeneral extends StatefulWidget {
   ScoutGeneral({Key? key}) : super(key: key);
@@ -16,8 +19,10 @@ class _ScoutGeneralState extends State<ScoutGeneral> {
   final ImagePicker _picker = ImagePicker();
   XFile? imageFile;
   final teamNumberController = TextEditingController();
+  final commentsController = TextEditingController();
   @override
   void dispose() {
+    commentsController.dispose();
     teamNumberController.dispose();
     super.dispose();
   }
@@ -28,6 +33,18 @@ class _ScoutGeneralState extends State<ScoutGeneral> {
         appBar: AppBar(title: Text('General Scouting')),
         body: Column(
           children: [
+            DigitTextField(
+              textController: teamNumberController,
+              hintText: 'Team Number',
+              maxLength: 4,
+            ),
+            TextField(
+                controller: commentsController,
+                decoration : InputDecoration(
+                  border: OutlineInputBorder(), hintText: 'Comments/Issues')
+                
+                ),
+           
             IconButton(
               onPressed: () async {
                 await _showSelectionDialog(context);
@@ -35,15 +52,13 @@ class _ScoutGeneralState extends State<ScoutGeneral> {
               },
               icon: Icon(Icons.add_a_photo_rounded),
             ),
-            Title(
-                title: 'Comments/Issues',
-                color: Colors.white,
-                child: TextField(
-                  controller: teamNumberController,
-                )),
-            FloatingActionButton(onPressed: () {
-              uploadImageToFirebase(context);
-            })
+            MenuButton(
+                title: 'submit',
+                onPressed: () {
+                  uploadImageToFirebase(context);
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => Menu()));
+                })
           ],
         ));
   }
@@ -78,27 +93,16 @@ class _ScoutGeneralState extends State<ScoutGeneral> {
 
   void _openGallery(BuildContext context) async {
     imageFile = await _picker.pickImage(source: ImageSource.gallery);
-    // this.setState(() {
-    //   imageFile = File(picture?.path ?? 'okay');
-    //   AlertDialog(
-    //     content: Text(picture?.path ?? 'okay'),
-    //   );
-    //   debugPrint(picture?.path ?? 'okay');
-    // });
     Navigator.of(context).pop();
   }
 
   void _openCamera(BuildContext context) async {
-    var picture = await new ImagePicker().pickImage(source: ImageSource.camera);
-    this.setState(() {
-      // imageFile = File(picture?.path ?? 'okay');
-    });
+    imageFile = await _picker.pickImage(source: ImageSource.camera);
     Navigator.of(context).pop();
   }
 
   Future uploadImageToFirebase(BuildContext context) async {
     File file = File(imageFile?.path ?? 'okay');
-    //await Firebase.initializeApp();
     firebase_storage.FirebaseStorage.instance
         .ref()
         .child('teams/${teamNumberController.text}')

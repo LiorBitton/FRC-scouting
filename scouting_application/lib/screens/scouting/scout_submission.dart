@@ -15,15 +15,10 @@ class _ScoutSubmissionState extends State<ScoutSubmission> {
     return Scaffold(
         body: Column(
       children: [
-        Expanded(
-          child: GridView(
-            children: [
-              SizedBox(height: 1, width: 1),
-            ],
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3, mainAxisSpacing: 0, crossAxisSpacing: 0),
-          ),
-        ),
+        TextField(
+          decoration: InputDecoration(
+              border: OutlineInputBorder(), hintText: 'comment'),
+        )
       ],
     ));
   }
