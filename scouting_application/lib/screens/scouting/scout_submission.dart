@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:scouting_application/screens/scouting/scout_home.dart';
-import 'package:scouting_application/screens/scouting/scout_manager.dart';
+import 'package:scouting_application/screens/scouting/scout_pregame.dart';
+import 'package:scouting_application/screens/scouting/scout_game.dart';
 
 class ScoutSubmission extends StatefulWidget {
   ScoutSubmission({Key? key}) : super(key: key);
@@ -12,8 +12,19 @@ class ScoutSubmission extends StatefulWidget {
 class _ScoutSubmissionState extends State<ScoutSubmission> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: null,
-    );
+    return Scaffold(
+    body: Column(
+      children: [
+        Expanded(
+          child: GridView(
+            children: [
+              SizedBox(height: 1, width: 1),
+            ],
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3, mainAxisSpacing: 0, crossAxisSpacing: 0),
+          ),
+        ),
+      ],
+    ));
   }
 }

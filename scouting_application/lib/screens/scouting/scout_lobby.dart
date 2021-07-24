@@ -2,59 +2,39 @@ import 'dart:ui';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:scouting_application/screens/analysis_home.dart';
-import 'package:scouting_application/screens/scouting/scout_lobby.dart';
+import 'package:scouting_application/screens/scouting/scout_general.dart';
+import 'package:scouting_application/screens/scouting/scout_pregame.dart';
 
-class Menu extends StatelessWidget {
-  const Menu({Key? key}) : super(key: key);
+class ScoutLobby extends StatelessWidget {
+  const ScoutLobby({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title:Text('Scouting')),
         body: Center(
       child:
           Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
         SizedBox(
           height: 50,
         ),
-        Center(
-            child: Text(
-          'EverScout',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-              color: Colors.lightGreen,
-              fontSize: 30,
-              fontWeight: FontWeight.bold),
-        )),
-        Expanded(
-          child: Image.asset(
-            'assets/eg_logo_white.png',
-            height: 200,
-          ),
-        ),
+
         Expanded(
             child: Column(
           children: [
             MenuButton(
-              title: 'scout',
+              title: 'game',
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => ScoutLobby()));
+                    MaterialPageRoute(builder: (context) => ScoutPregame()));
               },
             ),
             MenuButton(
-              title: 'analysis',
+              title: 'general',
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => AnalysisHome()));
+                    MaterialPageRoute(builder: (context) => ScoutGeneral()));
               },
             ),
-            //  ? MenuButton( 
-            //     title: "firebase test",
-            //     onPressed: () {
-            //       final fb = FirebaseDatabase.instance;
-            //       final ref = fb.reference();
-            //       ref.child('the test').set("is work");
-            //     })
           ],
         ))
       ]),

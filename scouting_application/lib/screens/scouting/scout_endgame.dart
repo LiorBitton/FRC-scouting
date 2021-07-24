@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:scouting_application/screens/scouting/scout_submission.dart';
 import 'package:scouting_application/widgets/custom_switch.dart';
-import 'package:scouting_application/widgets/plus_minus_button.dart';
 
 class ScoutEndgame extends StatefulWidget {
   ScoutEndgame({Key? key}) : super(key: key);
@@ -42,10 +40,6 @@ class _ScoutEndgameState extends State<ScoutEndgame>
                 crossAxisCount: 3, mainAxisSpacing: 0, crossAxisSpacing: 0),
           ),
         ),
-        FloatingActionButton(onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => ScoutSubmission()));
-        })
       ],
     ));
   }

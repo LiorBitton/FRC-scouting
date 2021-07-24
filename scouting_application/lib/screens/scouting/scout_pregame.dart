@@ -1,27 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:scouting_application/screens/scouting/scout_autonomous.dart';
-import 'package:scouting_application/screens/scouting/scout_manager.dart';
-import 'package:scouting_application/widgets/plus_minus_button.dart';
+import 'package:scouting_application/screens/scouting/scout_game.dart';
 
-class ScoutHome extends StatefulWidget {
-  ScoutHome({Key? key}) : super(key: key);
+class ScoutPregame extends StatefulWidget {
+  ScoutPregame({Key? key}) : super(key: key);
 
   @override
-  _ScoutHomeState createState() => _ScoutHomeState();
+  _ScoutPregameState createState() => _ScoutPregameState();
 }
 
-class _ScoutHomeState extends State<ScoutHome> {
+class _ScoutPregameState extends State<ScoutPregame> {
+  final matchNumberController = TextEditingController();
+  final teamNumberController = TextEditingController();
+  @override
+  void dispose() {
+    matchNumberController.dispose();
+    teamNumberController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(),
+        appBar: AppBar(title: Text('Game Scouting')),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               TextFormField(
-                initialValue: 'team number',
+                controller: teamNumberController,
+               // initialValue: 'team number',
                 maxLength: 4,
                 maxLines: 1,
                 maxLengthEnforcement: MaxLengthEnforcement.enforced,
@@ -31,7 +39,8 @@ class _ScoutHomeState extends State<ScoutHome> {
                 ],
               ),
               TextFormField(
-                  initialValue: 'match number',
+                  controller: matchNumberController,
+                 // initialValue: 'match number',
                   maxLength: 3,
                   maxLines: 1,
                   maxLengthEnforcement: MaxLengthEnforcement.enforced,
@@ -42,7 +51,12 @@ class _ScoutHomeState extends State<ScoutHome> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ScoutManager()));
+                            builder: (context) => ScoutGame(
+                                  matchNumber:
+                                      int.parse(matchNumberController.text),
+                                  teamNumber:
+                                      int.parse(teamNumberController.text),
+                                )));
                   }),
             ],
           ),
