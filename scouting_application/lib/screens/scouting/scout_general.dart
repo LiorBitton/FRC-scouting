@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:scouting_application/screens/menu.dart';
+import 'package:scouting_application/themes/custom_themes.dart';
 import 'package:scouting_application/widgets/digit_text_field.dart';
 import 'package:scouting_application/widgets/menu_button.dart';
 
@@ -32,6 +33,8 @@ class _ScoutGeneralState extends State<ScoutGeneral> {
     return Scaffold(
         appBar: AppBar(title: Text('General Scouting')),
         body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             DigitTextField(
               textController: teamNumberController,
@@ -40,18 +43,24 @@ class _ScoutGeneralState extends State<ScoutGeneral> {
             ),
             TextField(
                 controller: commentsController,
-                decoration : InputDecoration(
-                  border: OutlineInputBorder(), hintText: 'Comments/Issues')
-                
-                ),
-           
-            IconButton(
-              onPressed: () async {
-                await _showSelectionDialog(context);
-                debugPrint(imageFile?.path);
-              },
-              icon: Icon(Icons.add_a_photo_rounded),
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(), hintText: 'Comments/Issues')),
+            SizedBox(
+              height: 5,
             ),
+            CircleAvatar(
+              backgroundColor: CustomTheme.darkTheme.primaryColor,
+              radius: 20,
+              child: IconButton(
+                iconSize: 20,
+                onPressed: () async {
+                  await _showSelectionDialog(context);
+                  debugPrint(imageFile?.path);
+                },
+                icon: Icon(Icons.add_a_photo_rounded),
+              ),
+            ),
+            SizedBox(height: 5),
             MenuButton(
                 title: 'submit',
                 onPressed: () {
