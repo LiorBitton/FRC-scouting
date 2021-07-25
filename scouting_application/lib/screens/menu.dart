@@ -49,14 +49,7 @@ class Menu extends StatelessWidget {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => AnalysisHome()));
               },
-            ),MenuButton(
-                title: "firebase test",
-                onPressed: () {
-                  final fb = FirebaseDatabase.instance;
-                  debugPrint(fb.databaseURL);
-                  final ref = fb.reference();
-                  ref.child('the test').set("is vheck");
-                })
+            ),
           ],
         ))
       ]),
