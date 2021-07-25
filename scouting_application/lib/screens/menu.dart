@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:scouting_application/screens/analysis_home.dart';
 import 'package:scouting_application/screens/scouting/scout_lobby.dart';
@@ -48,7 +49,14 @@ class Menu extends StatelessWidget {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => AnalysisHome()));
               },
-            ),
+            ),MenuButton(
+                title: "firebase test",
+                onPressed: () {
+                  final fb = FirebaseDatabase.instance;
+                  debugPrint(fb.databaseURL);
+                  final ref = fb.reference();
+                  ref.child('the test').set("is vheck");
+                })
           ],
         ))
       ]),
