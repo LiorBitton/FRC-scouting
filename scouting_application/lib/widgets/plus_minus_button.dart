@@ -1,10 +1,15 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 class PlusMinusButton extends StatefulWidget {
-  PlusMinusButton({Key? key, required this.title, required this.counter})
+  PlusMinusButton({Key? key, required this.title})
       : super(key: key);
   final String title;
-  int counter;
+  int counter = 0;
+  int getCount() {
+    return counter;
+  }
+
   @override
   _PlusMinusButtonState createState() => _PlusMinusButtonState();
 }

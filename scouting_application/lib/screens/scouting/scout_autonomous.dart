@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:scouting_application/screens/scouting/scout_game.dart';
 import 'package:scouting_application/widgets/plus_minus_button.dart';
 import '../../widgets/custom_switch.dart';
 
+
 class ScoutAutonomous extends StatefulWidget {
   ScoutAutonomous({Key? key}) : super(key: key);
-  bool didMove = false;
-  int inner_counter = 0;
-  int outer_counter = 0;
-  int lower_counter = 0;
+
+  PlusMinusButton innerButton = PlusMinusButton(
+    title: "inner",
+  );
+  PlusMinusButton outerButton = PlusMinusButton(title: "outer");
+  PlusMinusButton lowerButton = PlusMinusButton(title: "lower");
+  CustomSwitch movedSwitch = CustomSwitch(title: 'moved');
   @override
   _ScoutAutonomousState createState() => _ScoutAutonomousState();
 }
@@ -30,18 +35,15 @@ class _ScoutAutonomousState extends State<ScoutAutonomous>
         Expanded(
           child: GridView(
             children: [
-              PlusMinusButton(
-                title: "inner",
-                counter: widget.inner_counter,
-              ),
-              PlusMinusButton(title: "outer", counter: widget.outer_counter),
-              PlusMinusButton(title: "lower", counter: widget.lower_counter),
+              widget.innerButton,
+              widget.outerButton,
+              widget.lowerButton,
               SizedBox(height: 1, width: 1),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  CustomSwitch(title: 'moved', isSwitched: widget.didMove),
+                  widget.movedSwitch,
                 ],
               ),
             ],

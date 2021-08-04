@@ -16,10 +16,12 @@ class MenuButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),
-          child: Text(
-            '$title',
-            style: TextStyle(fontSize: 20.0),
-            maxLines: 1,
+          child: FittedBox(
+            child: Text(
+              '$title',
+              style: TextStyle(fontSize: 20.0),
+              maxLines: 1,
+            ),
           ),
         ));
   }

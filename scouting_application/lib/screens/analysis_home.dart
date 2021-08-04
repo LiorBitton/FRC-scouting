@@ -1,7 +1,16 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
+import 'dart:async';
+import 'dart:io' as io;
 
+import 'package:firebase_core/firebase_core.dart' as firebase_core;
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:scouting_application/themes/custom_themes.dart';
 class AnalysisHome extends StatefulWidget {
   AnalysisHome({Key? key}) : super(key: key);
 
@@ -31,7 +40,11 @@ class _AnalysisHomeState extends State<AnalysisHome> {
                 if (snapshot.hasData) {
                   return (snapshot.data as Widget);
                 }
-                return Text('loading');
+                return Center(
+                  child: CircularProgressIndicator(
+                    color: CustomTheme.darkTheme.primaryColor
+                    ),
+                );
               }),
         ));
   }
@@ -62,6 +75,7 @@ class _AnalysisHomeState extends State<AnalysisHome> {
     for (int i = 0; i < teams.length; i++) {
       _isOpen.add(false);
       res.add(ExpansionPanel(
+        canTapOnHeader: true,
         headerBuilder: (context, isOpen) {
           return Row(
             children: [
@@ -72,12 +86,33 @@ class _AnalysisHomeState extends State<AnalysisHome> {
           );
         },
         isExpanded: _isOpen[i],
-        body: Text('TO DO - add stats display'),
+        body: Column(
+          children: [IconButton(onPressed: () async{
+            await _downloadFile(firebase_storage.FirebaseStorage.instance.ref('teams').child(teams[i]));
+            
+          }, icon: Icon(Icons.photo_album))],
+        ),
       ));
     }
     return res;
   }
+Future<void> _downloadFile(firebase_storage.Reference ref) async {
+    final io.Directory systemTempDir = io.Directory.systemTemp;
+    final io.File tempFile = io.File('${systemTempDir.path}/temp-${ref.name}');
+    if (tempFile.existsSync()) await tempFile.delete();
 
+    await ref.writeToFile(tempFile);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Success!\n Downloaded ${ref.name} \n from bucket: ${ref.bucket}\n '
+          'at path: ${ref.fullPath} \n'
+          'Wrote "${ref.fullPath}" to tmp-${ref.name}.txt',
+        ),
+      ),
+    );
+  }
   Future<List<String>> getTeams() async {
     firebase_core.Firebase.initializeApp();
     final fb = FirebaseDatabase.instance;
@@ -94,7 +129,6 @@ class _AnalysisHomeState extends State<AnalysisHome> {
       }
       return teams;
     });
-    print(teams.toString());
     return teams;
   }
 }

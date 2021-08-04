@@ -52,13 +52,14 @@ class _ScoutPregameState extends State<ScoutPregame> {
                     }
 
                     int matchNumber = int.parse(matchNumberController.text);
-                    int teamNumber = int.parse(teamNumberController.text);
+                    int teamID = int.parse(teamNumberController.text);
+                    ScoutGame.matchNumber = matchNumber;
+                    ScoutGame.teamID = teamID;
+                    
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => ScoutGame(
-                                  matchNumber: matchNumber,
-                                  teamNumber: teamNumber,
                                 )));
                   })
             ],

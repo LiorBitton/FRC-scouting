@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:scouting_application/screens/scouting/scout_pregame.dart';
-import 'package:scouting_application/screens/scouting/scout_game.dart';
+import 'package:scouting_application/widgets/menu_button.dart';
 
 class ScoutSubmission extends StatefulWidget {
-  ScoutSubmission({Key? key}) : super(key: key);
-
+  ScoutSubmission({Key? key, required this.onSubmit}) : super(key: key);
+  Function onSubmit;
   @override
   _ScoutSubmissionState createState() => _ScoutSubmissionState();
 }
 
-class _ScoutSubmissionState extends State<ScoutSubmission> with AutomaticKeepAliveClientMixin<ScoutSubmission> {
+class _ScoutSubmissionState extends State<ScoutSubmission>
+    with AutomaticKeepAliveClientMixin<ScoutSubmission> {
   bool get wantKeepAlive => true;
 
   @override
@@ -25,7 +25,12 @@ class _ScoutSubmissionState extends State<ScoutSubmission> with AutomaticKeepAli
         TextField(
           decoration: InputDecoration(
               border: OutlineInputBorder(), hintText: 'Comment'),
-        )
+        ),
+        MenuButton(
+            title: 'submit',
+            onPressed: () {
+              widget.onSubmit(context);
+            })
       ],
     ));
   }

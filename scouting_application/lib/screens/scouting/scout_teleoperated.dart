@@ -4,7 +4,9 @@ import 'package:scouting_application/widgets/plus_minus_button.dart';
 
 class ScoutTeleoperated extends StatefulWidget {
   ScoutTeleoperated({Key? key}) : super(key: key);
-
+  PlusMinusButton lowerButton = PlusMinusButton(title: "lower");
+  PlusMinusButton outerButton = PlusMinusButton(title: "outer");
+  PlusMinusButton innerButton = PlusMinusButton(title: "inner");
   @override
   _ScoutTeleoperatedState createState() => _ScoutTeleoperatedState();
 }
@@ -13,10 +15,8 @@ class _ScoutTeleoperatedState extends State<ScoutTeleoperated>
     with AutomaticKeepAliveClientMixin<ScoutTeleoperated> {
   @override
   bool get wantKeepAlive => true;
-  int inner_counter = 0;
-  int outer_counter = 0;
-  int lower_counter = 0;
-  bool temp = false;
+
+  
   @override
   void initState() {
     super.initState();
@@ -31,20 +31,10 @@ class _ScoutTeleoperatedState extends State<ScoutTeleoperated>
         Expanded(
           child: GridView(
             children: [
-              PlusMinusButton(
-                title: "inner",
-                counter: inner_counter,
-              ),
-              PlusMinusButton(title: "outer", counter: outer_counter),
-              PlusMinusButton(title: "lower", counter: lower_counter),
+              widget.innerButton,
+              widget.outerButton,
+              widget.lowerButton,
               SizedBox(height: 1, width: 1),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  CustomSwitch(title: 'moved', isSwitched: temp),
-                ],
-              ),
             ],
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3, mainAxisSpacing: 0, crossAxisSpacing: 0),

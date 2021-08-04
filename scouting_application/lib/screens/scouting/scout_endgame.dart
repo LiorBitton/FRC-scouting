@@ -32,7 +32,7 @@ class _ScoutEndgameState extends State<ScoutEndgame>
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  CustomSwitch(title: 'climbed', isSwitched: didClimb),
+                  CustomSwitch(title: 'climbed'),
                 ],
               ),
             ],

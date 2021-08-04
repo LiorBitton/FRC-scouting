@@ -1,24 +1,56 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:scouting_application/screens/menu.dart';
 import 'package:scouting_application/screens/scouting/scout_autonomous.dart';
 import 'package:scouting_application/screens/scouting/scout_endgame.dart';
 import 'package:scouting_application/screens/scouting/scout_submission.dart';
 import 'package:scouting_application/screens/scouting/scout_teleoperated.dart';
-
+import 'package:firebase_core/firebase_core.dart' as firebase_core;
 class ScoutGame extends StatefulWidget {
-  ScoutGame({Key? key, required this.matchNumber, required this.teamNumber})
+  ScoutGame({Key? key})
       : super(key: key);
-  ScoutAutonomous autonomous = new ScoutAutonomous();
-  ScoutTeleoperated teleoperated = new ScoutTeleoperated();
-  ScoutEndgame endgame = new ScoutEndgame();
-  ScoutSubmission submission = new ScoutSubmission();
-  final int matchNumber;
-  final int teamNumber;
+  static ScoutAutonomous autonomous = new ScoutAutonomous();
+  static ScoutTeleoperated teleoperated = new ScoutTeleoperated();
+  static ScoutEndgame endgame = new ScoutEndgame();
+  static ScoutSubmission submission = new ScoutSubmission(
+    onSubmit: (BuildContext context) {
+      submitGame(context);
+    },
+  );
+  static int matchNumber = 0;
+  static int teamID = 0;
+  static void submitGame(BuildContext context) {
+    firebase_core.Firebase.initializeApp();
+    final fb = FirebaseDatabase.instance;
+    final ref = fb.reference();
+    final dest = ref
+        .child('teams')
+        .child('$teamID')
+        .child('games')
+        .child('$matchNumber');
+    dest.set({
+      'a3': autonomous.innerButton.getCount(),
+      'a2': autonomous.outerButton.getCount(),
+      'a1':autonomous.lowerButton.getCount(),
+      'a5': autonomous.movedSwitch.getSwitched(),
+      'b3':teleoperated.innerButton.getCount(),
+      'b2':teleoperated.outerButton.getCount(),
+      'b1':teleoperated.lowerButton.getCount(),
+      
+
+
+
+    });
+    Navigator.push(context,
+    MaterialPageRoute(builder: (context) => Menu()));
+  }
 
   @override
   _ScoutGameState createState() => _ScoutGameState();
 }
 
 class _ScoutGameState extends State<ScoutGame> {
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -28,7 +60,7 @@ class _ScoutGameState extends State<ScoutGame> {
         child: Scaffold(
             appBar: AppBar(
               title: Text(
-                  'match: #${widget.matchNumber} | team: #${widget.teamNumber}'),
+                  'match: #${ScoutGame.matchNumber} | team: #${ScoutGame.teamID}'),
               automaticallyImplyLeading: false,
               bottom: TabBar(
                 indicatorColor: Color.fromARGB(255, 50, 50, 35),
@@ -46,10 +78,10 @@ class _ScoutGameState extends State<ScoutGame> {
               ),
             ),
             body: TabBarView(children: [
-              widget.autonomous,
-              widget.teleoperated,
-              widget.endgame,
-              widget.submission
+              ScoutGame.autonomous,
+              ScoutGame.teleoperated,
+              ScoutGame.endgame,
+              ScoutGame.submission
             ])),
       ),
     );

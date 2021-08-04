@@ -3,9 +3,12 @@ import 'package:flutter_switch/flutter_switch.dart';
 import 'package:scouting_application/themes/custom_themes.dart';
 
 class CustomSwitch extends StatefulWidget {
-  CustomSwitch({Key? key, required this.title, required this.isSwitched})
-      : super(key: key);
-  bool isSwitched;
+  CustomSwitch({Key? key, required this.title}) : super(key: key);
+  bool isSwitched = false;
+  bool getSwitched() {
+    return isSwitched;
+  }
+
   final String title;
   @override
   _CustomSwitchState createState() => _CustomSwitchState();
