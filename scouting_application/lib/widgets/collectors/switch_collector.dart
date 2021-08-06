@@ -1,20 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:scouting_application/themes/custom_themes.dart';
+import 'package:scouting_application/widgets/collectors/ever_collector.dart';
 
-class CustomSwitch extends StatefulWidget {
-  CustomSwitch({Key? key, required this.title}) : super(key: key);
-  bool isSwitched = false;
-  bool getSwitched() {
-    return isSwitched;
-  }
-
+class SwitchCollector extends StatefulWidget implements EverCollector {
+  SwitchCollector({Key? key, required this.title, required this.dataTag})
+      : super(key: key);
+  bool _isSwitched = false;
   final String title;
   @override
-  _CustomSwitchState createState() => _CustomSwitchState();
+  _SwitchCollectorState createState() => _SwitchCollectorState();
+
+  @override
+  getValue() {
+    return _isSwitched;
+  }
+
+  @override
+  String getDataTag() {
+    return dataTag;
+  }
+
+  @override
+  String dataTag;
 }
 
-class _CustomSwitchState extends State<CustomSwitch> {
+class _SwitchCollectorState extends State<SwitchCollector> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -23,7 +34,7 @@ class _CustomSwitchState extends State<CustomSwitch> {
           width: 100.0,
           height: 55.0,
           toggleSize: 45.0,
-          value: widget.isSwitched,
+          value: widget._isSwitched,
           borderRadius: 30.0,
           padding: 2.0,
           toggleColor: Color.fromRGBO(107, 181, 46, 0.5),
@@ -39,7 +50,7 @@ class _CustomSwitchState extends State<CustomSwitch> {
           inactiveColor: Colors.black38,
           onToggle: (val) {
             setState(() {
-              widget.isSwitched = val;
+              widget._isSwitched = val;
             });
           },
         ),

@@ -1,30 +1,37 @@
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:scouting_application/widgets/collectors/ever_collector.dart';
 
-class PlusMinusButton extends StatefulWidget {
-  PlusMinusButton({Key? key, required this.title})
+class PlusMinusCollector extends StatefulWidget implements EverCollector {
+  PlusMinusCollector({Key? key, required this.title, required this.dataTag})
       : super(key: key);
   final String title;
-  int counter = 0;
-  int getCount() {
-    return counter;
+  int _counter = 0;
+  String dataTag;
+  @override
+  _PlusMinusCollectorState createState() => _PlusMinusCollectorState();
+
+  @override
+  String getDataTag() {
+    return dataTag;
   }
 
   @override
-  _PlusMinusButtonState createState() => _PlusMinusButtonState();
+  getValue() {
+    return _counter;
+  }
 }
 
-class _PlusMinusButtonState extends State<PlusMinusButton> {
+class _PlusMinusCollectorState extends State<PlusMinusCollector> {
   void _increment() {
     setState(() {
-      widget.counter++;
+      widget._counter++;
     });
   }
 
   void _decrement() {
     setState(() {
-      if (widget.counter == 0) return;
-      widget.counter--;
+      if (widget._counter == 0) return;
+      widget._counter--;
     });
   }
 
@@ -47,7 +54,7 @@ class _PlusMinusButtonState extends State<PlusMinusButton> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(widget.title, style: TextStyle(fontSize: 20.0)),
-                    Text('${widget.counter}', style: TextStyle(fontSize: 38)),
+                    Text('${widget._counter}', style: TextStyle(fontSize: 38)),
                     Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         //  mainAxisSize: MainAxisSize.min,

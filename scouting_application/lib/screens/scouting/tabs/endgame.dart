@@ -1,15 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:scouting_application/widgets/custom_switch.dart';
+import 'package:scouting_application/screens/scouting/scouting_tab.dart';
+import 'package:scouting_application/widgets/collectors/ever_collector.dart';
+import 'package:scouting_application/widgets/collectors/switch_collector.dart';
 
-class ScoutEndgame extends StatefulWidget {
-  ScoutEndgame({Key? key}) : super(key: key);
+class EndgameTab extends StatefulWidget implements ScoutingTab {
+  EndgameTab({Key? key}) : super(key: key);
+  SwitchCollector climbedSwitch = SwitchCollector(
+    title: 'climbed',
+    dataTag: 'climbed',
+  );
+  @override
+  _EndgameTabState createState() => _EndgameTabState();
 
   @override
-  _ScoutEndgameState createState() => _ScoutEndgameState();
+  List<EverCollector> getCollectors() {
+    return [climbedSwitch];
+  }
 }
 
-class _ScoutEndgameState extends State<ScoutEndgame>
-    with AutomaticKeepAliveClientMixin<ScoutEndgame> {
+class _EndgameTabState extends State<EndgameTab>
+    with AutomaticKeepAliveClientMixin<EndgameTab> {
   @override
   bool get wantKeepAlive => true;
   int test = 0;
@@ -32,7 +42,7 @@ class _ScoutEndgameState extends State<ScoutEndgame>
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  CustomSwitch(title: 'climbed'),
+                  widget.climbedSwitch,
                 ],
               ),
             ],

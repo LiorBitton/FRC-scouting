@@ -1,20 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:scouting_application/screens/scouting/scout_game.dart';
-import 'package:scouting_application/widgets/plus_minus_button.dart';
-import '../../widgets/custom_switch.dart';
+import 'package:scouting_application/screens/scouting/game_manager.dart';
+import 'package:scouting_application/screens/scouting/scouting_tab.dart';
+import 'package:scouting_application/widgets/collectors/ever_collector.dart';
+import 'package:scouting_application/widgets/collectors/plus_minus_collector.dart';
+import '../../../widgets/collectors/switch_collector.dart';
 
-
-class ScoutAutonomous extends StatefulWidget {
+class ScoutAutonomous extends StatefulWidget implements ScoutingTab {
   ScoutAutonomous({Key? key}) : super(key: key);
 
-  PlusMinusButton innerButton = PlusMinusButton(
+  PlusMinusCollector innerButton = PlusMinusCollector(
     title: "inner",
+    dataTag: 'auto_inner',
   );
-  PlusMinusButton outerButton = PlusMinusButton(title: "outer");
-  PlusMinusButton lowerButton = PlusMinusButton(title: "lower");
-  CustomSwitch movedSwitch = CustomSwitch(title: 'moved');
+  PlusMinusCollector outerButton = PlusMinusCollector(
+    title: "outer",
+    dataTag: 'auto_outer',
+  );
+  PlusMinusCollector lowerButton = PlusMinusCollector(
+    title: "lower",
+    dataTag: 'auto_lower',
+  );
+  SwitchCollector movedSwitch = SwitchCollector(
+    title: 'moved',
+    dataTag: 'auto_moved',
+  );
   @override
   _ScoutAutonomousState createState() => _ScoutAutonomousState();
+
+  @override
+  List<EverCollector> getCollectors() {
+    return [innerButton, outerButton, lowerButton, movedSwitch];
+  }
 }
 
 class _ScoutAutonomousState extends State<ScoutAutonomous>

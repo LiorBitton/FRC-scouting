@@ -4,13 +4,10 @@ import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'dart:async';
 import 'dart:io' as io;
 
-import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:scouting_application/themes/custom_themes.dart';
+
 class AnalysisHome extends StatefulWidget {
   AnalysisHome({Key? key}) : super(key: key);
 
@@ -42,8 +39,7 @@ class _AnalysisHomeState extends State<AnalysisHome> {
                 }
                 return Center(
                   child: CircularProgressIndicator(
-                    color: CustomTheme.darkTheme.primaryColor
-                    ),
+                      color: CustomTheme.darkTheme.primaryColor),
                 );
               }),
         ));
@@ -87,16 +83,22 @@ class _AnalysisHomeState extends State<AnalysisHome> {
         },
         isExpanded: _isOpen[i],
         body: Column(
-          children: [IconButton(onPressed: () async{
-            await _downloadFile(firebase_storage.FirebaseStorage.instance.ref('teams').child(teams[i]));
-            
-          }, icon: Icon(Icons.photo_album))],
+          children: [
+            IconButton(
+                onPressed: () async {
+                  await _downloadFile(firebase_storage.FirebaseStorage.instance
+                      .ref('teams')
+                      .child(teams[i]));
+                },
+                icon: Icon(Icons.photo_album))
+          ],
         ),
       ));
     }
     return res;
   }
-Future<void> _downloadFile(firebase_storage.Reference ref) async {
+
+  Future<void> _downloadFile(firebase_storage.Reference ref) async {
     final io.Directory systemTempDir = io.Directory.systemTemp;
     final io.File tempFile = io.File('${systemTempDir.path}/temp-${ref.name}');
     if (tempFile.existsSync()) await tempFile.delete();
@@ -113,6 +115,7 @@ Future<void> _downloadFile(firebase_storage.Reference ref) async {
       ),
     );
   }
+
   Future<List<String>> getTeams() async {
     firebase_core.Firebase.initializeApp();
     final fb = FirebaseDatabase.instance;

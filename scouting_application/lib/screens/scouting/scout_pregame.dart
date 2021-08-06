@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:scouting_application/screens/scouting/scout_game.dart';
+import 'package:scouting_application/screens/scouting/game_manager.dart';
 import 'package:scouting_application/widgets/digit_text_field.dart';
 import 'package:scouting_application/widgets/menu_button.dart';
 import 'package:scouting_application/widgets/show_alert_dialog.dart';
@@ -53,14 +53,11 @@ class _ScoutPregameState extends State<ScoutPregame> {
 
                     int matchNumber = int.parse(matchNumberController.text);
                     int teamID = int.parse(teamNumberController.text);
-                    ScoutGame.matchNumber = matchNumber;
-                    ScoutGame.teamID = teamID;
-                    
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ScoutGame(
-                                )));
+                    GameManager.matchNumber = matchNumber;
+                    GameManager.teamID = teamID;
+
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => GameManager()));
                   })
             ],
           ),

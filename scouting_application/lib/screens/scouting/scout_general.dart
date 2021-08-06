@@ -119,7 +119,8 @@ class _ScoutGeneralState extends State<ScoutGeneral> {
     File file = File(imageFile?.path ?? 'okay');
     firebase_storage.FirebaseStorage.instance
         .ref()
-        .child('teams/${teamNumberController.text}/${file.path.split("/").last}')
+        .child(
+            'teams/${teamNumberController.text}/${file.path.split("/").last}')
         .putFile(file);
   }
 }
