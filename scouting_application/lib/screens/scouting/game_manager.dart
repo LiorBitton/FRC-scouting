@@ -49,6 +49,7 @@ class GameManager extends StatefulWidget {
       data.putIfAbsent(collector.getDataTag(), () => collector.getValue());
     }
     print(data);
+    data.putIfAbsent('match_number', () => matchNumber);
     dest.set(data);
     reset();
     Navigator.push(context, MaterialPageRoute(builder: (context) => Menu()));

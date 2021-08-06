@@ -1,0 +1,15 @@
+import matplotlib.pyplot as plt
+plt.subplot(211)
+plt.plot([0, 1, 2, 3, 4])
+plt.xlabel('thats nice')
+plt.ylabel('some numbers')
+plt.subplot(212)
+plt.plot([0, 6, 23, 4, 2])
+plt.xlabel('cool')
+plt.ylabel('some numbers')
+plt.subplot(212)
+plt.plot([32, 43, 1, 2, 3, 4])
+plt.xlabel('thats odd')
+plt.ylabel('fortnite gaming')
+
+plt.show()
