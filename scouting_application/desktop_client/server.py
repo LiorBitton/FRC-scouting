@@ -3,6 +3,7 @@ from firebase_admin import credentials
 from firebase_admin import db
 import json
 from os.path import abspath
+from game import Game
 cred = credentials.Certificate('./credentials.json')
 app = firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://everscout-3c93c.firebaseio.com/'})
@@ -41,11 +42,22 @@ def update_analytics(teamID):
 	if data is None:
 		print('No information on this team')
 		return
-	print(str(data))
 	for key in data.keys():
 		if (key is None):
 			continue
-		print(f'{key}:',data[key]['tele_inner'])
+		game_data = data[key]
+		try:
+			game_data['score']
+		except:
+			print(f'updating game {key[1:]}')
+			#load the  game_data into the dataclass and get a
+			#reference to the game in order to add statistics
+			game_object= Game(game_data)
+			game_ref = games_ref.child(f'{key}')
+			#
+			game_ref.child('score').set(game_object.score())
+		
+
 
 def update_team_analytics_listener(event):
 	if (event.data == '0'):
