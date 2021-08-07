@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:scouting_application/screens/scouting/scouting_tab.dart';
+import 'package:scouting_application/widgets/collectors/count_collector.dart';
 import 'package:scouting_application/widgets/collectors/ever_collector.dart';
-import 'package:scouting_application/widgets/collectors/switch_collector.dart';
 import 'package:scouting_application/widgets/collectors/plus_minus_collector.dart';
 
 class TeleoperatedTab extends StatefulWidget implements ScoutingTab {
@@ -18,12 +18,14 @@ class TeleoperatedTab extends StatefulWidget implements ScoutingTab {
     title: "inner",
     dataTag: "tele_inner",
   );
+  CountCollector missCollector =
+      CountCollector(title: 'miss', dataTag: 'tele_miss');
   @override
   _TeleoperatedTabState createState() => _TeleoperatedTabState();
 
   @override
   List<EverCollector> getCollectors() {
-    return [innerButton, outerButton, lowerButton];
+    return [innerButton, outerButton, lowerButton,missCollector];
   }
 }
 
@@ -49,7 +51,9 @@ class _TeleoperatedTabState extends State<TeleoperatedTab>
               widget.innerButton,
               widget.outerButton,
               widget.lowerButton,
+              
               SizedBox(height: 1, width: 1),
+              widget.missCollector
             ],
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3, mainAxisSpacing: 0, crossAxisSpacing: 0),
