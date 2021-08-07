@@ -17,16 +17,7 @@ class Game:
     #     self.reveled_climb = reveled_climb
     #     self.lower = lower
 	#     self.outer = outer
-	def __init__(self, auto_inner: int, auto_lower: int, auto_outer: int, auto_moved: bool, tele_inner: int, tele_outer: int, tele_lower: int, end_climbed: bool, inactive_time: int):
-		self.auto_inner = auto_inner
-		self.auto_outer = auto_outer
-		self.auto_lower = auto_lower
-		self.auto_moved = auto_moved
-		self.tele_inner = tele_inner 
-		self.tele_outer = tele_outer
-		self.tele_lower = tele_lower
-		self.climbed = end_climbed
-		self.inactive_time = inactive_time
+
 	def __init__(self, game: dict):
 		self.auto_inner = game['auto_inner']
 		self.auto_outer = game['auto_outer']
@@ -35,15 +26,26 @@ class Game:
 		self.tele_inner = game['tele_inner']
 		self.tele_outer = game['tele_outer']
 		self.tele_lower = game['tele_lower']
+		self.tele_miss = game['tele_miss']
 		self.climbed = game['climbed']
 		self.inactive_time = game['inactive_time']
 
-	def score(self):
+
+	def score_percentage(self):
+		scores = self.tele_inner + self.tele_outer + self.tele_lower
+		misses = self.tele_miss
+		return (scores*1.0/(misses+scores))*100
+
+	def auto_points(self):
 		sum = 0
 		sum += self.auto_inner*6
 		sum+= self.auto_outer*4
 		sum+= self.auto_lower*2
-		sum+= 5 if self.auto_moved else 0
+		sum += 5 if self.auto_moved else 0
+		return sum
+	def points(self):
+		sum = 0
+		sum+=auto_points()
 		sum+= self.tele_inner*3
 		sum+= self.tele_outer*2
 		sum += self.tele_lower

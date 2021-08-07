@@ -36,7 +36,7 @@ def download_database_listener(event):
 		download_database_ref.set('0')
 
 
-def update_analytics(teamID):
+def update_games_analytics(teamID):
 	games_ref = db.reference(f'teams/{teamID}/games')
 	data = games_ref.get()
 	if data is None:
@@ -47,15 +47,17 @@ def update_analytics(teamID):
 			continue
 		game_data = data[key]
 		try:
-			game_data['score']
-		except:
+			game_data['points']
+		except Exception as err:
+			print(err)
 			print(f'updating game {key[1:]}')
 			#load the  game_data into the dataclass and get a
 			#reference to the game in order to add statistics
 			game_object= Game(game_data)
 			game_ref = games_ref.child(f'{key}')
 			#
-			game_ref.child('score').set(game_object.score())
+			game_ref.child('points').set(game_object.points())
+			game_ref.child('score_percentage').set(game_object.score_percentage())
 		
 
 
@@ -63,7 +65,7 @@ def update_team_analytics_listener(event):
 	if (event.data == '0'):
 		return
 	print(f'Updating analytics for team {event.data}:...')
-	update_analytics(int(event.data))
+	update_games_analytics(int(event.data))
 	update_team_analytics_ref.set('0')
 	print('Update completed')
 
