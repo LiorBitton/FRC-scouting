@@ -9,7 +9,6 @@ app = firebase_admin.initialize_app(cred, {
 print("Connection OK")
 download_database_ref = db.reference('listeners/download_database')
 update_team_analytics_ref = db.reference('listeners/update_team_analytics')
-update_team_analytics_ref.set(7112)
 teams_ref = db.reference('teams')
 
 teams_data ={}
@@ -42,10 +41,11 @@ def update_analytics(teamID):
 	if data is None:
 		print('No information on this team')
 		return
-	for game in data:
-		if (game is None):
+	print(str(data))
+	for key in data.keys():
+		if (key is None):
 			continue
-		print(f'{game["match_number"]}:',game['tele_inner'])
+		print(f'{key}:',data[key]['tele_inner'])
 
 def update_team_analytics_listener(event):
 	if (event.data == '0'):

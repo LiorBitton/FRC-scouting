@@ -39,7 +39,7 @@ class GameManager extends StatefulWidget {
         .child('teams')
         .child('$teamID')
         .child('games')
-        .child('$matchNumber');
+        .child('G$matchNumber');
     Map<String, dynamic> data = {};
     List<EverCollector> dataCollectors = [];
     for (ScoutingTab tab in tabs) {
