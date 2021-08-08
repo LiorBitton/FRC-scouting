@@ -29,6 +29,7 @@ class Game:
 		self.tele_miss = game['tele_miss']
 		self.climbed = game['climbed']
 		self.inactive_time = game['inactive_time']
+		self.comment = game['comment']
 
 
 	def score_percentage(self):
@@ -43,9 +44,10 @@ class Game:
 		sum+= self.auto_lower*2
 		sum += 5 if self.auto_moved else 0
 		return sum
+
 	def points(self):
 		sum = 0
-		sum+=auto_points()
+		sum+= self.auto_points()
 		sum+= self.tele_inner*3
 		sum+= self.tele_outer*2
 		sum += self.tele_lower
