@@ -8,30 +8,11 @@ cred = credentials.Certificate('./credentials.json')
 app = firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://everscout-3c93c.firebaseio.com/'})
 print("Connection OK")
-download_database_ref = db.reference('listeners/download_database')
 update_team_analytics_ref = db.reference('listeners/update_team_analytics')
-teams_ref = db.reference('teams')
 
 teams_data ={}
 with open('teams.json','r') as json_file:
     teams_data = json.load(json_file)
-
-def update_teams_file_offline():
-	with open('teams.json', 'w') as outfile:
-		json.dump(teams_data, outfile)
-def update_teams_file_online():
-	global teams_data
-	with open('teams.json', 'w') as outfile:
-			teams_data = db.reference('teams').get()
-			json.dump(teams_data, outfile)
-	
-
-def download_database_listener(event):
-	if (str(event.data) == '1'):
-		print('downloading database:...')
-		update_teams_file_online()
-		print('download completed')
-		download_database_ref.set('0')
 
 
 def update_games_analytics(teamID,data =None):
@@ -135,4 +116,3 @@ def update_team_analytics_listener(event):
 	update_team_analytics_ref.set('0')
 
 update_team_analytics_ref.listen(update_team_analytics_listener)
-download_database_ref.listen(download_database_listener)

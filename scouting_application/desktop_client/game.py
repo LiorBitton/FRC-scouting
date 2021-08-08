@@ -35,6 +35,11 @@ class Game:
 	def score_percentage(self):
 		scores = self.tele_inner + self.tele_outer + self.tele_lower
 		misses = self.tele_miss
+		if misses == 0:
+			if scores == 0:
+				return 0
+			else:
+				return 100
 		return (scores*1.0/(misses+scores))*100
 
 	def auto_points(self):

@@ -32,7 +32,6 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.liorbitton.scouting_application"
         minSdkVersion 21
         targetSdkVersion 30
