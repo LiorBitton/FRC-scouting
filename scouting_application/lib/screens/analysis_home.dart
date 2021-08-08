@@ -6,6 +6,7 @@ import 'dart:io' as io;
 
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter/foundation.dart';
+import 'package:scouting_application/screens/analysis_gallery.dart';
 import 'package:scouting_application/themes/custom_themes.dart';
 
 class AnalysisHome extends StatefulWidget {
@@ -86,10 +87,10 @@ class _AnalysisHomeState extends State<AnalysisHome> {
         body: Column(
           children: [
             TeamDataWidget(dataToShow: teamsData[i]),
+            FloatingActionButton(onPressed: (){Navigator.push(context,
+            MaterialPageRoute(builder: (context) => AnalysisGallery(teamID: teams[i])));}),
             FittedBox(fit: BoxFit.cover ,
               child: IconButton(icon:Icon(Icons.refresh),
-              // FloatingActionButton(
-                  // child: Text('Request update',maxLines: 2,),
                   onPressed: () {
                     final fb = FirebaseDatabase.instance;
                     final ref = fb.reference();
@@ -100,14 +101,7 @@ class _AnalysisHomeState extends State<AnalysisHome> {
                     Navigator.push(context,
                     MaterialPageRoute(builder: (context) => AnalysisHome()));
                   }),
-            ) //await getTeamData(teams[i])),
-            // IconButton( TODO
-            //     onPressed: () async {
-            //       await _downloadFile(firebase_storage.FirebaseStorage.instance
-            //           .ref('teams')
-            //           .child(teams[i]));
-            //     },
-            //     icon: Icon(Icons.photo_album))
+            )
           ],
         ),
       ));

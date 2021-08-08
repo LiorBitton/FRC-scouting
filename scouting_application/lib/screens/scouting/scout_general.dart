@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -69,6 +71,7 @@ class _ScoutGeneralState extends State<ScoutGeneral> {
                         context, '😨חסר מספר קבוצה😨', 'תמלאו אחד בהולללל');
                     return;
                   }
+
                   if (imageFile != null) uploadImageToFirebase(context);
                   Navigator.push(
                       context, MaterialPageRoute(builder: (context) => Menu()));
@@ -117,10 +120,17 @@ class _ScoutGeneralState extends State<ScoutGeneral> {
 
   Future uploadImageToFirebase(BuildContext context) async {
     File file = File(imageFile?.path ?? 'okay');
-    firebase_storage.FirebaseStorage.instance
+    TaskSnapshot snapshot = await firebase_storage.FirebaseStorage.instance
         .ref()
         .child(
             'teams/${teamNumberController.text}/${file.path.split("/").last}')
         .putFile(file);
+    if (snapshot.state == TaskState.success) {
+      final String downloadUrl = await snapshot.ref.getDownloadURL();
+      final ref = FirebaseDatabase.instance.reference();
+      final imageRef =
+          ref.child('teams').child(teamNumberController.text).child('images').push();
+      imageRef.set(downloadUrl);
+    }
   }
 }
