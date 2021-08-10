@@ -10,10 +10,6 @@ app = firebase_admin.initialize_app(cred, {
 print("Connection OK")
 update_team_analytics_ref = db.reference('listeners/update_team_analytics')
 
-teams_data ={}
-with open('teams.json','r') as json_file:
-    teams_data = json.load(json_file)
-
 
 def update_games_analytics(teamID,data =None):
 	games_ref = db.reference(f'teams/{teamID}/games')

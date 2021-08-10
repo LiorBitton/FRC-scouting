@@ -25,8 +25,10 @@ class GameManager extends StatefulWidget {
     endgame,
     playstyle
   ];
+  //initialized by ScoutPregame
   static int matchNumber = 0;
   static int teamID = 0;
+  static bool isBlueAlliance = false;
 
   ///Upload the data from the game to the project's RealtimeDatabase
   ///
@@ -48,7 +50,7 @@ class GameManager extends StatefulWidget {
     for (EverCollector collector in dataCollectors) {
       data.putIfAbsent(collector.getDataTag(), () => collector.getValue());
     }
-    print(data);
+    data.putIfAbsent('is_blue_alliance', () => isBlueAlliance);
     dest.set(data);
     reset();
     Navigator.push(context, MaterialPageRoute(builder: (context) => Menu()));
@@ -65,6 +67,7 @@ class GameManager extends StatefulWidget {
     );
     matchNumber = 0;
     teamID = 0;
+    isBlueAlliance = false;
     tabs = [autonomous, teleoperated, endgame, playstyle];
   }
 

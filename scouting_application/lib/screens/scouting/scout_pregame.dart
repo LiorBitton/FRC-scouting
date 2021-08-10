@@ -14,6 +14,7 @@ class ScoutPregame extends StatefulWidget {
 class _ScoutPregameState extends State<ScoutPregame> {
   final matchNumberController = TextEditingController();
   final teamNumberController = TextEditingController();
+  List<bool> isSelected = [true, false];
   @override
   void dispose() {
     matchNumberController.dispose();
@@ -39,6 +40,26 @@ class _ScoutPregameState extends State<ScoutPregame> {
                 hintText: 'match number',
                 maxLength: 3,
               ),
+              ToggleButtons(
+                children: <Widget>[
+                  Text('Blue', style: TextStyle(color: Colors.blue[700])),
+                  Text('Red', style: TextStyle(color: Colors.red[700])),
+                ],
+                onPressed: (int index) {
+                  setState(() {
+                    for (int buttonIndex = 0;
+                        buttonIndex < isSelected.length;
+                        buttonIndex++) {
+                      if (buttonIndex == index) {
+                        isSelected[buttonIndex] = !isSelected[buttonIndex];
+                      } else {
+                        isSelected[buttonIndex] = false;
+                      }
+                    }
+                  });
+                },
+                isSelected: isSelected,
+              ),
               MenuButton(
                   title: 'Start',
                   onPressed: () {
@@ -55,6 +76,7 @@ class _ScoutPregameState extends State<ScoutPregame> {
                     int teamID = int.parse(teamNumberController.text);
                     GameManager.matchNumber = matchNumber;
                     GameManager.teamID = teamID;
+                    GameManager.isBlueAlliance = isSelected[0];
 
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) => GameManager()));

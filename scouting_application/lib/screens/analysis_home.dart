@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
@@ -87,19 +89,35 @@ class _AnalysisHomeState extends State<AnalysisHome> {
         body: Column(
           children: [
             TeamDataWidget(dataToShow: teamsData[i]),
-            FloatingActionButton(onPressed: (){Navigator.push(context,
-            MaterialPageRoute(builder: (context) => AnalysisGallery(teamID: teams[i])));}),
-            FittedBox(fit: BoxFit.cover ,
-              child: IconButton(icon:Icon(Icons.refresh),
-                  onPressed: () {
+            FloatingActionButton(
+                heroTag: new Random().nextInt(99999),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              AnalysisGallery(teamID: teams[i])));
+                }),
+            FittedBox(
+              fit: BoxFit.cover,
+              child: IconButton(
+                  icon: Icon(Icons.refresh),
+                  onPressed: () async {
                     final fb = FirebaseDatabase.instance;
                     final ref = fb.reference();
-                    final listener_ref =
+                    final listenerRef =
                         ref.child('listeners').child('update_team_analytics');
-                    listener_ref.set(teams[i]);
-                    Navigator.pop(context);
-                    Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => AnalysisHome()));
+                    listenerRef.set(teams[i]);
+                    listenerRef.onValue.listen((event) {
+                      if(event.snapshot.value=="0"){//it means the operation ended
+          Navigator.pop(context);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AnalysisHome()));
+                      }
+                    });
+                    
                   }),
             )
           ],
@@ -109,74 +127,37 @@ class _AnalysisHomeState extends State<AnalysisHome> {
     return res;
   }
 
-//TODO
-  Future<void> _downloadFile(firebase_storage.Reference ref) async {
-    final io.Directory systemTempDir = io.Directory.systemTemp;
-    final io.File tempFile = io.File('${systemTempDir.path}/temp-${ref.name}');
-    if (tempFile.existsSync()) await tempFile.delete();
-
-    await ref.writeToFile(tempFile);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Success!\n Downloaded ${ref.name} \n from bucket: ${ref.bucket}\n '
-          'at path: ${ref.fullPath} \n'
-          'Wrote "${ref.fullPath}" to tmp-${ref.name}.txt',
-        ),
-      ),
-    );
-  }
-
   Future<List<String>> getTeams() async {
     firebase_core.Firebase.initializeApp();
     final fb = FirebaseDatabase.instance;
     final ref = fb.reference();
     List<String> teams = [];
-    teams = await ref.child("teams").once().then((DataSnapshot data) {
+    teams = await ref.child("teams").once().then((DataSnapshot data) async {
       final info = Map<String, dynamic>.from(data.value);
-      List<String> out = [];
-      for (var key in info.keys) {
-        out.add(key);
+      List<String> teamNumbers = [];
+      for (var teamID in info.keys) {
+        teamNumbers.add(teamID);
+        List<String> teamData = [];
+        try {
+          //add the data from teams/teamID/stats
+          final stats = Map<String, dynamic>.from(info[teamID]['stats']);
+          for (var key in stats.keys) {
+            teamData.add('$key:${stats[key]}');
+          }
+          teamData.add('===DATA FROM LAST GAME===');
+          //add the data from teams/teamID/last_game
+          final lastGame = Map<String, dynamic>.from(info[teamID]['last_game']);
+          for (var key in lastGame.keys) {
+            teamData.add('$key:${lastGame[key]}');
+          }
+        } catch (Exception) {
+          teamData.add('no statistics for this team yet');
+        }
+        teamsData.add(teamData);
       }
-
-      return out;
+      return teamNumbers;
     });
-    for (var team in teams) {
-      teamsData.add(await getTeamData(team));
-    }
     return teams;
-  }
-
-  Future<List<String>> getTeamData(String teamID) async {
-    final fb = FirebaseDatabase.instance;
-    final ref = fb.reference();
-    final team_ref = ref.child('teams').child(teamID);
-    final stats_ref = team_ref.child('stats');
-    final last_game_ref = team_ref.child('last_game');
-    List<String> res = [];
-    try {
-      res.addAll(await stats_ref.once().then((DataSnapshot data) {
-        List<String> out = [];
-        final stats = Map<String, dynamic>.from(data.value);
-        for (var key in stats.keys) {
-          out.add('$key:${stats[key]}');
-        }
-        return out;
-      }));
-      res.add('===DATA FROM LAST GAME===');
-      res.addAll(await last_game_ref.once().then((DataSnapshot data) {
-        List<String> out = [];
-        final stats = Map<String, dynamic>.from(data.value);
-        for (var key in stats.keys) {
-          out.add('$key:${stats[key]}');
-        }
-        return out;
-      }));
-    } catch (Exception) {
-      return ['Ask the coach to update the analytics'];
-    }
-    return res;
   }
 }
 

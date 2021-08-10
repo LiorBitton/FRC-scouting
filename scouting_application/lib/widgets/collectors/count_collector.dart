@@ -11,7 +11,7 @@ class CountCollector extends StatefulWidget implements EverCollector {
   @override
   String dataTag;
   String title;
-  int _value=0;
+  int _value = 0;
   @override
   String getDataTag() {
     return dataTag;

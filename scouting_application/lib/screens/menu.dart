@@ -51,8 +51,6 @@ class Menu extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => AnalysisHome()));
               },
             ),
-            
-                
           ],
         )),
         // FloatingActionButton(onPressed: () {

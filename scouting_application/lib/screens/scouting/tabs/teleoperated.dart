@@ -25,7 +25,7 @@ class TeleoperatedTab extends StatefulWidget implements ScoutingTab {
 
   @override
   List<EverCollector> getCollectors() {
-    return [innerButton, outerButton, lowerButton,missCollector];
+    return [innerButton, outerButton, lowerButton, missCollector];
   }
 }
 
@@ -51,7 +51,6 @@ class _TeleoperatedTabState extends State<TeleoperatedTab>
               widget.innerButton,
               widget.outerButton,
               widget.lowerButton,
-              
               SizedBox(height: 1, width: 1),
               widget.missCollector
             ],
