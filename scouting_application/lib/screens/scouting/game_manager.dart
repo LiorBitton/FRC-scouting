@@ -36,7 +36,7 @@ class GameManager extends StatefulWidget {
   static void submitGame(BuildContext context) {
     firebase_core.Firebase.initializeApp();
     final fb = FirebaseDatabase.instance;
-    final ref = fb.reference();
+    final ref = fb.ref();
     final dest = ref
         .child('teams')
         .child('$teamID')

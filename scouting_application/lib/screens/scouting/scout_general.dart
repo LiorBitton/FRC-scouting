@@ -127,7 +127,7 @@ class _ScoutGeneralState extends State<ScoutGeneral> {
         .putFile(file);
     if (snapshot.state == TaskState.success) {
       final String downloadUrl = await snapshot.ref.getDownloadURL();
-      final ref = FirebaseDatabase.instance.reference();
+      final ref = FirebaseDatabase.instance.ref();
       final imageRef = ref
           .child('teams')
           .child(teamNumberController.text)

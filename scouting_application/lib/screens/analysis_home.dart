@@ -104,7 +104,7 @@ class _AnalysisHomeState extends State<AnalysisHome> {
                   icon: Icon(Icons.refresh),
                   onPressed: () async {
                     final fb = FirebaseDatabase.instance;
-                    final ref = fb.reference();
+                    final ref = fb.ref();
                     final listenerRef =
                         ref.child('listeners').child('update_team_analytics');
                     listenerRef.set(teams[i]);
@@ -130,7 +130,7 @@ class _AnalysisHomeState extends State<AnalysisHome> {
   Future<List<String>> getTeams() async {
     firebase_core.Firebase.initializeApp();
     final fb = FirebaseDatabase.instance;
-    final ref = fb.reference();
+    final ref = fb.ref();
     List<String> teams = [];
     teams = await ref.child("teams").once().then((DataSnapshot data) async {
       final info = Map<String, dynamic>.from(data.value);

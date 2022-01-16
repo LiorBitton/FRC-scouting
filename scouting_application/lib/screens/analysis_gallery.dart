@@ -11,7 +11,7 @@ class AnalysisGallery extends StatefulWidget {
 class _AnalysisGalleryState extends State<AnalysisGallery> {
   List<String> urls = [];
   void fetchUrls() async {
-    final ref = FirebaseDatabase.instance.reference();
+    final ref = FirebaseDatabase.instance.ref();
     final imagesRef = ref.child('teams').child(widget.teamID).child('images');
     urls = await imagesRef.once().then((DataSnapshot data) {
       List<String> out = [];
@@ -44,7 +44,7 @@ class _AnalysisGalleryState extends State<AnalysisGallery> {
   }
 
   Future<List<Image>> getImages() async {
-    final ref = FirebaseDatabase.instance.reference();
+    final ref = FirebaseDatabase.instance.ref();
     final imagesRef = ref.child('teams').child(widget.teamID).child('images');
     urls = await imagesRef.once().then((DataSnapshot data) {
       List<String> out = [];

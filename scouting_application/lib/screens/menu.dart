@@ -56,7 +56,7 @@ class Menu extends StatelessWidget {
         // FloatingActionButton(onPressed: () {
         //   firebase_core.Firebase.initializeApp();
         //   final fb = FirebaseDatabase.instance;
-        //   final ref = fb.reference();
+        //   final ref = fb.ref();
         //   ref.child('cool').set('gh');
         // })
       ]),
