@@ -30,6 +30,7 @@
         <!-- This script installs service_worker.js to provide PWA functionality to
        application. For more information, see:
        https://developers.google.com/web/fundamentals/primers/service-workers -->
+        <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
         <script>
             var serviceWorkerVersion = null;
             var scriptLoaded = false;
@@ -91,7 +92,6 @@
                 loadMainDartJs();
             }
         </script>
-        <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
 
         <script>
             var firebaseConfig = {
@@ -103,6 +103,7 @@
                 appId: "",
                 measurementId: "",
             };
+
             // Initialize Firebase
             firebase.initializeApp(firebaseConfig);
         </script>

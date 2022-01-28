@@ -132,8 +132,8 @@ class _AnalysisHomeState extends State<AnalysisHome> {
     final fb = FirebaseDatabase.instance;
     final ref = fb.ref();
     List<String> teams = [];
-    teams = await ref.child("teams").once().then((DataSnapshot data) async {
-      final info = Map<String, dynamic>.from(data.value);
+    DataSnapshot data =await ref.child("teams").get();
+    final info = Map<String, dynamic>.from((data.value as Map<dynamic,dynamic>));
       List<String> teamNumbers = [];
       for (var teamID in info.keys) {
         teamNumbers.add(teamID);
@@ -155,8 +155,8 @@ class _AnalysisHomeState extends State<AnalysisHome> {
         }
         teamsData.add(teamData);
       }
-      return teamNumbers;
-    });
+      
+    
     return teams;
   }
 }

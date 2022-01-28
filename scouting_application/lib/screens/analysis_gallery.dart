@@ -13,14 +13,11 @@ class _AnalysisGalleryState extends State<AnalysisGallery> {
   void fetchUrls() async {
     final ref = FirebaseDatabase.instance.ref();
     final imagesRef = ref.child('teams').child(widget.teamID).child('images');
-    urls = await imagesRef.once().then((DataSnapshot data) {
-      List<String> out = [];
-      final stats = Map<String, dynamic>.from(data.value);
-      for (var key in stats.keys) {
-        out.add(stats[key]);
+    DataSnapshot data = await imagesRef.get();
+      final images = Map<String, dynamic>.from(data.value as Map<dynamic,dynamic>);
+      for (var key in images.keys) {
+        urls.add(images[key]);
       }
-      return out;
-    });
   }
 
   @override
@@ -46,14 +43,11 @@ class _AnalysisGalleryState extends State<AnalysisGallery> {
   Future<List<Image>> getImages() async {
     final ref = FirebaseDatabase.instance.ref();
     final imagesRef = ref.child('teams').child(widget.teamID).child('images');
-    urls = await imagesRef.once().then((DataSnapshot data) {
-      List<String> out = [];
-      final stats = Map<String, dynamic>.from(data.value);
+    DataSnapshot data = await imagesRef.get();
+      final stats = Map<String, dynamic>.from(data.value as Map<dynamic,dynamic>);
       for (var key in stats.keys) {
-        out.add(stats[key]);
+        urls.add(stats[key]);
       }
-      return out;
-    });
     List<Image> out = [];
     for (String url in urls) {
       out.add(
