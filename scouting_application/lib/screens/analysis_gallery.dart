@@ -51,7 +51,7 @@ class _AnalysisGalleryState extends State<AnalysisGallery> {
     List<Image> out = [];
     for (String url in urls) {
       out.add(
-        await Image.network(url, fit: BoxFit.fill),
+        Image.network(url, fit: BoxFit.fill),
       );
     }
     return out;

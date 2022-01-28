@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'EverScout',
       themeMode: ThemeMode.system,
-      theme: CustomTheme.darkTheme,
+      theme: CustomTheme.lightTheme,
       home: Menu(),
       darkTheme: CustomTheme.darkTheme,
     );

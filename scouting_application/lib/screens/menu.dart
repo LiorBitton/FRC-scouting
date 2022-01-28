@@ -1,7 +1,4 @@
-import 'dart:ui';
-import 'package:firebase_core/firebase_core.dart' as firebase_core;
 
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:scouting_application/screens/analysis_home.dart';
 import 'package:scouting_application/screens/scouting/lobby.dart';

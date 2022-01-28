@@ -4,10 +4,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'dart:async';
-import 'dart:io' as io;
 
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import 'package:flutter/foundation.dart';
 import 'package:scouting_application/screens/analysis_gallery.dart';
 import 'package:scouting_application/themes/custom_themes.dart';
 
