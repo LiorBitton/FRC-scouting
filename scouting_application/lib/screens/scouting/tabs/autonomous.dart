@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:scouting_application/screens/scouting/game_manager.dart';
 import 'package:scouting_application/screens/scouting/scouting_tab.dart';
 import 'package:scouting_application/widgets/collectors/ever_collector.dart';
 import 'package:scouting_application/widgets/collectors/plus_minus_collector.dart';
@@ -8,28 +7,24 @@ import '../../../widgets/collectors/switch_collector.dart';
 class ScoutAutonomous extends StatefulWidget implements ScoutingTab {
   ScoutAutonomous({Key? key}) : super(key: key);
 
-  PlusMinusCollector innerButton = PlusMinusCollector(
-    title: "inner",
-    dataTag: 'auto_inner',
+  PlusMinusCollector upperCollector = PlusMinusCollector(
+    title: "UPPER",
+    dataTag: 'auto_upper',
   );
-  PlusMinusCollector outerButton = PlusMinusCollector(
-    title: "outer",
-    dataTag: 'auto_outer',
-  );
-  PlusMinusCollector lowerButton = PlusMinusCollector(
-    title: "lower",
+  PlusMinusCollector lowerCollector = PlusMinusCollector(
+    title: "LOWER",
     dataTag: 'auto_lower',
   );
-  SwitchCollector movedSwitch = SwitchCollector(
-    title: 'moved',
-    dataTag: 'auto_moved',
+  SwitchCollector taxiSwitch = SwitchCollector(
+    title: 'TAXI',
+    dataTag: 'auto_taxi',
   );
   @override
   _ScoutAutonomousState createState() => _ScoutAutonomousState();
 
   @override
   List<EverCollector> getCollectors() {
-    return [innerButton, outerButton, lowerButton, movedSwitch];
+    return [upperCollector, lowerCollector, taxiSwitch];
   }
 }
 
@@ -51,15 +46,14 @@ class _ScoutAutonomousState extends State<ScoutAutonomous>
         Expanded(
           child: GridView(
             children: [
-              widget.innerButton,
-              widget.outerButton,
-              widget.lowerButton,
+              widget.upperCollector,
+              widget.lowerCollector,
               SizedBox(height: 1, width: 1),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  widget.movedSwitch,
+                  widget.taxiSwitch,
                 ],
               ),
             ],

@@ -6,18 +6,15 @@ import 'package:scouting_application/widgets/collectors/plus_minus_collector.dar
 
 class TeleoperatedTab extends StatefulWidget implements ScoutingTab {
   TeleoperatedTab({Key? key}) : super(key: key);
-  PlusMinusCollector lowerButton = PlusMinusCollector(
-    title: "lower",
+  PlusMinusCollector upperCollector = PlusMinusCollector(
+    title: "UPPER",
+    dataTag: "tele_upper",
+  );
+  PlusMinusCollector lowerCollector = PlusMinusCollector(
+    title: "LOWER",
     dataTag: "tele_lower",
   );
-  PlusMinusCollector outerButton = PlusMinusCollector(
-    title: "outer",
-    dataTag: "tele_outer",
-  );
-  PlusMinusCollector innerButton = PlusMinusCollector(
-    title: "inner",
-    dataTag: "tele_inner",
-  );
+
   CountCollector missCollector =
       CountCollector(title: 'miss', dataTag: 'tele_miss');
   @override
@@ -25,7 +22,7 @@ class TeleoperatedTab extends StatefulWidget implements ScoutingTab {
 
   @override
   List<EverCollector> getCollectors() {
-    return [innerButton, outerButton, lowerButton, missCollector];
+    return [lowerCollector, upperCollector, missCollector];
   }
 }
 
@@ -48,9 +45,8 @@ class _TeleoperatedTabState extends State<TeleoperatedTab>
         Expanded(
           child: GridView(
             children: [
-              widget.innerButton,
-              widget.outerButton,
-              widget.lowerButton,
+              widget.lowerCollector,
+              widget.upperCollector,
               SizedBox(height: 1, width: 1),
               widget.missCollector
             ],
