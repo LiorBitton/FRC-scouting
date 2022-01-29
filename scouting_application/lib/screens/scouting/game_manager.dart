@@ -92,12 +92,12 @@ class _GameManagerState extends State<GameManager> {
                 indicatorSize: TabBarIndicatorSize.tab,
                 indicatorWeight: 5,
                 tabs: [
-                  Tab(text: "Auto", icon: Icon(Icons.do_not_touch)),
-                  Tab(text: "Teleop", icon: Icon(Icons.drive_eta_rounded)),
-                  Tab(text: "Endgame", icon: Icon(Icons.elevator)),
+                  Tab(child:Text("Auto",style: TextStyle(color: Colors.white)), icon: Icon(Icons.do_not_touch,color: Colors.white)),
+                  Tab(child:Text("Teleop",style: TextStyle(color: Colors.white)) , icon: Icon(Icons.drive_eta_rounded,color: Colors.white)),
+                  Tab(child:Text("Endgame",style: TextStyle(color: Colors.white)) , icon: Icon(Icons.elevator,color: Colors.white)),
                   Tab(
-                    text: 'Playstyle',
-                    icon: Icon(Icons.alt_route),
+                    child: Text("Playstyle",style: TextStyle(color: Colors.white)),
+                    icon: Icon(Icons.alt_route,color: Colors.white),
                   )
                 ],
               ),

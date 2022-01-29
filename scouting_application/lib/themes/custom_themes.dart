@@ -42,6 +42,10 @@ class CustomTheme {
         primaryColor: Colors.purple,
         scaffoldBackgroundColor: Colors.white,
         fontFamily: 'Montserrat', //3
+        textTheme: TextTheme(
+            bodyText1: GoogleFonts.roboto(
+                fontWeight: FontWeight.bold,
+                color: Colors.black)),
         buttonTheme: ButtonThemeData(
           // 4
           shape:

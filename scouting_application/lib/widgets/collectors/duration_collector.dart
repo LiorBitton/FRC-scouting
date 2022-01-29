@@ -38,10 +38,10 @@ class _DurationCollectorState extends State<DurationCollector> {
           child: Column(
             children: [
               FittedBox(
-                child: IconButton(
+                child: IconButton(color: Colors.white,
                     onPressed: () {}, icon: widget.icon ?? Icon(Icons.timer)),
               ),
-              FittedBox(child: Text('${widget._duration.toStringAsFixed(1)}'))
+              FittedBox(child: Text('${widget._duration.toStringAsFixed(1)}',style: TextStyle(color: Colors.white)))
             ],
           )),
     );

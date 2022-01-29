@@ -47,7 +47,8 @@ class _SwitchCollectorState extends State<SwitchCollector> {
             width: 5.0,
           ),
           activeColor: Color.fromRGBO(107, 181, 46, 0.5),
-          inactiveColor: Colors.black38,
+          inactiveColor: ThemeProvider().isLightMode?Colors.white: Colors.black,
+           //Colors.white,
           onToggle: (val) {
             setState(() {
               widget._isSwitched = val;

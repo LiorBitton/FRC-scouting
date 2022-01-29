@@ -18,9 +18,9 @@ class EndgameTab extends StatefulWidget implements ScoutingTab {
     icon: Icon(Icons.elevator_rounded),
   );
   DropDownCollector<int> climbedToCollector =
-      DropDownCollector(dataTag: "climb_to", options: [1, 2, 3, 4]);
+      DropDownCollector(title: "CLIMBED TO",dataTag: "climb_to", options: [1, 2, 3, 4]);
       DropDownCollector<int> climbGoalCollector =
-      DropDownCollector(dataTag: "climb_goal", options: [1, 2, 3, 4]);
+      DropDownCollector(title:"TRYING TO REACH", dataTag: "climb_goal", options: [1, 2, 3, 4]);
   @override
   _EndgameTabState createState() => _EndgameTabState();
 
