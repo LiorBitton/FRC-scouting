@@ -7,26 +7,23 @@ import 'package:scouting_application/widgets/collectors/switch_collector.dart';
 
 class EndgameTab extends StatefulWidget implements ScoutingTab {
   EndgameTab({Key? key}) : super(key: key);
-  SwitchCollector climbAttemptSwitch =
-      SwitchCollector(title: "CLIMBING", dataTag: "climb_attempted");
-  SwitchCollector climbedSwitch = SwitchCollector(
-    title: 'climbed',
-    dataTag: 'climbed',
-  );
+
   DurationCollector climbTimeCollector = DurationCollector(
     dataTag: "climb_time",
     icon: Icon(Icons.elevator_rounded),
   );
-  DropDownCollector<int> climbedToCollector =
-      DropDownCollector(title: "CLIMBED TO",dataTag: "climb_to", options: [1, 2, 3, 4]);
-      DropDownCollector<int> climbGoalCollector =
-      DropDownCollector(title:"TRYING TO REACH", dataTag: "climb_goal", options: [1, 2, 3, 4]);
+  DropDownCollector<int> climbedToCollector = DropDownCollector(
+      title: "CLIMBED TO", dataTag: "climb_to", options: [0, 1, 2, 3, 4]);
+  DropDownCollector<int> climbGoalCollector = DropDownCollector(
+      title: "TRYING TO REACH",
+      dataTag: "climb_goal",
+      options: [0, 1, 2, 3, 4]);
   @override
   _EndgameTabState createState() => _EndgameTabState();
 
   @override
   List<EverCollector> getCollectors() {
-    return [climbedSwitch, climbTimeCollector, climbAttemptSwitch,climbGoalCollector,climbedToCollector];
+    return [climbTimeCollector, climbGoalCollector, climbedToCollector];
   }
 }
 
@@ -46,7 +43,6 @@ class _EndgameTabState extends State<EndgameTab>
         body: Column(
       children: [
         widget.climbTimeCollector,
-        widget.climbAttemptSwitch,
         widget.climbGoalCollector,
         widget.climbedToCollector,
         Expanded(
@@ -56,9 +52,7 @@ class _EndgameTabState extends State<EndgameTab>
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  widget.climbedSwitch,
-                ],
+                children: [],
               ),
             ],
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

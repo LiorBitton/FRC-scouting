@@ -15,14 +15,21 @@ class TeleoperatedTab extends StatefulWidget implements ScoutingTab {
     dataTag: "tele_lower",
   );
 
-  CountCollector missCollector =
-      CountCollector(title: 'miss', dataTag: 'tele_miss');
+  CountCollector missLowerCollector =
+      CountCollector(title: 'LOW MISS', dataTag: 'tele_lo_miss');
+  CountCollector missUpperCollector =
+      CountCollector(title: 'UPPER MISS', dataTag: 'tele_up_miss');
   @override
   _TeleoperatedTabState createState() => _TeleoperatedTabState();
 
   @override
   List<EverCollector> getCollectors() {
-    return [lowerCollector, upperCollector, missCollector];
+    return [
+      lowerCollector,
+      upperCollector,
+      missLowerCollector,
+      missUpperCollector
+    ];
   }
 }
 
@@ -47,8 +54,9 @@ class _TeleoperatedTabState extends State<TeleoperatedTab>
             children: [
               widget.lowerCollector,
               widget.upperCollector,
+              widget.missLowerCollector,
+              widget.missUpperCollector,
               SizedBox(height: 1, width: 1),
-              widget.missCollector
             ],
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3, mainAxisSpacing: 0, crossAxisSpacing: 0),
