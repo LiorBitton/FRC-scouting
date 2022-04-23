@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+import 'package:scouting_application/screens/scouting/games_list.dart';
 import 'package:scouting_application/screens/scouting/scout_general.dart';
 import 'package:scouting_application/screens/scouting/scout_pregame.dart';
 import 'package:scouting_application/widgets/menu_button.dart';
@@ -16,12 +16,23 @@ class ScoutLobby extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 MenuButton(
-                  title: 'game',
+                  title: 'Free',
                   onPressed: () {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => ScoutPregame()));
+                  },
+                ),
+                SizedBox(
+                  height: 5,
+                  width: 5,
+                ),
+                MenuButton(
+                  title: 'Realtime',
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => GamesList()));
                   },
                 ),
                 SizedBox(

@@ -41,7 +41,7 @@ class GameManager extends StatefulWidget {
         .child('teams')
         .child('$teamID')
         .child('games')
-        .child('G$matchNumber');
+        .child('M$matchNumber');
     Map<String, dynamic> data = {};
     List<EverCollector> dataCollectors = [];
     for (ScoutingTab tab in tabs) {
@@ -92,12 +92,22 @@ class _GameManagerState extends State<GameManager> {
                 indicatorSize: TabBarIndicatorSize.tab,
                 indicatorWeight: 5,
                 tabs: [
-                  Tab(child:Text("Auto",style: TextStyle(color: Colors.white)), icon: Icon(Icons.do_not_touch,color: Colors.white)),
-                  Tab(child:Text("Teleop",style: TextStyle(color: Colors.white)) , icon: Icon(Icons.drive_eta_rounded,color: Colors.white)),
-                  Tab(child:Text("Endgame",style: TextStyle(color: Colors.white)) , icon: Icon(Icons.elevator,color: Colors.white)),
                   Tab(
-                    child: Text("Playstyle",style: TextStyle(color: Colors.white)),
-                    icon: Icon(Icons.alt_route,color: Colors.white),
+                      child:
+                          Text("Auto", style: TextStyle(color: Colors.white)),
+                      icon: Icon(Icons.do_not_touch, color: Colors.white)),
+                  Tab(
+                      child:
+                          Text("Teleop", style: TextStyle(color: Colors.white)),
+                      icon: Icon(Icons.drive_eta_rounded, color: Colors.white)),
+                  Tab(
+                      child: Text("Endgame",
+                          style: TextStyle(color: Colors.white)),
+                      icon: Icon(Icons.elevator, color: Colors.white)),
+                  Tab(
+                    child: Text("Playstyle",
+                        style: TextStyle(color: Colors.white)),
+                    icon: Icon(Icons.alt_route, color: Colors.white),
                   )
                 ],
               ),

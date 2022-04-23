@@ -1,3 +1,6 @@
+import 'dart:core';
+import 'dart:core';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:firebase_database/firebase_database.dart';
@@ -85,7 +88,8 @@ class _AnalysisHomeState extends State<AnalysisHome> {
         isExpanded: _isOpen[i],
         body: Column(
           children: [
-            TeamDataWidget(dataToShow: teamsData[i]),
+            TeamDataWidget(
+                dataToShow: ["test"]), //teamsdata, ["lior", "is", "cool"]
             FloatingActionButton(
                 heroTag: new Random().nextInt(99999),
                 onPressed: () {
@@ -93,7 +97,7 @@ class _AnalysisHomeState extends State<AnalysisHome> {
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              AnalysisGallery(teamID: teams[i])));
+                              AnalysisGallery(teamID: "3339"))); //teams[i]
                 }),
             FittedBox(
               fit: BoxFit.cover,
@@ -106,15 +110,15 @@ class _AnalysisHomeState extends State<AnalysisHome> {
                         ref.child('listeners').child('update_team_analytics');
                     listenerRef.set(teams[i]);
                     listenerRef.onValue.listen((event) {
-                      if(event.snapshot.value=="0"){//it means the operation ended
-          Navigator.pop(context);
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AnalysisHome()));
+                      if (event.snapshot.value == "0") {
+                        //it means the operation ended
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AnalysisHome()));
                       }
                     });
-                    
                   }),
             )
           ],
@@ -129,31 +133,41 @@ class _AnalysisHomeState extends State<AnalysisHome> {
     final fb = FirebaseDatabase.instance;
     final ref = fb.ref();
     List<String> teams = [];
-    DataSnapshot data =await ref.child("teams").get();
-    final info = Map<String, dynamic>.from((data.value as Map<dynamic,dynamic>));
-      List<String> teamNumbers = [];
-      for (var teamID in info.keys) {
-        teamNumbers.add(teamID);
-        List<String> teamData = [];
-        try {
-          //add the data from teams/teamID/stats
-          final stats = Map<String, dynamic>.from(info[teamID]['stats']);
-          for (var key in stats.keys) {
-            teamData.add('$key:${stats[key]}');
+    DataSnapshot data = await ref.child("teams").get();
+    final info = 
+        Map<String, dynamic>.from((data.value as Map<dynamic, dynamic>));
+    List<String> teamNumbers = [];
+    for (var teamID in info.keys) {
+      teamNumbers.add(teamID);
+      List<String> teamData = [];
+      try {
+        //add the data from teams/teamID/stats
+        // final stats = Map<String, dynamic>.from(info[teamID]['stats']);
+        // for (var key in stats.keys) {
+        //   teamData.add('$key:${stats[key]}');
+        // }
+        teamData.add('===DATA FROM LAST GAME===');
+        //add the data from teams/teamID/last_game
+        final games = Map<String, dynamic>.from(info[teamID]);
+        //find last game
+        String lastGameKey = "No Games Yet";
+        for (var key in games.keys) {
+          if (key.startsWith("G")) {
+            if (key.compareTo(lastGameKey) > 0) {
+              lastGameKey = key;
+            }
           }
-          teamData.add('===DATA FROM LAST GAME===');
-          //add the data from teams/teamID/last_game
-          final lastGame = Map<String, dynamic>.from(info[teamID]['last_game']);
-          for (var key in lastGame.keys) {
-            teamData.add('$key:${lastGame[key]}');
-          }
-        } catch (Exception) {
-          teamData.add('no statistics for this team yet');
         }
-        teamsData.add(teamData);
+        final lastGame = Map<String, dynamic>.from(info[teamID][lastGameKey]);
+
+        teamData.add(lastGame.values.toString());
+        stderr.writeln(lastGame.values.toString());
+      } catch (Exception) {
+        teamData.add('no statistics for this team yet');
       }
-      
-    
+      teamsData.add(teamData);
+    }
+
     return teams;
   }
 }
