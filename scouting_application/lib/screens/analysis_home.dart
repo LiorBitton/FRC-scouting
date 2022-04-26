@@ -6,6 +6,7 @@ import 'dart:math';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
+import 'package:scouting_application/classes/team_search_delegate.dart';
 import 'dart:async';
 
 import 'package:scouting_application/screens/analysis_gallery.dart';
@@ -32,20 +33,26 @@ class _AnalysisHomeState extends State<AnalysisHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      
         appBar: AppBar(title: Text('Stats')),
-        body: SingleChildScrollView(
-          child: FutureBuilder<ExpansionPanelList>(
-              future: items,
-              builder: (BuildContext conte,
-                  AsyncSnapshot<ExpansionPanelList> snapshot) {
-                if (snapshot.hasData) {
-                  return (snapshot.data as Widget);
-                }
-                return Center(
-                  child: CircularProgressIndicator(
-                      color: CustomTheme.darkTheme.primaryColor),
-                );
-              }),
+        body: Column(
+          children: [FloatingActionButton(onPressed: showSearch(context: context, delegate: TeamSearchDelegate())),
+
+            SingleChildScrollView(
+              child: FutureBuilder<ExpansionPanelList>(
+                  future: items,
+                  builder: (BuildContext conte,
+                      AsyncSnapshot<ExpansionPanelList> snapshot) {
+                    if (snapshot.hasData) {
+                      return (snapshot.data as Widget);
+                    }
+                    return Center(
+                      child: CircularProgressIndicator(
+                          color: CustomTheme.darkTheme.primaryColor),
+                    );
+                  }),
+            ),
+          ],
         ));
   }
 
