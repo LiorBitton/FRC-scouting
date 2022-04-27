@@ -25,3 +25,4 @@ scouting_application/desktop_client/everscout-3c93c-firebase-adminsdk-kasna-781a
 scouting_application/desktop_client/teams.json
 scouting_application/desktop_client/credentials.json
 .vscode/settings.json
+scouting_application/lib/classes/secret_constants.dart
