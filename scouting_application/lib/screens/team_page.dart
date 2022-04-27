@@ -22,6 +22,7 @@ class TeamPage extends StatelessWidget {
     return Scaffold(
         body: Center(
             child: Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         FutureBuilder<TBATeam>(
           future: futureTBATeam,
@@ -36,6 +37,16 @@ class TeamPage extends StatelessWidget {
         ),
         MenuButton(
             title: "Photos",
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => TeamGallery(
+                            teamNumber: teamNumber,
+                          )));
+            }),
+        MenuButton(
+            title: "Games",
             onPressed: () {
               Navigator.push(
                   context,
