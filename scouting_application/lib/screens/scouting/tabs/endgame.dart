@@ -41,25 +41,24 @@ class _EndgameTabState extends State<EndgameTab>
   Widget build(BuildContext context) {
     return Scaffold(
         body: Column(
-      children: [
-        widget.climbTimeCollector,
-        widget.climbGoalCollector,
-        widget.climbedToCollector,
-        Expanded(
-          child: GridView(
-            children: [
-              SizedBox(height: 1, width: 1),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [],
-              ),
-            ],
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3, mainAxisSpacing: 0, crossAxisSpacing: 0),
+      // var newList = ;
+      children: new List.from((widget.getCollectors() as List<Widget>))
+        ..addAll([
+          Expanded(
+            child: GridView(
+              children: [
+                SizedBox(height: 1, width: 1),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [],
+                ),
+              ],
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3, mainAxisSpacing: 0, crossAxisSpacing: 0),
+            ),
           ),
-        ),
-      ],
+        ]),
     ));
   }
 }

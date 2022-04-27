@@ -1,16 +1,13 @@
 import 'dart:core';
-import 'dart:core';
 import 'dart:io';
 import 'dart:math';
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'package:scouting_application/classes/team_search_delegate.dart';
-import 'dart:async';
-
+import 'package:http/http.dart' as http;
 import 'package:scouting_application/screens/analysis_gallery.dart';
-import 'package:scouting_application/themes/custom_themes.dart';
+import 'package:scouting_application/screens/team_page.dart';
 
 class AnalysisHome extends StatefulWidget {
   AnalysisHome({Key? key}) : super(key: key);
@@ -27,36 +24,79 @@ class _AnalysisHomeState extends State<AnalysisHome> {
   @override
   void initState() {
     updateItems();
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
-        appBar: AppBar(title: Text('Stats')),
+        appBar: AppBar(
+          title: Text('Stats'),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  showSearch(
+                      context: context, delegate: TeamSearchDelegate(teams));
+                },
+                icon: Icon(Icons.search))
+          ],
+        ),
         body: Column(
-          children: [FloatingActionButton(onPressed: showSearch(context: context, delegate: TeamSearchDelegate())),
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                physics: ScrollPhysics(),
+                child: Column(
+                  children: [
+                    StreamBuilder(
+                        stream: FirebaseDatabase.instance
+                            .ref('teams')
+                            .onValue
+                            .asBroadcastStream(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return Center(child: CircularProgressIndicator());
+                          } else {
+                            var data =
+                                (snapshot.data as DatabaseEvent).snapshot.value;
+                            final info = Map<String, dynamic>.from(
+                                (data as Map<dynamic, dynamic>));
+                            teams = info.keys.toList();
+                            teams.sort((a, b) => a.compareTo(b));
+                            teams.remove("9999");
 
-            SingleChildScrollView(
-              child: FutureBuilder<ExpansionPanelList>(
-                  future: items,
-                  builder: (BuildContext conte,
-                      AsyncSnapshot<ExpansionPanelList> snapshot) {
-                    if (snapshot.hasData) {
-                      return (snapshot.data as Widget);
-                    }
-                    return Center(
-                      child: CircularProgressIndicator(
-                          color: CustomTheme.darkTheme.primaryColor),
-                    );
-                  }),
+                            return ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: teams.length,
+                                itemBuilder: (context, index) {
+                                  String team = teams[index];
+                                  return ListTile(
+                                    title: Text(
+                                      team,
+                                    ),
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  TeamPage(teamNumber: team)));
+                                    },
+                                  );
+                                });
+                          }
+                        }),
+                  ],
+                ),
+              ),
             ),
           ],
         ));
   }
 
   void updateItems() async {
+    // teams = getTeams();
     items = createExpansionPanelList();
   }
 
@@ -141,7 +181,7 @@ class _AnalysisHomeState extends State<AnalysisHome> {
     final ref = fb.ref();
     List<String> teams = [];
     DataSnapshot data = await ref.child("teams").get();
-    final info = 
+    final info =
         Map<String, dynamic>.from((data.value as Map<dynamic, dynamic>));
     List<String> teamNumbers = [];
     for (var teamID in info.keys) {
