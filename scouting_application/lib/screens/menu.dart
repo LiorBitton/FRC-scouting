@@ -37,6 +37,18 @@ class Menu extends StatelessWidget {
         Expanded(
             child: Column(
           children: [
+            IconButton(
+                icon: Icon(Icons.touch_app),
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => ScoutLobby()));
+                }),
+            IconButton(
+                icon: Icon(Icons.query_stats),
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => AnalysisHome()));
+                }),
             MenuButton(
               title: 'scout',
               onPressed: () {
