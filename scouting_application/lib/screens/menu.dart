@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:scouting_application/screens/analysis_home.dart';
 import 'package:scouting_application/screens/scouting/lobby.dart';
 import 'package:scouting_application/screens/sign_in_google.dart';
@@ -12,7 +11,7 @@ class Menu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    onStart();
+    onStart(context);
     return Scaffold(
         body: Center(
       child:
@@ -41,10 +40,8 @@ class Menu extends StatelessWidget {
             MenuButton(
               title: 'scout',
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => GoogleSignInScreen()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => ScoutLobby()));
                 // MaterialPageRoute(builder: (context) => ScoutLobby()));
               },
             ),
@@ -57,15 +54,8 @@ class Menu extends StatelessWidget {
               },
             ),
             SizedBox(height: 5, width: 5),
-            MenuButton(title: "disco", onPressed: () => {_signOut()})
           ],
         )),
-        // FloatingActionButton(onPressed: () {
-        //   firebase_core.Firebase.initializeApp();
-        //   final fb = FirebaseDatabase.instance;
-        //   final ref = fb.ref();
-        //   ref.child('cool').set('gh');
-        // })
       ]),
     ));
   }
@@ -74,28 +64,14 @@ class Menu extends StatelessWidget {
     await auth.signOut();
   }
 
-  void onStart() {
+  void onStart(BuildContext context) {
     var currentUser = auth.currentUser;
-    print(currentUser);
 
     if (currentUser == null) {
-      linkGoogleAndTwitter();
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => GoogleSignInScreen()));
+    } else {
+      print("user is connected");
     }
-  }
-
-  Future<void> linkGoogleAndTwitter() async {
-    // Trigger the Google Authentication flow.
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-    // Obtain the auth details from the request.
-    final GoogleSignInAuthentication? googleAuth =
-        await googleUser?.authentication;
-    // Create a new credential.
-    final OAuthCredential googleCredential = GoogleAuthProvider.credential(
-      accessToken: googleAuth?.accessToken,
-      idToken: googleAuth?.idToken,
-    );
-    // Sign in to Firebase with the Google [UserCredential].
-    final UserCredential googleUserCredential =
-        await FirebaseAuth.instance.signInWithCredential(googleCredential);
   }
 }
