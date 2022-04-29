@@ -24,7 +24,6 @@ class _AnalysisHomeState extends State<AnalysisHome> {
   @override
   void initState() {
     updateItems();
-
     super.initState();
   }
 
@@ -63,8 +62,9 @@ class _AnalysisHomeState extends State<AnalysisHome> {
                             final info = Map<String, dynamic>.from(
                                 (data as Map<dynamic, dynamic>));
                             teams = info.keys.toList();
-                            teams.sort((a, b) => a.compareTo(b));
                             teams.remove("9999");
+                            teams.sort(
+                                (a, b) => int.parse(a).compareTo(int.parse(b)));
 
                             return ListView.builder(
                                 shrinkWrap: true,
