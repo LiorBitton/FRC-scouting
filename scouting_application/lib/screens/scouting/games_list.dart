@@ -175,8 +175,13 @@ class _GamesListState extends State<GamesList> {
     ));
   }
 
-  Column createUI() {
+  Future<Column> createUI() async{
     List<Container> content = [];
+    List<Map<String, dynamic>> matches = await fetchMatches();
+    for(Map<String, dynamic> match in matches){
+      content.add(getMatchContainer(match));
+    }
+    return Column(children: content,);
   }
 
   Container getMatchContainer(Map<String, dynamic> match) {}
