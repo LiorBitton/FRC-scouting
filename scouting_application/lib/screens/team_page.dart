@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:scouting_application/classes/TBA_team.dart';
 import 'package:scouting_application/classes/secret_constants.dart';
 import 'package:scouting_application/screens/team_gallery.dart';
+import 'package:scouting_application/screens/team_games.dart';
 import 'package:scouting_application/widgets/menu_button.dart';
 
 class TeamPage extends StatelessWidget {
@@ -51,7 +52,7 @@ class TeamPage extends StatelessWidget {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => TeamGallery(
+                      builder: (context) => TeamGames(
                             teamNumber: teamNumber,
                           )));
             }),
