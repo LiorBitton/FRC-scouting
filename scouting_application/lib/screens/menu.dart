@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:scouting_application/screens/admin.dart';
 import 'package:scouting_application/screens/analysis_home.dart';
 import 'package:scouting_application/screens/scouting/lobby.dart';
 import 'package:scouting_application/screens/sign_in_google.dart';
@@ -37,18 +38,18 @@ class Menu extends StatelessWidget {
         Expanded(
             child: Column(
           children: [
-            IconButton(
-                icon: Icon(Icons.touch_app),
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => ScoutLobby()));
-                }),
-            IconButton(
-                icon: Icon(Icons.query_stats),
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => AnalysisHome()));
-                }),
+            // IconButton(
+            //     icon: Icon(Icons.touch_app),
+            //     onPressed: () {
+            //       Navigator.push(context,
+            //           MaterialPageRoute(builder: (context) => ScoutLobby()));
+            //     }),
+            // IconButton(
+            //     icon: Icon(Icons.query_stats),
+            //     onPressed: () {
+            //       Navigator.push(context,
+            //           MaterialPageRoute(builder: (context) => AnalysisHome()));
+            //     }),
             MenuButton(
               title: 'scout',
               onPressed: () {
@@ -66,6 +67,12 @@ class Menu extends StatelessWidget {
               },
             ),
             SizedBox(height: 5, width: 5),
+            IconButton(
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => AdminSettings()));
+                },
+                icon: Icon(Icons.admin_panel_settings))
           ],
         )),
       ]),
