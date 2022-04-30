@@ -8,6 +8,7 @@ import 'package:scouting_application/classes/secret_constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:scouting_application/screens/scouting/game_manager.dart';
 
+//todo make sure no two people are scouting on the same time (currently scouted in databasse)
 class RealtimeScoutingLobby extends StatefulWidget {
   RealtimeScoutingLobby({Key? key}) : super(key: key);
 

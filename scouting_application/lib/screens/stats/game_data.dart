@@ -5,7 +5,7 @@ class GameData extends StatelessWidget {
       : super(key: key);
   final String teamID;
   final Map<String, dynamic> data;
-  @override
+  @override //todo generic display for data
   Widget build(BuildContext context) {
     return Container();
   }

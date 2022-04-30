@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/screens/stats/game_data.dart';
 
+//todo make stateful
 class TeamGames extends StatelessWidget {
   TeamGames({Key? key, required this.teamNumber}) : super(key: key);
   final String teamNumber;
