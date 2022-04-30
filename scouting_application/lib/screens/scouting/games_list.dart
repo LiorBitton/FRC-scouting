@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/classes/secret_constants.dart';
 import 'package:http/http.dart' as http;
+import 'package:scouting_application/screens/scouting/game_manager.dart';
 
 class GamesList extends StatefulWidget {
   GamesList({Key? key}) : super(key: key);
@@ -16,11 +17,82 @@ class GamesList extends StatefulWidget {
 }
 
 class _GamesListState extends State<GamesList> {
+  late Future<Wrap> futureMatches;
+
   @override
   Widget build(BuildContext context) {
+    futureMatches = createUI();
     return Scaffold(
-        body: Center(
-      child: Container(
+        appBar: AppBar(title: Text(Global.current_event)),
+        body: SingleChildScrollView(
+          child: Center(
+            child: FutureBuilder<Wrap>(
+              future: futureMatches,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return snapshot.data!;
+                } else if (snapshot.hasError) {
+                  print('${snapshot.error}');
+                }
+                return const CircularProgressIndicator();
+              },
+            ),
+          ),
+        ));
+  }
+
+  Future<Wrap> createUI() async {
+    List<Container> content = [];
+    dynamic matches = await fetchMatches();
+    for (dynamic match in matches) {
+      Map<String, dynamic> tempMatch =
+          Map<String, dynamic>.from(match as Map<String, dynamic>);
+      content.add(getMatchContainer(tempMatch));
+    }
+    return Wrap(
+      direction: Axis.vertical,
+      spacing: 50,
+      children: content,
+    );
+  }
+
+  Container getMatchContainer(Map<String, dynamic> match) {
+    List<dynamic> blueAlliance = match['alliances']['blue']['team_keys'];
+    List<dynamic> redAlliance = match['alliances']['red']['team_keys'];
+    List<ElevatedButton> blueButtons = [];
+    List<ElevatedButton> redButtons = [];
+
+    ///
+    final String matchNumber = match['match_number'].toString();
+    final String matchSet = match['set_number'].toString();
+    final String matchType = match['comp_level'];
+    final String matchKey = '${matchType}${matchSet}m$matchNumber';
+    String matchTitle = '';
+
+    ///
+    for (int i = 0; i < blueAlliance.length; i++) {
+      blueAlliance[i] = (blueAlliance[i] as String).replaceAll('frc', '');
+      blueButtons
+          .add(getTeamButton(true, blueAlliance[i].toString(), matchKey));
+      redAlliance[i] = (redAlliance[i] as String).replaceAll('frc', '');
+      redButtons.add(getTeamButton(false, redAlliance[i].toString(), matchKey));
+    }
+
+    switch (matchType) {
+      case "f":
+        matchTitle = "Final $matchNumber";
+        break;
+      case "sf":
+        matchTitle = "SF $matchSet - $matchNumber";
+        break;
+      case "qf":
+        matchTitle = "QF $matchSet - $matchNumber";
+        break;
+      case "qm":
+        matchTitle = "Qual #$matchNumber";
+    }
+
+    return Container(
         width: 300,
         height: 300,
         decoration: BoxDecoration(
@@ -35,159 +107,59 @@ class _GamesListState extends State<GamesList> {
           ],
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              width: double.infinity,
-              child: Wrap(
-                direction: Axis.horizontal,
-                spacing: 20,
-                children: [
-                  SizedBox(width: 1),
-                  Text(
-                    "Match #6",
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                        fontSize: 38,
-                        fontStyle: FontStyle.normal,
-                        fontWeight: FontWeight.w900),
-                  ),
-                ],
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: double.infinity,
+                child: Wrap(
+                  direction: Axis.horizontal,
+                  spacing: 20,
+                  children: [
+                    SizedBox(width: 1),
+                    Text(
+                      matchTitle,
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                          fontSize: 38,
+                          fontStyle: FontStyle.normal,
+                          fontWeight: FontWeight.w900),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Wrap(
-                  alignment: WrapAlignment.spaceEvenly,
-                  direction: Axis.vertical,
-                  spacing: 20, // <-- Spacing between children
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisSize: MainAxisSize.max,
                   children: [
-                    SizedBox(
-                        width: 130,
-                        height: 60,
-                        child: ElevatedButton(
-                            onPressed: () {},
-                            child: Text("7112",
-                                style: GoogleFonts.roboto(
-                                    fontWeight: FontWeight.w700, fontSize: 26)),
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                        Colors.red),
-                                shape: MaterialStateProperty.all<
-                                        RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18.0),
-                                ))))),
-                    SizedBox(
-                        width: 130,
-                        height: 60,
-                        child: ElevatedButton(
-                            onPressed: () {},
-                            child: Text("team"),
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                        Colors.red),
-                                shape: MaterialStateProperty.all<
-                                        RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18.0),
-                                ))))),
-                    SizedBox(
-                        width: 130,
-                        height: 60,
-                        child: ElevatedButton(
-                            onPressed: () {},
-                            child: Text("team"),
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                        Colors.red),
-                                shape: MaterialStateProperty.all<
-                                        RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18.0),
-                                ))))),
-                  ],
-                ),
-                Wrap(
-                  alignment: WrapAlignment.spaceEvenly,
-                  direction: Axis.vertical,
-                  spacing: 20, // <-- Spacing between children
-                  children: [
-                    SizedBox(
-                        width: 130,
-                        height: 60,
-                        child: ElevatedButton(
-                            onPressed: () {},
-                            child: Text("team"),
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                        Colors.blue),
-                                shape: MaterialStateProperty.all<
-                                        RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18.0),
-                                ))))),
-                    SizedBox(
-                        width: 130,
-                        height: 60,
-                        child: ElevatedButton(
-                            onPressed: () {},
-                            child: Text("team"),
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                        Colors.blue),
-                                shape: MaterialStateProperty.all<
-                                        RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18.0),
-                                ))))),
-                    SizedBox(
-                        width: 130,
-                        height: 60,
-                        child: ElevatedButton(
-                            onPressed: () {},
-                            child: Text("team"),
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                        Colors.blue),
-                                shape: MaterialStateProperty.all<
-                                        RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18.0),
-                                ))))),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    ));
+                    //red alliance
+                    Wrap(
+                        alignment: WrapAlignment.spaceEvenly,
+                        direction: Axis.vertical,
+                        spacing: 20, // <-- Spacing between children
+                        children: redButtons),
+                    //blue alliance
+                    Wrap(
+                        alignment: WrapAlignment.spaceEvenly,
+                        direction: Axis.vertical,
+                        spacing: 20, // <-- Spacing between children
+                        children: blueButtons)
+                  ])
+            ]));
   }
 
-  Future<Column> createUI() async{
-    List<Container> content = [];
-    List<Map<String, dynamic>> matches = await fetchMatches();
-    for(Map<String, dynamic> match in matches){
-      content.add(getMatchContainer(match));
-    }
-    return Column(children: content,);
-  }
-
-  Container getMatchContainer(Map<String, dynamic> match) {}
-  ElevatedButton getTeamButton(bool isBlue, String teamID) {
+  ElevatedButton getTeamButton(bool isBlue, String teamID, String matchKey) {
     return ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => GameManager(
+                      isBlueAll: isBlue,
+                      matchKey: matchKey,
+                      teamNumber: int.parse(teamID))));
+        },
         child: Text(teamID,
             style:
                 GoogleFonts.roboto(fontWeight: FontWeight.w700, fontSize: 26)),
@@ -200,16 +172,19 @@ class _GamesListState extends State<GamesList> {
             ))));
   }
 
-  Future<List<Map<String, dynamic>>> fetchMatches() async {
+  Future<List<dynamic>> fetchMatches() async {
     var url = Uri.parse(
         'https://www.thebluealliance.com/api/v3/event/${Global.current_event}/matches/simple');
     final response = await http.get(url, headers: {
       'X-TBA-Auth-Key': SecretConstants.TBA_API_KEY,
       'accept': 'application/json'
     });
-    List<Map<String, dynamic>> res = [];
-    if (response.statusCode == 200) {}else{log('error downloading matches')}
-
+    List<dynamic> res = [];
+    if (response.statusCode == 200) {
+      res = jsonDecode(response.body);
+    } else {
+      log('error downloading matches');
+    }
     return res;
   }
 }

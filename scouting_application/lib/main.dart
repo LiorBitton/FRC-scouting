@@ -18,13 +18,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      if (user == null) {
-      } else {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => Menu()));
-      }
-    });
     initGlobal();
     return MaterialApp(
       title: 'EverScout',

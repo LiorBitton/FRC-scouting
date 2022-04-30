@@ -74,12 +74,15 @@ class _ScoutPregameState extends State<ScoutPregame> {
 
                     int matchNumber = int.parse(matchNumberController.text);
                     int teamID = int.parse(teamNumberController.text);
-                    GameManager.matchNumber = matchNumber;
-                    GameManager.teamID = teamID;
-                    GameManager.isBlueAlliance = isSelected[0];
 
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => GameManager()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => GameManager(
+                                  matchNum: matchNumber,
+                                  teamNumber: teamID,
+                                  isBlueAll: isSelected[0],
+                                )));
                   })
             ],
           ),

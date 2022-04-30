@@ -1,5 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/screens/menu.dart';
 import 'package:scouting_application/screens/scouting/scouting_tab.dart';
 import 'package:scouting_application/screens/scouting/tabs/autonomous.dart';
@@ -10,7 +11,15 @@ import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'package:scouting_application/widgets/collectors/ever_collector.dart';
 
 class GameManager extends StatefulWidget {
-  GameManager({Key? key}) : super(key: key);
+  //GameManager.matchNumber = matchNumber;
+  // GameManager.teamID = teamID;
+  // GameManager.isBlueAlliance = isSelected[0];
+  GameManager(
+      {Key? key,
+      required this.isBlueAll,
+      required this.matchKey,
+      required this.teamNumber})
+      : super(key: key);
   static ScoutAutonomous autonomous = new ScoutAutonomous();
   static TeleoperatedTab teleoperated = new TeleoperatedTab();
   static EndgameTab endgame = new EndgameTab();
@@ -26,7 +35,10 @@ class GameManager extends StatefulWidget {
     playstyle
   ];
   //initialized by ScoutPregame
-  static int matchNumber = 0;
+  final String matchKey;
+  final int teamNumber;
+  final bool isBlueAll;
+  static String matchID = '';
   static int teamID = 0;
   static bool isBlueAlliance = false;
 
@@ -41,7 +53,8 @@ class GameManager extends StatefulWidget {
         .child('teams')
         .child('$teamID')
         .child('games')
-        .child('M$matchNumber');
+        .child(Global.current_event)
+        .child('$matchID');
     Map<String, dynamic> data = {};
     List<EverCollector> dataCollectors = [];
     for (ScoutingTab tab in tabs) {
@@ -65,7 +78,7 @@ class GameManager extends StatefulWidget {
         submitGame(context);
       },
     );
-    matchNumber = 0;
+    matchID = "";
     teamID = 0;
     isBlueAlliance = false;
     tabs = [autonomous, teleoperated, endgame, playstyle];
@@ -78,6 +91,10 @@ class GameManager extends StatefulWidget {
 class _GameManagerState extends State<GameManager> {
   @override
   Widget build(BuildContext context) {
+    GameManager.matchID = widget.matchKey;
+    GameManager.isBlueAlliance = widget.isBlueAll;
+    GameManager.teamID = widget.teamNumber;
+
     return WillPopScope(
       onWillPop: () async => false,
       child: DefaultTabController(
@@ -85,7 +102,7 @@ class _GameManagerState extends State<GameManager> {
         child: Scaffold(
             appBar: AppBar(
               title: Text(
-                  'match: #${GameManager.matchNumber} | team: #${GameManager.teamID}'),
+                  'match: #${GameManager.matchID} | team: #${GameManager.teamID}'),
               automaticallyImplyLeading: false,
               bottom: TabBar(
                 indicatorColor: Color.fromARGB(255, 50, 50, 35),
