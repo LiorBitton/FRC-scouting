@@ -74,7 +74,7 @@ class _ScoutGeneralState extends State<ScoutGeneral> {
 
                   if (imageFile != null) uploadImageToFirebase(context);
                   Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => Menu()));
+                      context, MaterialPageRoute(builder: (context) => Homepage()));
                 })
           ],
         ));

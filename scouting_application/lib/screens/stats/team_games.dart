@@ -1,7 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:scouting_application/screens/game_data.dart';
+import 'package:scouting_application/classes/global.dart';
+import 'package:scouting_application/screens/stats/game_data.dart';
 
 class TeamGames extends StatelessWidget {
   TeamGames({Key? key, required this.teamNumber}) : super(key: key);
@@ -15,7 +15,7 @@ class TeamGames extends StatelessWidget {
           Expanded(
             child: StreamBuilder(
                 stream: FirebaseDatabase.instance
-                    .ref('teams/$teamNumber/games')
+                    .ref('teams/$teamNumber/games/${Global.current_event}')
                     .onValue
                     .asBroadcastStream(),
                 builder: (context, snapshot) {
@@ -26,26 +26,22 @@ class TeamGames extends StatelessWidget {
                     final info = Map<String, dynamic>.from(
                         (data as Map<dynamic, dynamic>));
                     List<String> gameIDs = info.keys.toList();
-                    for (int i = 0; i < gameIDs.length; i++) {
-                      gameIDs[i] = gameIDs[i].replaceAll(
-                          'M', ''); //TODO change database way of saving events
-                    }
-                    gameIDs
-                        .sort((a, b) => int.parse(a).compareTo(int.parse(b)));
-
+                    //todo sort by latest match
                     return ListView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
                         itemCount: gameIDs.length,
                         itemBuilder: (context, index) {
-                          final String gameID = 'Q${gameIDs[index]}';
+                          final String gameID = gameIDs[index];
                           return ListTile(
                             title: Text(gameID),
                             onTap: () {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => GameData()));
+                                      builder: (context) => GameData(
+                                          teamID: teamNumber,
+                                          data: info[gameID])));
                             },
                           );
                         });

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:scouting_application/screens/scouting/games_list.dart';
+import 'package:scouting_application/screens/scouting/realtime_scouting_lobby.dart';
 import 'package:scouting_application/screens/scouting/scout_general.dart';
-import 'package:scouting_application/screens/scouting/scout_pregame.dart';
+import 'package:scouting_application/screens/scouting/free_scouting_lobby.dart';
 import 'package:scouting_application/widgets/menu_button.dart';
 
-class ScoutLobby extends StatelessWidget {
-  const ScoutLobby({Key? key}) : super(key: key);
+class ScoutingMenu extends StatelessWidget {
+  const ScoutingMenu({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,7 +21,7 @@ class ScoutLobby extends StatelessWidget {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ScoutPregame()));
+                            builder: (context) => FreeScoutingLobby()));
                   },
                 ),
                 SizedBox(
@@ -31,8 +31,10 @@ class ScoutLobby extends StatelessWidget {
                 MenuButton(
                   title: 'Realtime',
                   onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => GamesList()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => RealtimeScoutingLobby()));
                   },
                 ),
                 SizedBox(

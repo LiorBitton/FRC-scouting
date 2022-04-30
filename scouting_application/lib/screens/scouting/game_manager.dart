@@ -66,7 +66,7 @@ class GameManager extends StatefulWidget {
     data.putIfAbsent('is_blue_alliance', () => isBlueAlliance);
     dest.set(data);
     reset();
-    Navigator.push(context, MaterialPageRoute(builder: (context) => Menu()));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => Homepage()));
   }
 
   static void reset() {

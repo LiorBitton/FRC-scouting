@@ -1,13 +1,15 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:scouting_application/screens/admin.dart';
-import 'package:scouting_application/screens/analysis_home.dart';
-import 'package:scouting_application/screens/scouting/lobby.dart';
-import 'package:scouting_application/screens/sign_in_google.dart';
+import 'package:scouting_application/classes/global.dart';
+import 'package:scouting_application/screens/admin_settings.dart';
+import 'package:scouting_application/screens/stats/stats_lobby.dart';
+import 'package:scouting_application/screens/scouting/scouting_menu.dart';
+import 'package:scouting_application/screens/google_sign_in.dart';
 import 'package:scouting_application/widgets/menu_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class Menu extends StatelessWidget {
-  Menu({Key? key}) : super(key: key);
+class Homepage extends StatelessWidget {
+  Homepage({Key? key}) : super(key: key);
   final FirebaseAuth auth = FirebaseAuth.instance;
 
   @override
@@ -54,7 +56,7 @@ class Menu extends StatelessWidget {
               title: 'scout',
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => ScoutLobby()));
+                    MaterialPageRoute(builder: (context) => ScoutingMenu()));
                 // MaterialPageRoute(builder: (context) => ScoutLobby()));
               },
             ),
@@ -63,7 +65,7 @@ class Menu extends StatelessWidget {
               title: 'analysis',
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => AnalysisHome()));
+                    MaterialPageRoute(builder: (context) => StatsLobby()));
               },
             ),
             SizedBox(height: 5, width: 5),
@@ -91,6 +93,14 @@ class Menu extends StatelessWidget {
           MaterialPageRoute(builder: (context) => GoogleSignInScreen()));
     } else {
       print("user is connected");
+      initGlobal();
     }
+  }
+
+  void initGlobal() async {
+    Global.current_event = await FirebaseDatabase.instance
+        .ref('settings/current_event')
+        .get()
+        .then((value) => value.value.toString());
   }
 }

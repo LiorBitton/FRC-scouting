@@ -1,11 +1,11 @@
 import 'dart:convert';
-import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:scouting_application/classes/secret_constants.dart';
 
-class TeamGallery extends StatelessWidget {
-  TeamGallery({Key? key, required this.teamNumber}) : super(key: key);
+class TeamPhotoGallery extends StatelessWidget {
+  TeamPhotoGallery({Key? key, required this.teamNumber}) : super(key: key);
   final String teamNumber;
   late Future<List<Image>> futureImages;
   @override

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:scouting_application/screens/team_page.dart';
+import 'package:scouting_application/screens/stats/team_homepage.dart';
 
 class TeamSearchDelegate extends SearchDelegate {
   List<String> searchTerms = ['dog', 'food'];
@@ -61,7 +61,7 @@ class TeamSearchDelegate extends SearchDelegate {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => TeamPage(teamNumber: team)));
+                        builder: (context) => TeamHomepage(teamNumber: team)));
               });
         });
   }

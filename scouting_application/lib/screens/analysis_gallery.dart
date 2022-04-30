@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
+@Deprecated("Not working yet,fix it")
 class AnalysisGallery extends StatefulWidget {
   AnalysisGallery({Key? key, required this.teamID}) : super(key: key);
   final String teamID;
@@ -14,10 +15,11 @@ class _AnalysisGalleryState extends State<AnalysisGallery> {
     final ref = FirebaseDatabase.instance.ref();
     final imagesRef = ref.child('teams').child(widget.teamID).child('images');
     DataSnapshot data = await imagesRef.get();
-      final images = Map<String, dynamic>.from(data.value as Map<dynamic,dynamic>);
-      for (var key in images.keys) {
-        urls.add(images[key]);
-      }
+    final images =
+        Map<String, dynamic>.from(data.value as Map<dynamic, dynamic>);
+    for (var key in images.keys) {
+      urls.add(images[key]);
+    }
   }
 
   @override
@@ -44,10 +46,11 @@ class _AnalysisGalleryState extends State<AnalysisGallery> {
     final ref = FirebaseDatabase.instance.ref();
     final imagesRef = ref.child('teams').child(widget.teamID).child('images');
     DataSnapshot data = await imagesRef.get();
-      final stats = Map<String, dynamic>.from(data.value as Map<dynamic,dynamic>);
-      for (var key in stats.keys) {
-        urls.add(stats[key]);
-      }
+    final stats =
+        Map<String, dynamic>.from(data.value as Map<dynamic, dynamic>);
+    for (var key in stats.keys) {
+      urls.add(stats[key]);
+    }
     List<Image> out = [];
     for (String url in urls) {
       out.add(

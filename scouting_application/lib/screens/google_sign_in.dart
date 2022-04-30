@@ -20,7 +20,7 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
       if (user == null) {
       } else {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => Menu()));
+            context, MaterialPageRoute(builder: (context) => Homepage()));
       }
     });
     return Container(

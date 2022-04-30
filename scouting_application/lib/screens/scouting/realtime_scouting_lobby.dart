@@ -8,14 +8,14 @@ import 'package:scouting_application/classes/secret_constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:scouting_application/screens/scouting/game_manager.dart';
 
-class GamesList extends StatefulWidget {
-  GamesList({Key? key}) : super(key: key);
+class RealtimeScoutingLobby extends StatefulWidget {
+  RealtimeScoutingLobby({Key? key}) : super(key: key);
 
   @override
-  State<GamesList> createState() => _GamesListState();
+  State<RealtimeScoutingLobby> createState() => _RealtimeScoutingLobbyState();
 }
 
-class _GamesListState extends State<GamesList> {
+class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
   late Future<Wrap> futureMatches;
 
   @override
@@ -65,7 +65,7 @@ class _GamesListState extends State<GamesList> {
     final String matchNumber = match['match_number'].toString();
     final String matchSet = match['set_number'].toString();
     final String matchType = match['comp_level'];
-    final String matchKey = '${matchType}${matchSet}m$matchNumber';
+    final String matchKey = '$matchType${matchSet}m$matchNumber';
     String matchTitle = '';
 
     ///

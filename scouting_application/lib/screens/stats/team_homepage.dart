@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:scouting_application/classes/TBA_team.dart';
 import 'package:scouting_application/classes/secret_constants.dart';
-import 'package:scouting_application/screens/team_gallery.dart';
-import 'package:scouting_application/screens/team_games.dart';
+import 'package:scouting_application/screens/stats/team_photo_gallery.dart';
+import 'package:scouting_application/screens/stats/team_games.dart';
 import 'package:scouting_application/widgets/menu_button.dart';
 
-class TeamPage extends StatelessWidget {
-  TeamPage({Key? key, required this.teamNumber}) : super(key: key);
+class TeamHomepage extends StatelessWidget {
+  TeamHomepage({Key? key, required this.teamNumber}) : super(key: key);
   final String teamNumber;
   late Future<TBATeam> futureTBATeam;
 
@@ -42,7 +42,7 @@ class TeamPage extends StatelessWidget {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => TeamGallery(
+                      builder: (context) => TeamPhotoGallery(
                             teamNumber: teamNumber,
                           )));
             }),

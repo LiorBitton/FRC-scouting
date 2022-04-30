@@ -4,14 +4,14 @@ import 'package:scouting_application/widgets/digit_text_field.dart';
 import 'package:scouting_application/widgets/menu_button.dart';
 import 'package:scouting_application/widgets/show_alert_dialog.dart';
 
-class ScoutPregame extends StatefulWidget {
-  ScoutPregame({Key? key}) : super(key: key);
+class FreeScoutingLobby extends StatefulWidget {
+  FreeScoutingLobby({Key? key}) : super(key: key);
 
   @override
-  _ScoutPregameState createState() => _ScoutPregameState();
+  _FreeScoutingLobbyState createState() => _FreeScoutingLobbyState();
 }
 
-class _ScoutPregameState extends State<ScoutPregame> {
+class _FreeScoutingLobbyState extends State<FreeScoutingLobby> {
   final matchNumberController = TextEditingController();
   final teamNumberController = TextEditingController();
   List<bool> isSelected = [true, false];

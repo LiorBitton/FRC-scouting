@@ -5,18 +5,17 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'package:scouting_application/classes/team_search_delegate.dart';
-import 'package:http/http.dart' as http;
 import 'package:scouting_application/screens/analysis_gallery.dart';
-import 'package:scouting_application/screens/team_page.dart';
+import 'package:scouting_application/screens/stats/team_homepage.dart';
 
-class AnalysisHome extends StatefulWidget {
-  AnalysisHome({Key? key}) : super(key: key);
+class StatsLobby extends StatefulWidget {
+  StatsLobby({Key? key}) : super(key: key);
 
   @override
-  _AnalysisHomeState createState() => _AnalysisHomeState();
+  _StatsLobbyState createState() => _StatsLobbyState();
 }
 
-class _AnalysisHomeState extends State<AnalysisHome> {
+class _StatsLobbyState extends State<StatsLobby> {
   List<bool> _isOpen = [];
   List<String> teams = [];
   List<List<String>> teamsData = [];
@@ -81,7 +80,8 @@ class _AnalysisHomeState extends State<AnalysisHome> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  TeamPage(teamNumber: team)));
+                                                  TeamHomepage(
+                                                      teamNumber: team)));
                                     },
                                   );
                                 });
@@ -163,7 +163,7 @@ class _AnalysisHomeState extends State<AnalysisHome> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => AnalysisHome()));
+                                builder: (context) => StatsLobby()));
                       }
                     });
                   }),
