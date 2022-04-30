@@ -72,14 +72,14 @@ class _ScoutPregameState extends State<ScoutPregame> {
                       return;
                     }
 
-                    int matchNumber = int.parse(matchNumberController.text);
+                    String matchKey = (matchNumberController.text);
                     int teamID = int.parse(teamNumberController.text);
 
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => GameManager(
-                                  matchNum: matchNumber,
+                                  matchKey: matchKey,
                                   teamNumber: teamID,
                                   isBlueAll: isSelected[0],
                                 )));

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -91,10 +90,10 @@ class _GamesListState extends State<GamesList> {
       case "qm":
         matchTitle = "Qual #$matchNumber";
     }
-
+    final double buttonSpacing = 10;
     return Container(
-        width: 300,
-        height: 300,
+        width: 280,
+        height: 250,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),
           color: Colors.grey[100]!,
@@ -115,7 +114,7 @@ class _GamesListState extends State<GamesList> {
                 width: double.infinity,
                 child: Wrap(
                   direction: Axis.horizontal,
-                  spacing: 20,
+                  spacing: 30,
                   children: [
                     SizedBox(width: 1),
                     Text(
@@ -137,13 +136,13 @@ class _GamesListState extends State<GamesList> {
                     Wrap(
                         alignment: WrapAlignment.spaceEvenly,
                         direction: Axis.vertical,
-                        spacing: 20, // <-- Spacing between children
+                        spacing: buttonSpacing, // <-- Spacing between children
                         children: redButtons),
                     //blue alliance
                     Wrap(
                         alignment: WrapAlignment.spaceEvenly,
                         direction: Axis.vertical,
-                        spacing: 20, // <-- Spacing between children
+                        spacing: buttonSpacing, // <-- Spacing between children
                         children: blueButtons)
                   ])
             ]));
@@ -168,7 +167,7 @@ class _GamesListState extends State<GamesList> {
                 isBlue ? Colors.blue : Colors.red),
             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18.0),
+              borderRadius: BorderRadius.circular(14.0),
             ))));
   }
 
