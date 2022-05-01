@@ -3,7 +3,6 @@ import 'package:scouting_application/screens/scouting/scouting_tab.dart';
 import 'package:scouting_application/widgets/collectors/dropdown_collector.dart';
 import 'package:scouting_application/widgets/collectors/duration_collector.dart';
 import 'package:scouting_application/widgets/collectors/ever_collector.dart';
-import 'package:scouting_application/widgets/collectors/switch_collector.dart';
 
 class EndgameTab extends StatefulWidget implements ScoutingTab {
   EndgameTab({Key? key}) : super(key: key);
@@ -42,7 +41,7 @@ class _EndgameTabState extends State<EndgameTab>
     return Scaffold(
         body: Column(
       // var newList = ;
-      children: new List.from((widget.getCollectors() as List<Widget>))
+      children: new List.from(widget.getCollectors())
         ..addAll([
           Expanded(
             child: GridView(

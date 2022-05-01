@@ -46,9 +46,7 @@ class _AdminSettingsState extends State<AdminSettings> {
                           currentEventValue = val.toString();
                         });
                       });
-                } else if (snapshot.hasError) {
-                  ('${snapshot.error}');
-                }
+                } else if (snapshot.hasError) {}
                 return const CircularProgressIndicator();
               },
             ),
