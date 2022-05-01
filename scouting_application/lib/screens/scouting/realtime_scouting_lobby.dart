@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:scouting_application/classes/global.dart';
@@ -18,7 +19,7 @@ class RealtimeScoutingLobby extends StatefulWidget {
 
 class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
   late Future<Wrap> futureMatches;
-
+  Set<String> currentlyScouted = new Set<String>();
   @override
   Widget build(BuildContext context) {
     futureMatches = createUI();
@@ -41,13 +42,44 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
         ));
   }
 
+  Future<void> _initCurrentlyScouted() async {
+    final ref = FirebaseDatabase.instance.ref();
+    final dest = ref.child('sync').child('currently_scouted');
+    Iterable<String> scoutedList =
+        await dest.once().then((DatabaseEvent snapshot) {
+      if (snapshot.snapshot.exists) {
+        print(snapshot.snapshot.value);
+        Map<String, dynamic> val = Map<String, dynamic>.from(
+            snapshot.snapshot.value as Map<dynamic, dynamic>);
+        return val.keys;
+      }
+      return [];
+    });
+    currentlyScouted.addAll(scoutedList);
+    dest.onChildAdded.listen(
+      (event) {
+        currentlyScouted.add((event.snapshot.value as String));
+        print(currentlyScouted);
+      },
+    );
+    dest.onChildRemoved.listen(
+      (event) {
+        currentlyScouted.remove((event.snapshot.value as String));
+        print(currentlyScouted);
+      },
+    );
+  }
+
   Future<Wrap> createUI() async {
     List<Container> content = [];
+    _initCurrentlyScouted();
     dynamic matches = await fetchMatches();
+    //todo sort matches
     for (dynamic match in matches) {
       Map<String, dynamic> tempMatch =
           Map<String, dynamic>.from(match as Map<String, dynamic>);
-      content.add(getMatchContainer(tempMatch));
+      Container? matchCont = getMatchContainer(tempMatch);
+      if (matchCont != null) content.add(matchCont);
     }
     return Wrap(
       direction: Axis.vertical,
@@ -56,7 +88,9 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
     );
   }
 
-  Container getMatchContainer(Map<String, dynamic> match) {
+  Container? getMatchContainer(Map<String, dynamic> match) {
+    // if (match["winning_alliance"] != "")
+    //   return null; //dont show match if already played TODO check how a tie and DNF shows in a realtime competition
     List<dynamic> blueAlliance = match['alliances']['blue']['team_keys'];
     List<dynamic> redAlliance = match['alliances']['red']['team_keys'];
     List<ElevatedButton> blueButtons = [];
@@ -72,10 +106,13 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
     ///
     for (int i = 0; i < blueAlliance.length; i++) {
       blueAlliance[i] = (blueAlliance[i] as String).replaceAll('frc', '');
-      blueButtons
-          .add(getTeamButton(true, blueAlliance[i].toString(), matchKey));
+      ElevatedButton? bluebtn =
+          getTeamButton(true, blueAlliance[i].toString(), matchKey);
+      if (bluebtn != null) blueButtons.add(bluebtn);
       redAlliance[i] = (redAlliance[i] as String).replaceAll('frc', '');
-      redButtons.add(getTeamButton(false, redAlliance[i].toString(), matchKey));
+      ElevatedButton? redbtn =
+          getTeamButton(false, redAlliance[i].toString(), matchKey);
+      if (redbtn != null) redButtons.add(redbtn);
     }
 
     switch (matchType) {
@@ -149,27 +186,29 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
             ]));
   }
 
-  ElevatedButton getTeamButton(bool isBlue, String teamID, String matchKey) {
-    return ElevatedButton(
-        onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => GameManager(
-                      isBlueAll: isBlue,
-                      matchKey: matchKey,
-                      teamNumber: int.parse(teamID))));
-        },
-        child: Text(teamID,
-            style:
-                GoogleFonts.roboto(fontWeight: FontWeight.w700, fontSize: 26)),
-        style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(
-                isBlue ? Colors.blue : Colors.red),
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14.0),
-            ))));
+  ElevatedButton? getTeamButton(bool isBlue, String teamID, String matchKey) {
+    return currentlyScouted.contains(teamID)
+        ? null
+        : ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => GameManager(
+                          isBlueAll: isBlue,
+                          matchKey: matchKey,
+                          teamNumber: int.parse(teamID))));
+            },
+            child: Text(teamID,
+                style: GoogleFonts.roboto(
+                    fontWeight: FontWeight.w700, fontSize: 26)),
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all<Color>(
+                    isBlue ? Colors.blue : Colors.red),
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                    RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14.0),
+                ))));
   }
 
   Future<List<dynamic>> fetchMatches() async {
