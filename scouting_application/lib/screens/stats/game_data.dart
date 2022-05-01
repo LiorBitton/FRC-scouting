@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class GameData extends StatelessWidget {
   const GameData({Key? key, required this.teamID, required this.data})
@@ -7,6 +7,14 @@ class GameData extends StatelessWidget {
   final Map<String, dynamic> data;
   @override //todo generic display for data
   Widget build(BuildContext context) {
-    return Container();
+    List<String> dataKeys = data.keys.toList();
+    return Scaffold(
+        body: ListView.builder(
+            itemCount: dataKeys.length,
+            itemBuilder: ((context, index) {
+              return ListTile(
+                  title: Text(
+                      '${dataKeys.elementAt(index)} : ${data[dataKeys[index]].toString()}'));
+            })));
   }
 }
