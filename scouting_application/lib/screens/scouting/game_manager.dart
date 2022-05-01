@@ -7,7 +7,6 @@ import 'package:scouting_application/screens/scouting/tabs/autonomous.dart';
 import 'package:scouting_application/screens/scouting/tabs/endgame.dart';
 import 'package:scouting_application/screens/scouting/tabs/playstyle.dart';
 import 'package:scouting_application/screens/scouting/tabs/teleoperated.dart';
-import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'package:scouting_application/widgets/collectors/ever_collector.dart';
 
 class GameManager extends StatefulWidget {
@@ -46,9 +45,10 @@ class GameManager extends StatefulWidget {
   ///
   ///
   static void submitGame(BuildContext context) {
-    firebase_core.Firebase.initializeApp();
+    // firebase_core.Firebase.initializeApp();
     final fb = FirebaseDatabase.instance;
     final ref = fb.ref();
+    notifyScoutingFinished();
     final dest = ref
         .child('teams')
         .child('$teamID')
@@ -66,7 +66,18 @@ class GameManager extends StatefulWidget {
     data.putIfAbsent('is_blue_alliance', () => isBlueAlliance);
     dest.set(data);
     reset();
-    Navigator.push(context, MaterialPageRoute(builder: (context) => Homepage()));
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => Homepage()));
+  }
+
+  static void notifyScoutingFinished() {
+    final fb = FirebaseDatabase.instance;
+    final ref = fb.ref();
+    ref
+        .child('sync')
+        .child('currently_scouted')
+        .child(GameManager.teamID.toString())
+        .remove();
   }
 
   static void reset() {
@@ -89,48 +100,109 @@ class GameManager extends StatefulWidget {
 }
 
 class _GameManagerState extends State<GameManager> {
+  late Future<bool> futureScoutingOccupied;
+
+  @override
+  void initState() {
+    super.initState();
+    futureScoutingOccupied = _notifyScoutingTeam();
+  }
+
   @override
   Widget build(BuildContext context) {
     GameManager.matchID = widget.matchKey;
     GameManager.isBlueAlliance = widget.isBlueAll;
     GameManager.teamID = widget.teamNumber;
 
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: DefaultTabController(
-        length: 4,
-        child: Scaffold(
-            appBar: AppBar(
-              title: Text(
-                  'match: #${GameManager.matchID} | team: #${GameManager.teamID}'),
-              automaticallyImplyLeading: false,
-              bottom: TabBar(
-                indicatorColor: Color.fromARGB(255, 50, 50, 35),
-                indicatorSize: TabBarIndicatorSize.tab,
-                indicatorWeight: 5,
-                tabs: [
-                  Tab(
-                      child:
-                          Text("Auto", style: TextStyle(color: Colors.white)),
-                      icon: Icon(Icons.do_not_touch, color: Colors.white)),
-                  Tab(
-                      child:
-                          Text("Teleop", style: TextStyle(color: Colors.white)),
-                      icon: Icon(Icons.drive_eta_rounded, color: Colors.white)),
-                  Tab(
-                      child: Text("Endgame",
-                          style: TextStyle(color: Colors.white)),
-                      icon: Icon(Icons.elevator, color: Colors.white)),
-                  Tab(
-                    child: Text("Playstyle",
-                        style: TextStyle(color: Colors.white)),
-                    icon: Icon(Icons.alt_route, color: Colors.white),
-                  )
-                ],
-              ),
-            ),
-            body: TabBarView(children: GameManager.tabs)),
-      ),
-    );
+    return FutureBuilder<bool>(
+        future: futureScoutingOccupied,
+        builder: ((context, snapshot) {
+          if (snapshot.hasData) {
+            if (!(snapshot.data!)) {
+              Navigator.pop(context);
+            } else {
+              return WillPopScope(
+                onWillPop: () async => false,
+                child: DefaultTabController(
+                  length: 4,
+                  child: Scaffold(
+                      appBar: AppBar(
+                        title: Text(
+                            'match: #${GameManager.matchID} | team: #${GameManager.teamID}'),
+                        actions: [
+                          IconButton(
+                              onPressed: () {
+                                _notifyScoutingFinished();
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Homepage()));
+                              },
+                              icon: Icon(Icons.exit_to_app))
+                        ],
+                        automaticallyImplyLeading: false,
+                        bottom: TabBar(
+                          indicatorColor: Color.fromARGB(255, 50, 50, 35),
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          indicatorWeight: 5,
+                          tabs: [
+                            Tab(
+                                child: Text("Auto",
+                                    style: TextStyle(color: Colors.white)),
+                                icon: Icon(Icons.do_not_touch,
+                                    color: Colors.white)),
+                            Tab(
+                                child: Text("Teleop",
+                                    style: TextStyle(color: Colors.white)),
+                                icon: Icon(Icons.drive_eta_rounded,
+                                    color: Colors.white)),
+                            Tab(
+                                child: Text("Endgame",
+                                    style: TextStyle(color: Colors.white)),
+                                icon:
+                                    Icon(Icons.elevator, color: Colors.white)),
+                            Tab(
+                              child: Text("Playstyle",
+                                  style: TextStyle(color: Colors.white)),
+                              icon: Icon(Icons.alt_route, color: Colors.white),
+                            )
+                          ],
+                        ),
+                      ),
+                      body: TabBarView(children: GameManager.tabs)),
+                ),
+              );
+            }
+          }
+          return CircularProgressIndicator();
+        }));
+  }
+
+  Future<bool> _notifyScoutingTeam() async {
+    final fb = FirebaseDatabase.instance;
+    final ref = fb.ref();
+    final dest = ref
+        .child('sync')
+        .child('currently_scouted')
+        .child(widget.teamNumber.toString());
+    bool exists = await dest.once().then((DatabaseEvent snapshot) {
+      return snapshot.snapshot.exists;
+    });
+    if (exists) {
+      return false;
+    } else {
+      await dest.set(widget.teamNumber.toString());
+      return true;
+    }
+  }
+
+  void _notifyScoutingFinished() {
+    final fb = FirebaseDatabase.instance;
+    final ref = fb.ref();
+    ref
+        .child('sync')
+        .child('currently_scouted')
+        .child(GameManager.teamID.toString())
+        .remove();
   }
 }
