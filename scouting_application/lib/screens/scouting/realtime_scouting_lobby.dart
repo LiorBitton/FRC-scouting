@@ -48,7 +48,7 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
     Iterable<String> scoutedList =
         await dest.once().then((DatabaseEvent snapshot) {
       if (snapshot.snapshot.exists) {
-        print(snapshot.snapshot.value);
+        (snapshot.snapshot.value);
         Map<String, dynamic> val = Map<String, dynamic>.from(
             snapshot.snapshot.value as Map<dynamic, dynamic>);
         return val.keys;
@@ -59,13 +59,13 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
     dest.onChildAdded.listen(
       (event) {
         currentlyScouted.add((event.snapshot.value as String));
-        print(currentlyScouted);
+        (currentlyScouted);
       },
     );
     dest.onChildRemoved.listen(
       (event) {
         currentlyScouted.remove((event.snapshot.value as String));
-        print(currentlyScouted);
+        (currentlyScouted);
       },
     );
   }
@@ -74,7 +74,7 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
     List<Container> content = [];
     _initCurrentlyScouted();
     dynamic matches = await fetchMatches();
-    //todo sort matches
+    //TODO sort matches
     for (dynamic match in matches) {
       Map<String, dynamic> tempMatch =
           Map<String, dynamic>.from(match as Map<String, dynamic>);

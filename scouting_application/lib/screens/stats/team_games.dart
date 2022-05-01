@@ -24,6 +24,9 @@ class TeamGames extends StatelessWidget {
                     return Center(child: CircularProgressIndicator());
                   } else {
                     var data = (snapshot.data as DatabaseEvent).snapshot.value;
+                    if (data == null) {
+                      return Center(child: Text("no games for this team"));
+                    }
                     final info = Map<String, dynamic>.from(
                         (data as Map<dynamic, dynamic>));
                     List<String> gameIDs = info.keys.toList();
@@ -42,7 +45,9 @@ class TeamGames extends StatelessWidget {
                                   MaterialPageRoute(
                                       builder: (context) => GameData(
                                           teamID: teamNumber,
-                                          data: info[gameID])));
+                                          data: Map<String, dynamic>.from(
+                                              (info[gameID]
+                                                  as Map<dynamic, dynamic>)))));
                             },
                           );
                         });

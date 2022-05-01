@@ -47,7 +47,7 @@ class _AdminSettingsState extends State<AdminSettings> {
                         });
                       });
                 } else if (snapshot.hasError) {
-                  print('${snapshot.error}');
+                  ('${snapshot.error}');
                 }
                 return const CircularProgressIndicator();
               },

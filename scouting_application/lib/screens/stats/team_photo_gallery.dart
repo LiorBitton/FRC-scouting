@@ -57,7 +57,7 @@ class TeamPhotoGallery extends StatelessWidget {
         } catch (Exception) {
           try {
             //if the photo is the logo of the team
-            print(mediaItem['details']['base64Image']);
+            (mediaItem['details']['base64Image']);
             out.add(imageFromBase64String(mediaItem['details']['base64Image']));
           } catch (Exception) {}
         }
