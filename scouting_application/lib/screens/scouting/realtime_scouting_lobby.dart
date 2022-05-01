@@ -48,7 +48,6 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
     Iterable<String> scoutedList =
         await dest.once().then((DatabaseEvent snapshot) {
       if (snapshot.snapshot.exists) {
-        (snapshot.snapshot.value);
         Map<String, dynamic> val = Map<String, dynamic>.from(
             snapshot.snapshot.value as Map<dynamic, dynamic>);
         return val.keys;
@@ -59,13 +58,11 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
     dest.onChildAdded.listen(
       (event) {
         currentlyScouted.add((event.snapshot.value as String));
-        (currentlyScouted);
       },
     );
     dest.onChildRemoved.listen(
       (event) {
         currentlyScouted.remove((event.snapshot.value as String));
-        (currentlyScouted);
       },
     );
   }
@@ -89,8 +86,10 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
   }
 
   Container? getMatchContainer(Map<String, dynamic> match) {
-    // if (match["winning_alliance"] != "")
-    //   return null; //dont show match if already played TODO check how a tie and DNF shows in a realtime competition
+    if (match["winning_alliance"] != "" &&
+        (match["alliances"]["red"]["score"] == -1 ||
+            match["alliances"]["red"]["score"] == null))
+      return null; //dont show match if already played TODO check how a tie and DNF shows in a realtime competition
     List<dynamic> blueAlliance = match['alliances']['blue']['team_keys'];
     List<dynamic> redAlliance = match['alliances']['red']['team_keys'];
     List<ElevatedButton> blueButtons = [];
