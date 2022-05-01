@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:scouting_application/screens/scouting/realtime_scouting_lobby.dart';
-import 'package:scouting_application/screens/scouting/scout_general.dart';
 import 'package:scouting_application/screens/scouting/free_scouting_lobby.dart';
 import 'package:scouting_application/widgets/menu_button.dart';
 
@@ -44,10 +43,10 @@ class ScoutingMenu extends StatelessWidget {
                 MenuButton(
                   title: 'general',
                   onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ScoutGeneral()));
+                    // Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //         builder: (context) => ScoutGeneral()));
                   },
                 )
               ]),
