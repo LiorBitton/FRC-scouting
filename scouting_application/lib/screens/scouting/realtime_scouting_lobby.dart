@@ -75,7 +75,7 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
       //yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]
       String aKey = a["key"];
       String bKey = b["key"];
-      print("$aKey : $bKey");
+
       int stageEqual = aKey // _[COMP_LEVEL]m
           .substring(aKey.indexOf("_"), aKey.lastIndexOf("m"))
           .compareTo(bKey.substring(bKey.indexOf("_"), bKey.lastIndexOf("m")));
@@ -102,7 +102,7 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
     // if (match["winning_alliance"] != "" &&
     //     (match["alliances"]["red"]["score"] == -1 ||
     //         match["alliances"]["red"]["score"] == null))
-    //   return null; //dont show match if already played TODO check how a tie and DNF shows in a realtime competition
+    //   return null; //dont show match if already played 
     List<dynamic> blueAlliance = match['alliances']['blue']['team_keys'];
     List<dynamic> redAlliance = match['alliances']['red']['team_keys'];
     List<ElevatedButton> blueButtons = [];
