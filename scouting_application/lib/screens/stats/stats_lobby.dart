@@ -1,13 +1,15 @@
 import 'dart:convert';
 import 'dart:core';
+import 'dart:io';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:scouting_application/classes/secret_constants.dart';
 import 'package:scouting_application/classes/team_search_delegate.dart';
 // import 'package:scouting_application/screens/analysis_gallery.dart';
 import 'package:scouting_application/screens/stats/team_homepage.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+
 class StatsLobby extends StatefulWidget {
   StatsLobby({Key? key}) : super(key: key);
 
@@ -18,10 +20,12 @@ class StatsLobby extends StatefulWidget {
 class _StatsLobbyState extends State<StatsLobby> {
   List<String> teams = [];
   List<List<String>> teamsData = [];
-  late Future<Map<String, Image>> futureLogos;
+  Map<String, dynamic> teamNicknames = {"": ""};
+  bool nicknamesLoaded = false;
   @override
   void initState() {
     super.initState();
+    loadNicknames();
   }
 
   @override
@@ -64,6 +68,7 @@ class _StatsLobbyState extends State<StatsLobby> {
                             teams.remove("9999");
                             teams.sort(
                                 (a, b) => int.parse(a).compareTo(int.parse(b)));
+
                             return ListView.builder(
                                 shrinkWrap: true,
                                 physics: NeverScrollableScrollPhysics(),
@@ -83,9 +88,7 @@ class _StatsLobbyState extends State<StatsLobby> {
                                           }
                                           return Text("");
                                         }
-                                        return CircularProgressIndicator(
-                                          color: Colors.green,
-                                        );
+                                        return Text("");
                                       },
                                     ),
                                     leading: FutureBuilder<Widget?>(
@@ -128,7 +131,6 @@ class _StatsLobbyState extends State<StatsLobby> {
 
   Future<Widget?> fetchTeamLogo(String teamNumber) async {
     int year = new DateTime.now().year;
-    defaultCacheManager
     var url = Uri.parse(
         'https://www.thebluealliance.com/api/v3/team/frc$teamNumber/media/$year');
     final response = await http.get(url, headers: {
@@ -169,6 +171,12 @@ class _StatsLobbyState extends State<StatsLobby> {
   }
 
   Future<String> fetchTeamNickname(String teamNumber) async {
+    if (!nicknamesLoaded) await loadNicknames();
+    if (teamNicknames.containsKey(teamNumber)) {
+      print("loaded $teamNumber from json");
+      return teamNicknames[teamNumber]!;
+    }
+
     var url = Uri.parse(
         'https://www.thebluealliance.com/api/v3/team/frc$teamNumber/simple');
     final response = await http.get(url, headers: {
@@ -179,11 +187,42 @@ class _StatsLobbyState extends State<StatsLobby> {
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
-      return jsonDecode(response.body)["nickname"];
+      String nickname = jsonDecode(response.body)["nickname"];
+      if (!teamNicknames.containsKey(teamNumber)) {
+        teamNicknames.putIfAbsent(teamNumber, () => nickname);
+        saveNicknamesToFile();
+        print("saved $teamNumber to json");
+      }
+      return nickname;
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
       throw Exception('Failed to load TBATeam');
     }
+  }
+
+  Future<void> loadNicknames() async {
+    if (nicknamesLoaded) return;
+    nicknamesLoaded = true;
+    String fileName = 'teamData.json';
+    var dir = await getTemporaryDirectory();
+
+    File file = File(dir.path + '/' + fileName);
+    if (!file.existsSync()) {
+      print("creating file");
+      file = await file.create();
+      await saveNicknamesToFile();
+    }
+    var jsonData = file.readAsStringSync();
+    var jsonResponse = jsonDecode(jsonData);
+    teamNicknames =
+        Map<String, dynamic>.from(jsonResponse as Map<String, dynamic>);
+  }
+
+  Future<void> saveNicknamesToFile() async {
+    String fileName = 'teamData.json';
+    var dir = await getTemporaryDirectory();
+    File file = File(dir.path + '/' + fileName);
+    file.writeAsStringSync(json.encode(teamNicknames));
   }
 }
