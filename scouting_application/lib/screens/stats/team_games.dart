@@ -40,9 +40,9 @@ class TeamGames extends StatelessWidget {
                         return stageEqual;
                       }
 
-                      return int.parse(a.substring(a.lastIndexOf("m"))) -
-                          int.parse(
-                              b.substring(b.lastIndexOf("m"))); //[MATCH_NUMBER]
+                      return int.parse(a.substring(a.lastIndexOf("m") + 1)) -
+                          int.parse(b.substring(
+                              b.lastIndexOf("m") + 1)); //[MATCH_NUMBER]
                     });
                     return ListView.builder(
                         shrinkWrap: true,
