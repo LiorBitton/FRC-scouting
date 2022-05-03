@@ -9,7 +9,6 @@ import 'package:scouting_application/classes/secret_constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:scouting_application/screens/scouting/game_manager.dart';
 
-//todo make sure no two people are scouting on the same time (currently scouted in databasse)
 class RealtimeScoutingLobby extends StatefulWidget {
   RealtimeScoutingLobby({Key? key}) : super(key: key);
 
@@ -71,7 +70,21 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
     List<Container> content = [];
     _initCurrentlyScouted();
     dynamic matches = await fetchMatches();
-    //TODO sort matches
+
+    (matches as List<dynamic>).sort((a, b) {
+      //yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]
+      String aKey = a["key"];
+      String bKey = b["key"];
+      print("$aKey : $bKey");
+      int stageEqual = aKey // _[COMP_LEVEL]m
+          .substring(aKey.indexOf("_"), aKey.lastIndexOf("m"))
+          .compareTo(bKey.substring(bKey.indexOf("_"), bKey.lastIndexOf("m")));
+      if (stageEqual != 0) {
+        return stageEqual;
+      }
+
+      return a["match_number"] - b["match_number"]; //[MATCH_NUMBER]
+    });
     for (dynamic match in matches) {
       Map<String, dynamic> tempMatch =
           Map<String, dynamic>.from(match as Map<String, dynamic>);
@@ -86,10 +99,10 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
   }
 
   Container? getMatchContainer(Map<String, dynamic> match) {
-    if (match["winning_alliance"] != "" &&
-        (match["alliances"]["red"]["score"] == -1 ||
-            match["alliances"]["red"]["score"] == null))
-      return null; //dont show match if already played TODO check how a tie and DNF shows in a realtime competition
+    // if (match["winning_alliance"] != "" &&
+    //     (match["alliances"]["red"]["score"] == -1 ||
+    //         match["alliances"]["red"]["score"] == null))
+    //   return null; //dont show match if already played TODO check how a tie and DNF shows in a realtime competition
     List<dynamic> blueAlliance = match['alliances']['blue']['team_keys'];
     List<dynamic> redAlliance = match['alliances']['red']['team_keys'];
     List<ElevatedButton> blueButtons = [];

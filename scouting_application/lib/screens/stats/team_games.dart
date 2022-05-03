@@ -30,7 +30,20 @@ class TeamGames extends StatelessWidget {
                     final info = Map<String, dynamic>.from(
                         (data as Map<dynamic, dynamic>));
                     List<String> gameIDs = info.keys.toList();
-                    //todo sort by latest match
+                    //todo check the soring method
+                    gameIDs.sort((a, b) {
+                      //yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]
+                      int stageEqual = a // _[COMP_LEVEL]m
+                          .substring(0, a.lastIndexOf("m"))
+                          .compareTo(b.substring(0, b.lastIndexOf("m")));
+                      if (stageEqual != 0) {
+                        return stageEqual;
+                      }
+
+                      return int.parse(a.substring(a.lastIndexOf("m"))) -
+                          int.parse(
+                              b.substring(b.lastIndexOf("m"))); //[MATCH_NUMBER]
+                    });
                     return ListView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
