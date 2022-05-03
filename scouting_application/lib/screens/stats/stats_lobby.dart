@@ -1,12 +1,13 @@
+import 'dart:convert';
 import 'dart:core';
-import 'dart:io';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart' as firebase_core;
+import 'package:scouting_application/classes/secret_constants.dart';
 import 'package:scouting_application/classes/team_search_delegate.dart';
 // import 'package:scouting_application/screens/analysis_gallery.dart';
 import 'package:scouting_application/screens/stats/team_homepage.dart';
-
+import 'package:http/http.dart' as http;
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 class StatsLobby extends StatefulWidget {
   StatsLobby({Key? key}) : super(key: key);
 
@@ -17,9 +18,9 @@ class StatsLobby extends StatefulWidget {
 class _StatsLobbyState extends State<StatsLobby> {
   List<String> teams = [];
   List<List<String>> teamsData = [];
+  late Future<Map<String, Image>> futureLogos;
   @override
   void initState() {
-    updateItems();
     super.initState();
   }
 
@@ -63,7 +64,6 @@ class _StatsLobbyState extends State<StatsLobby> {
                             teams.remove("9999");
                             teams.sort(
                                 (a, b) => int.parse(a).compareTo(int.parse(b)));
-
                             return ListView.builder(
                                 shrinkWrap: true,
                                 physics: NeverScrollableScrollPhysics(),
@@ -73,6 +73,38 @@ class _StatsLobbyState extends State<StatsLobby> {
                                   return ListTile(
                                     title: Text(
                                       team,
+                                    ),
+                                    subtitle: FutureBuilder<String>(
+                                      future: fetchTeamNickname(team),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.hasData) {
+                                          if (snapshot.data != null) {
+                                            return Text("${snapshot.data}");
+                                          }
+                                          return Text("");
+                                        }
+                                        return CircularProgressIndicator(
+                                          color: Colors.green,
+                                        );
+                                      },
+                                    ),
+                                    leading: FutureBuilder<Widget?>(
+                                      future: fetchTeamLogo(team),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.hasData) {
+                                          if (snapshot.data != null) {
+                                            try {
+                                              return snapshot.data! as Image;
+                                            } catch (e) {
+                                              return Icon(Icons.people);
+                                            }
+                                          }
+                                          return Icon(Icons.people);
+                                        }
+                                        return CircularProgressIndicator(
+                                          color: Colors.green,
+                                        );
+                                      },
                                     ),
                                     onTap: () {
                                       Navigator.push(
@@ -94,46 +126,64 @@ class _StatsLobbyState extends State<StatsLobby> {
         ));
   }
 
-  void updateItems() async {
-    // teams = getTeams();
-    // items = createExpansionPanelList();
+  Future<Widget?> fetchTeamLogo(String teamNumber) async {
+    int year = new DateTime.now().year;
+    defaultCacheManager
+    var url = Uri.parse(
+        'https://www.thebluealliance.com/api/v3/team/frc$teamNumber/media/$year');
+    final response = await http.get(url, headers: {
+      'X-TBA-Auth-Key': SecretConstants.TBA_API_KEY,
+      'accept': 'application/json'
+    });
+    Widget? out = Text("ok");
+    if (response.statusCode == 200) {
+      List<dynamic> res = jsonDecode(response.body);
+      if (res == null) {
+        return out;
+      }
+      for (dynamic media in res) {
+        //Fetching team's logo
+        try {
+          if (media["type"] == "avatar")
+            out = imageFromBase64String(
+                res[0]['details']['base64Image'].toString());
+        } catch (exception) {
+          debugPrint('failed to download logo of $teamNumber');
+          return Text("ok");
+        }
+      }
+      return out;
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to load TBATeam');
+    }
   }
 
-  Future<List<String>> getTeams() async {
-    firebase_core.Firebase.initializeApp();
-    final fb = FirebaseDatabase.instance;
-    final ref = fb.ref();
-    List<String> teams = [];
-    DataSnapshot data = await ref.child("teams").get();
-    final info =
-        Map<String, dynamic>.from((data.value as Map<dynamic, dynamic>));
-    List<String> teamNumbers = [];
-    for (var teamID in info.keys) {
-      teamNumbers.add(teamID);
-      List<String> teamData = [];
-      try {
-        teamData.add('===DATA FROM LAST GAME===');
-        //add the data from teams/teamID/last_game
-        final games = Map<String, dynamic>.from(info[teamID]);
-        //find last game
-        String lastGameKey = "No Games Yet";
-        for (var key in games.keys) {
-          if (key.startsWith("G")) {
-            if (key.compareTo(lastGameKey) > 0) {
-              lastGameKey = key;
-            }
-          }
-        }
-        final lastGame = Map<String, dynamic>.from(info[teamID][lastGameKey]);
-
-        teamData.add(lastGame.values.toString());
-        stderr.writeln(lastGame.values.toString());
-      } catch (Exception) {
-        teamData.add('no statistics for this team yet');
-      }
-      teamsData.add(teamData);
+  Image? imageFromBase64String(String base64String) {
+    try {
+      return Image.memory(base64Decode(base64String));
+    } catch (e) {
+      return null;
     }
+  }
 
-    return teams;
+  Future<String> fetchTeamNickname(String teamNumber) async {
+    var url = Uri.parse(
+        'https://www.thebluealliance.com/api/v3/team/frc$teamNumber/simple');
+    final response = await http.get(url, headers: {
+      'X-TBA-Auth-Key': SecretConstants.TBA_API_KEY,
+      'accept': 'application/json'
+    });
+
+    if (response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+      return jsonDecode(response.body)["nickname"];
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to load TBATeam');
+    }
   }
 }
