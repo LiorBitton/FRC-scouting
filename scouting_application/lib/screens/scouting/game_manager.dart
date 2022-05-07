@@ -1,7 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:scouting_application/classes/global.dart';
-import 'package:scouting_application/screens/menu.dart';
+import 'package:scouting_application/screens/homepage.dart';
 import 'package:scouting_application/screens/scouting/scouting_tab.dart';
 import 'package:scouting_application/screens/scouting/tabs/autonomous.dart';
 import 'package:scouting_application/screens/scouting/tabs/endgame.dart';

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_signin_button/button_list.dart';
 import 'package:flutter_signin_button/button_view.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:scouting_application/screens/menu.dart';
+import 'package:scouting_application/screens/homepage.dart';
 
 class GoogleSignInScreen extends StatefulWidget {
   GoogleSignInScreen({Key? key}) : super(key: key);
