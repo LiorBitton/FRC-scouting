@@ -15,6 +15,9 @@ class CustomTheme {
         dividerColor: Colors.white,
         primaryColor: Color.fromARGB(255, 107, 181, 46),
         scaffoldBackgroundColor: Colors.black,
+        appBarTheme: AppBarTheme(
+          color: Color.fromRGBO(107, 181, 46, 100),
+        ),
         // fontFamily: ,
         textTheme: TextTheme(
             bodyText1: GoogleFonts.roboto(
@@ -34,18 +37,18 @@ class CustomTheme {
   }
 
   static ThemeData get lightTheme {
-    //1
-
     return ThemeData(
         brightness: Brightness.light,
         colorScheme: ColorScheme.light(),
-        primaryColor: Colors.purple,
+        primaryColor: Color.fromRGBO(107, 181, 46, 100),
         scaffoldBackgroundColor: Colors.white,
+        appBarTheme: AppBarTheme(
+          color: Color.fromRGBO(107, 181, 46, 100),
+        ),
         fontFamily: 'Montserrat', //3
         textTheme: TextTheme(
             bodyText1: GoogleFonts.roboto(
-                fontWeight: FontWeight.bold,
-                color: Colors.black)),
+                fontWeight: FontWeight.bold, color: Colors.black)),
         buttonTheme: ButtonThemeData(
           // 4
           shape:
