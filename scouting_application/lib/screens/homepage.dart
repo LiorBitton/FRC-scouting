@@ -5,7 +5,6 @@ import 'package:scouting_application/screens/admin_settings.dart';
 import 'package:scouting_application/screens/stats/stats_lobby.dart';
 import 'package:scouting_application/screens/scouting/scouting_menu.dart';
 import 'package:scouting_application/screens/google_sign_in.dart';
-import 'package:scouting_application/widgets/menu_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class Homepage extends StatelessWidget {
@@ -19,71 +18,61 @@ class Homepage extends StatelessWidget {
       onWillPop: () async => false,
       child: Scaffold(
           appBar: AppBar(
-            title: Text("EverScout"),
+            title: Row(
+              children: [
+                Text("EverScout"),
+                Image.asset(
+                  'assets/eg_logo_white.png',
+                  color: Colors.white,
+                  height: AppBar().preferredSize.height - 20,
+                ),
+              ],
+            ),
             automaticallyImplyLeading: false,
             actions: [
-              IconButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AdminSettings()));
-                  },
-                  icon: Icon(Icons.admin_panel_settings))
+              FutureBuilder<bool>(
+                future: isAdmin(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    if (snapshot.data as bool)
+                      return IconButton(
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AdminSettings()));
+                          },
+                          icon: Icon(Icons.admin_panel_settings));
+                  }
+                  return Text("");
+                },
+              )
             ],
           ),
           body: Center(
             child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  SizedBox(
-                    height: 50,
-                  ),
-                  Expanded(
-                    child: Image.asset(
-                      'assets/eg_logo_white.png',
-                      height: 200,
-                    ),
-                  ),
-                  Expanded(
-                      child: Column(
-                    children: [
-                      // IconButton(
-                      //     icon: Icon(Icons.touch_app),
-                      //     onPressed: () {
-                      //       Navigator.push(context,
-                      //           MaterialPageRoute(builder: (context) => ScoutLobby()));
-                      //     }),
-                      // IconButton(
-                      //     icon: Icon(Icons.query_stats),
-                      //     onPressed: () {
-                      //       Navigator.push(context,
-                      //           MaterialPageRoute(builder: (context) => AnalysisHome()));
-                      //     }),
-                      MenuButton(
-                        title: 'scout',
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ScoutingMenu()));
-                          // MaterialPageRoute(builder: (context) => ScoutLobby()));
-                        },
-                      ),
-                      SizedBox(height: 5, width: 5),
-                      MenuButton(
-                        title: 'analysis',
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => StatsLobby()));
-                        },
-                      ),
-                      SizedBox(height: 5, width: 5),
-                    ],
-                  )),
-                ]),
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                    icon: Icon(Icons.touch_app),
+                    iconSize: 40,
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ScoutingMenu()));
+                    }),
+                IconButton(
+                    icon: Icon(Icons.query_stats),
+                    iconSize: 40,
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => StatsLobby()));
+                    }),
+              ],
+            ),
           )),
     );
   }
@@ -99,9 +88,18 @@ class Homepage extends StatelessWidget {
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => GoogleSignInScreen()));
     } else {
-      ("user is connected");
       initGlobal();
     }
+  }
+
+  Future<bool> isAdmin() async {
+    String? email = auth.currentUser!.email;
+    if (email != null) {
+      DataSnapshot val =
+          await FirebaseDatabase.instance.ref('settings/admins').get();
+      return (val.value as List<Object?>).contains(email);
+    }
+    return false;
   }
 
   void initGlobal() async {

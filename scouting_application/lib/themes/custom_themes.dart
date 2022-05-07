@@ -36,15 +36,16 @@ class CustomTheme {
         ));
   }
 
+  static const Color teamColor = Color.fromRGBO(107, 181, 46, 100);
   static ThemeData get lightTheme {
     return ThemeData(
         brightness: Brightness.light,
         colorScheme: ColorScheme.light(),
-        primaryColor: Color.fromRGBO(107, 181, 46, 100),
+        primaryColor: teamColor,
         scaffoldBackgroundColor: Colors.white,
         appBarTheme: AppBarTheme(
-          color: Color.fromRGBO(107, 181, 46, 100),
-        ),
+            color: teamColor, titleTextStyle: GoogleFonts.acme(fontSize: 25)),
+        iconTheme: IconThemeData(color: teamColor),
         fontFamily: 'Montserrat', //3
         textTheme: TextTheme(
             bodyText1: GoogleFonts.roboto(
