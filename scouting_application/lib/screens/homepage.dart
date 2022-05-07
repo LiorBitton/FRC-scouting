@@ -55,7 +55,7 @@ class Homepage extends StatelessWidget {
               children: [
                 IconButton(
                     icon: Icon(Icons.touch_app),
-                    iconSize: 40,
+                    iconSize: 50,
                     onPressed: () {
                       Navigator.push(
                           context,
@@ -64,7 +64,7 @@ class Homepage extends StatelessWidget {
                     }),
                 IconButton(
                     icon: Icon(Icons.query_stats),
-                    iconSize: 40,
+                    iconSize: 50,
                     onPressed: () {
                       Navigator.push(
                           context,
@@ -107,5 +107,9 @@ class Homepage extends StatelessWidget {
         .ref('settings/current_event')
         .get()
         .then((value) => value.value.toString());
+    Global.allowFreeScouting = await FirebaseDatabase.instance
+        .ref('settings/allow_free_scouting')
+        .get()
+        .then((value) => value.value as bool);
   }
 }

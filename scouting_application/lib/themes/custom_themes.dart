@@ -18,11 +18,9 @@ class CustomTheme {
         appBarTheme: AppBarTheme(
           color: Color.fromRGBO(107, 181, 46, 100),
         ),
-        // fontFamily: ,
+        iconTheme: IconThemeData(color: teamColor),
         textTheme: TextTheme(
-            bodyText1: GoogleFonts.roboto(
-                fontWeight: FontWeight.bold)), //ThemeData.dark().textTheme,
-        iconTheme: IconThemeData(color: Colors.white70, opacity: 100),
+            bodyText1: GoogleFonts.roboto(fontWeight: FontWeight.bold)),
         buttonTheme: ButtonThemeData(
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18.0),

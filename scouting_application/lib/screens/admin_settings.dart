@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/classes/secret_constants.dart';
+import 'package:settings_ui/settings_ui.dart';
 
 class AdminSettings extends StatefulWidget {
   AdminSettings({Key? key}) : super(key: key);
@@ -15,7 +16,9 @@ class AdminSettings extends StatefulWidget {
 
 class _AdminSettingsState extends State<AdminSettings> {
   String currentEventValue = Global.current_event;
+  bool _allowFreeScouting = Global.allowFreeScouting;
   late Future<List<DropdownMenuItem<String>>> futureEvents;
+
   @override
   void initState() {
     super.initState();
@@ -25,51 +28,86 @@ class _AdminSettingsState extends State<AdminSettings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text("Events"),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text("Current Event"),
-            FutureBuilder<List<DropdownMenuItem<String>>>(
-              future: futureEvents,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return DropdownButton(
-                      value: currentEventValue,
-                      items: snapshot.data!,
-                      onChanged: (val) {
-                        setState(() {
-                          currentEventValue = val.toString();
-                        });
-                      });
-                } else if (snapshot.hasError) {}
-                return const CircularProgressIndicator();
-              },
-            ),
-          ],
-        ),
-        IconButton(
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: Icon(Icons.group_add),
             onPressed: () {
-              _saveValues();
+              //todo add an admin by email
             },
-            icon: Icon(Icons.save))
-      ],
-    ));
+          ),
+        ],
+      ),
+      body: SettingsList(
+        sections: [
+          SettingsSection(title: Text("Event"), tiles: [
+            SettingsTile(
+              title: Text(
+                "Event",
+                maxLines: 1,
+              ),
+              trailing: FutureBuilder<List<DropdownMenuItem<String>>>(
+                future: futureEvents,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return DropdownButton(
+                        iconSize: 0,
+                        value: currentEventValue,
+                        items: snapshot.data!,
+                        onChanged: (val) {
+                          setState(() {
+                            currentEventValue = val.toString();
+                          });
+                          _saveValues();
+                        });
+                  } else if (snapshot.hasError) {}
+                  return const CircularProgressIndicator();
+                },
+              ),
+            ),
+            SettingsTile.switchTile(
+                leading: Icon(Icons.event_available),
+                initialValue: _allowFreeScouting,
+                onToggle: (val) {
+                  setState(() {
+                    _allowFreeScouting = val;
+                  });
+                  _saveValues();
+                },
+                title: Text("Allow Free Scouting"))
+          ]),
+          SettingsSection(title: Text("Database"), tiles: [
+            SettingsTile(
+                title: Text("Remove Teams"),
+                description: Text("Erase team's data."),
+                leading: Icon(Icons.delete_sweep)
+                //todo onPressed: () {}
+                ),
+            SettingsTile(
+              title: Text("Block Teams"),
+              description: Text("Hide specific teams from scouters."),
+              leading: Icon(Icons.block),
+              //todo onPressed: () {}
+            )
+          ])
+        ],
+      ),
+    );
   }
 
   void _saveValues() {
     _updatedbValues();
     Global.current_event = currentEventValue;
+    Global.allowFreeScouting = _allowFreeScouting;
   }
 
   void _updatedbValues() {
     FirebaseDatabase.instance
         .ref('settings/current_event')
         .set(currentEventValue);
+    FirebaseDatabase.instance
+        .ref('settings/allow_free_scouting')
+        .set(_allowFreeScouting);
   }
 
   Future<List<DropdownMenuItem<String>>> fetchEvents() async {
