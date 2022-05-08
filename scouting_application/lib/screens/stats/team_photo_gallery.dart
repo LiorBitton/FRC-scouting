@@ -15,17 +15,22 @@ class TeamPhotoGallery extends StatelessWidget {
       child: Column(
         children: [
           FutureBuilder<List<Image>>(
-              future: futureImages,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Column(
-                    children: snapshot.data!,
-                  );
-                } else if (snapshot.hasError) {
-                  print('${snapshot.error}');
-                }
-                return const CircularProgressIndicator();
-              }),
+            future: futureImages,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Column(
+                  children: snapshot.data!,
+                );
+              } else if (snapshot.hasError) {
+                print('${snapshot.error}');
+              }
+              return Image.asset(
+                "assets/loading.gif",
+                height: 125.0,
+                width: 125.0,
+              );
+            },
+          ),
         ],
       ),
     );
