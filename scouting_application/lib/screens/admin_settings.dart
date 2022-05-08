@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/classes/secret_constants.dart';
+import 'package:scouting_application/themes/custom_themes.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 class AdminSettings extends StatefulWidget {
@@ -18,11 +19,20 @@ class _AdminSettingsState extends State<AdminSettings> {
   String currentEventValue = Global.current_event;
   bool _allowFreeScouting = Global.allowFreeScouting;
   late Future<List<DropdownMenuItem<String>>> futureEvents;
-
+  TextEditingController _textFieldController = TextEditingController();
   @override
   void initState() {
     super.initState();
     futureEvents = fetchEvents();
+  }
+
+  void addAdmin(String email) async {
+    DatabaseReference ref = FirebaseDatabase.instance.ref('settings/admins');
+    DataSnapshot data = await ref.get();
+    print(data.value);
+    List<dynamic> admins = (data.value as List).toList();
+    admins.add(email);
+    ref.set(admins);
   }
 
   @override
@@ -31,11 +41,10 @@ class _AdminSettingsState extends State<AdminSettings> {
       appBar: AppBar(
         actions: [
           IconButton(
-            icon: Icon(Icons.group_add),
-            onPressed: () {
-              //todo add an admin by email
-            },
-          ),
+              icon: Icon(Icons.group_add),
+              onPressed: () {
+                _displayTextInputDialog(context);
+              }),
         ],
       ),
       body: SettingsList(
@@ -68,6 +77,7 @@ class _AdminSettingsState extends State<AdminSettings> {
             SettingsTile.switchTile(
                 leading: Icon(Icons.event_available),
                 initialValue: _allowFreeScouting,
+                activeSwitchColor: CustomTheme.teamColor,
                 onToggle: (val) {
                   setState(() {
                     _allowFreeScouting = val;
@@ -128,5 +138,46 @@ class _AdminSettingsState extends State<AdminSettings> {
       }
     }
     return out;
+  }
+
+  String emailValue = "";
+  Future<void> _displayTextInputDialog(BuildContext context) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('TextField in Dialog'),
+            content: TextField(
+              onChanged: (value) {
+                setState(() {
+                  emailValue = value;
+                });
+              },
+              controller: _textFieldController,
+              decoration: InputDecoration(hintText: "Text Field in Dialog"),
+            ),
+            actions: <Widget>[
+              IconButton(
+                color: Colors.red,
+                icon: Icon(Icons.cancel),
+                onPressed: () {
+                  setState(() {
+                    Navigator.pop(context);
+                  });
+                },
+              ),
+              IconButton(
+                color: Colors.green,
+                icon: Icon(Icons.check),
+                onPressed: () {
+                  setState(() {
+                    addAdmin(emailValue);
+                    Navigator.pop(context);
+                  });
+                },
+              ),
+            ],
+          );
+        });
   }
 }

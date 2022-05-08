@@ -23,6 +23,7 @@ class _StatsLobbyState extends State<StatsLobby> {
   List<List<String>> teamsData = [];
   Map<String, TeamData> teamData = {};
   bool nicknamesLoaded = false;
+  bool allowSearch = false;
   @override
   void initState() {
     super.initState();
@@ -35,14 +36,16 @@ class _StatsLobbyState extends State<StatsLobby> {
         appBar: AppBar(
           title: Text('Stats'),
           actions: [
-            IconButton(
-                onPressed: () {
-                  showSearch(
-                      context: context,
-                      delegate: TeamSearchDelegate(teams),
-                      useRootNavigator: true);
-                },
-                icon: Icon(Icons.search))
+            allowSearch
+                ? IconButton(
+                    onPressed: () {
+                      showSearch(
+                          context: context,
+                          delegate: TeamSearchDelegate(teams),
+                          useRootNavigator: true);
+                    },
+                    icon: Icon(Icons.search))
+                : Text("")
           ],
         ),
         body: Column(
@@ -56,8 +59,14 @@ class _StatsLobbyState extends State<StatsLobby> {
                         future: createCache(),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
-                            return Center(child: CircularProgressIndicator());
+                            return Center(
+                                child: Image.asset(
+                              "assets/loading.gif",
+                              height: 125.0,
+                              width: 125.0,
+                            ));
                           } else {
+                            allowSearch = true;
                             return ListView.builder(
                                 shrinkWrap: true,
                                 physics: NeverScrollableScrollPhysics(),
@@ -100,12 +109,12 @@ class _StatsLobbyState extends State<StatsLobby> {
         String b64logo = teamData[teamNumber]!.getAvatar();
         if (b64logo == "none") {
           //if team didnt upload an avatar
-          print("team #$teamNumber doesnt have an avatar");
+          // print("team #$teamNumber doesnt have an avatar");
           return "none";
         }
         if (b64logo != "") {
           //if avatar exists in cache
-          print("loaded $teamNumber photo from json");
+          // print("loaded $teamNumber photo from json");
           return b64logo;
         }
       } catch (e) {}
@@ -124,7 +133,7 @@ class _StatsLobbyState extends State<StatsLobby> {
           if (media["type"] == "avatar") {
             String b64logo = res[0]['details']['base64Image'].toString();
             teamData[teamNumber]!.setAvatar(b64logo);
-            print("saved $teamNumber photo to json");
+            // print("saved $teamNumber photo to json");
             return b64logo;
           }
         } catch (exception) {
@@ -152,9 +161,9 @@ class _StatsLobbyState extends State<StatsLobby> {
   }
 
   Future<String> fetchTeamNickname(String teamNumber) async {
-    if (!nicknamesLoaded) await loadCache();
+    // if (!nicknamesLoaded) await loadCache();
     if (teamData.containsKey(teamNumber)) {
-      print("loaded $teamNumber from json");
+      // print("loaded $teamNumber from json");
       return teamData[teamNumber]!.getName();
     }
 
@@ -172,8 +181,7 @@ class _StatsLobbyState extends State<StatsLobby> {
       if (!teamData.containsKey(teamNumber)) {
         teamData.putIfAbsent(
             teamNumber, () => TeamData(name: nickname, avatar: ""));
-        saveCache();
-        print("saved $teamNumber to json");
+        // print("saved $teamNumber to json");
       }
       return nickname;
     } else {
@@ -192,7 +200,7 @@ class _StatsLobbyState extends State<StatsLobby> {
 
     File file = File(dir.path + '/' + fileName);
     if (!file.existsSync()) {
-      print("creating file");
+      // print("creating file");
       file = await file.create();
       await saveCache();
     }
