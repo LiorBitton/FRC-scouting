@@ -43,7 +43,7 @@ class _AdminSettingsState extends State<AdminSettings> {
           IconButton(
               icon: Icon(Icons.group_add),
               onPressed: () {
-                _displayTextInputDialog(context);
+                _displayEmailInputDialog(context);
               }),
         ],
       ),
@@ -141,12 +141,12 @@ class _AdminSettingsState extends State<AdminSettings> {
   }
 
   String emailValue = "";
-  Future<void> _displayTextInputDialog(BuildContext context) async {
+  Future<void> _displayEmailInputDialog(BuildContext context) async {
     return showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('TextField in Dialog'),
+            title: Text("Enter Admin's Email"),
             content: TextField(
               onChanged: (value) {
                 setState(() {
@@ -154,9 +154,9 @@ class _AdminSettingsState extends State<AdminSettings> {
                 });
               },
               controller: _textFieldController,
-              decoration: InputDecoration(hintText: "Text Field in Dialog"),
+              decoration: InputDecoration(hintText: "liorb5000@gmail.com"),
             ),
-            actions: <Widget>[
+            actions: [
               IconButton(
                 color: Colors.red,
                 icon: Icon(Icons.cancel),
