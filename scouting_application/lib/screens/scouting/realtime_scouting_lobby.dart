@@ -18,57 +18,71 @@ class RealtimeScoutingLobby extends StatefulWidget {
 
 class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
   late Future<Wrap> futureMatches;
-  Set<String> currentlyScouted = new Set<String>();
+
+  ///Teams that either being scouted at the moment or were chosen to be hidden by admin
+  Set<String> hiddenTeams = new Set<String>();
+  Set<String> blockedTeams = new Set<String>();
+  @override
+  void initState() {
+    super.initState();
+    _fetchBlockedTeams();
+  }
   @override
   Widget build(BuildContext context) {
-    futureMatches = createUI();
     return Scaffold(
         appBar: AppBar(title: Text(Global.current_event)),
         body: SingleChildScrollView(
           child: Center(
-            child: FutureBuilder<Wrap>(
-              future: futureMatches,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return snapshot.data!;
-                } else if (snapshot.hasError) {
-                  print('${snapshot.error}');
-                }
-                return const CircularProgressIndicator();
-              },
-            ),
+            child: StreamBuilder<dynamic>(
+                stream: scoutedTeamsRef.onValue,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    hiddenTeams.clear();
+                    hiddenTeams.addAll(blockedTeams);
+                    if (((snapshot.data as DatabaseEvent).snapshot.value) !=
+                        null) {
+                      Map<String, dynamic> val = Map<String, dynamic>.from(
+                          ((snapshot.data as DatabaseEvent).snapshot.value)
+                              as Map<dynamic, dynamic>);
+
+                      hiddenTeams.addAll(val.keys.toList());
+                    }
+                  }
+                  return FutureBuilder<Wrap>(
+                    future: createUI(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        print("entered");
+                        return snapshot.data!;
+                      } else if (snapshot.hasError) {
+                        print('${snapshot.error}');
+                      }
+                      return const CircularProgressIndicator();
+                    },
+                  );
+                }),
           ),
         ));
   }
 
-  Future<void> _initCurrentlyScouted() async {
-    final ref = FirebaseDatabase.instance.ref();
-    final dest = ref.child('sync').child('currently_scouted');
-    Iterable<String> scoutedList =
-        await dest.once().then((DatabaseEvent snapshot) {
-      if (snapshot.snapshot.exists) {
-        Map<String, dynamic> val = Map<String, dynamic>.from(
-            snapshot.snapshot.value as Map<dynamic, dynamic>);
-        return val.keys;
-      }
-      return [];
-    });
-    currentlyScouted.addAll(scoutedList);
-    dest.onChildAdded.listen(
-      (event) {
-        currentlyScouted.add((event.snapshot.value as String));
-      },
-    );
-    dest.onChildRemoved.listen(
-      (event) {
-        currentlyScouted.remove((event.snapshot.value as String));
-      },
-    );
+  final scoutedTeamsRef =
+      FirebaseDatabase.instance.ref("sync/currently_scouted");
+
+  final blockedTeamsRef =
+      FirebaseDatabase.instance.ref('settings/blocked_teams');
+  Future<void> _fetchBlockedTeams() async {
+    blockedTeamsRef.keepSynced(true);
+    final DataSnapshot blockedTeamsData = await blockedTeamsRef.get();
+    final List<dynamic> tempBlockedList = blockedTeamsData.value as List;
+    List<String> blockedList = [];
+    for (var item in tempBlockedList) {
+      blockedList.add(item.toString());
+    }
+    blockedTeams.addAll(blockedList);
   }
 
   Future<Wrap> createUI() async {
     List<Container> content = [];
-    _initCurrentlyScouted();
     dynamic matches = await fetchMatches();
 
     (matches as List<dynamic>).sort((a, b) {
@@ -102,7 +116,7 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
     // if (match["winning_alliance"] != "" &&
     //     (match["alliances"]["red"]["score"] == -1 ||
     //         match["alliances"]["red"]["score"] == null))
-    //   return null; //dont show match if already played 
+    //   return null; //dont show match if already played
     List<dynamic> blueAlliance = match['alliances']['blue']['team_keys'];
     List<dynamic> redAlliance = match['alliances']['red']['team_keys'];
     List<ElevatedButton> blueButtons = [];
@@ -199,7 +213,7 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
   }
 
   ElevatedButton? getTeamButton(bool isBlue, String teamID, String matchKey) {
-    return currentlyScouted.contains(teamID)
+    return hiddenTeams.contains(teamID)
         ? null
         : ElevatedButton(
             onPressed: () {
