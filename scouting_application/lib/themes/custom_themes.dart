@@ -13,10 +13,11 @@ class CustomTheme {
         brightness: Brightness.dark,
         colorScheme: ColorScheme.dark(),
         dividerColor: Colors.white,
-        primaryColor: Color.fromARGB(255, 107, 181, 46),
+        primaryColor: teamColor,
         scaffoldBackgroundColor: Colors.black,
         appBarTheme: AppBarTheme(
-          color: Color.fromRGBO(107, 181, 46, 100),
+          color: teamColor,
+          titleTextStyle: GoogleFonts.acme(fontSize: 25),
         ),
         iconTheme: IconThemeData(color: teamColor),
         textTheme: TextTheme(

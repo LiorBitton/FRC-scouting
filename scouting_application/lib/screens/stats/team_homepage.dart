@@ -36,7 +36,7 @@ class TeamHomepage extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                           builder: (context) => TeamGames(
-                                teamNumber: teamNumber,
+                                teamID: teamNumber,
                               )));
                 }),
           ],

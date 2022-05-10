@@ -67,6 +67,7 @@ class _AdminSettingsState extends State<AdminSettings> {
                         items: snapshot.data!,
                         onChanged: (val) {
                           setState(() {
+                            //todo save event name to display in realtime scouting
                             currentEventValue = val.toString();
                           });
                           _saveValues();

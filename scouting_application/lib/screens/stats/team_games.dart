@@ -2,22 +2,27 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/screens/stats/game_data.dart';
-import 'package:nil/nil.dart';
 
-//todo make stateful
-class TeamGames extends StatelessWidget {
-  TeamGames({Key? key, required this.teamNumber}) : super(key: key);
-  final String teamNumber;
+class TeamGames extends StatefulWidget {
+  TeamGames({Key? key, required this.teamID}) : super(key: key);
+  final String teamID;
+
+  @override
+  State<TeamGames> createState() => _TeamGamesState();
+}
+
+class _TeamGamesState extends State<TeamGames> {
   late List<Map<String, dynamic>> games;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       body: Column(
         children: [
           Expanded(
             child: StreamBuilder(
                 stream: FirebaseDatabase.instance
-                    .ref('teams/$teamNumber/games/${Global.current_event}')
+                    .ref('teams/${widget.teamID}/games/${Global.current_event}')
                     .onValue
                     .asBroadcastStream(),
                 builder: (context, snapshot) {
@@ -31,7 +36,6 @@ class TeamGames extends StatelessWidget {
                     final info = Map<String, dynamic>.from(
                         (data as Map<dynamic, dynamic>));
                     List<String> gameIDs = info.keys.toList();
-                    //todo check the soring method
                     gameIDs.sort((a, b) {
                       //yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]
                       int stageEqual = a // _[COMP_LEVEL]m
@@ -50,24 +54,28 @@ class TeamGames extends StatelessWidget {
                         physics: NeverScrollableScrollPhysics(),
                         itemCount: gameIDs.length,
                         itemBuilder: (context, index) {
-                          final String gameID = gameIDs[index];
+                          final String gameKey = gameIDs[index];
                           return ListTile(
                             trailing: Global.isAdmin
                                 ? IconButton(
                                     icon: Icon(Icons.delete),
-                                    onPressed:
-                                        () {}, //todo implement delete game from database
+                                    onPressed: () {
+                                      setState(() {
+                                        handleDeleteGame(
+                                            widget.teamID, gameKey);
+                                      });
+                                    },
                                   )
-                                : nil,
-                            title: Text(gameID),
+                                : Text(""),
+                            title: Text(gameKey),
                             onTap: () {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => GameData(
-                                          teamID: teamNumber,
+                                          teamID: widget.teamID,
                                           data: Map<String, dynamic>.from(
-                                              (info[gameID]
+                                              (info[gameKey]
                                                   as Map<dynamic, dynamic>)))));
                             },
                           );
@@ -78,5 +86,11 @@ class TeamGames extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void handleDeleteGame(String teamKey, String gameKey) {
+    FirebaseDatabase.instance
+        .ref("teams/$teamKey/games/${Global.current_event}/$gameKey")
+        .remove();
   }
 }
