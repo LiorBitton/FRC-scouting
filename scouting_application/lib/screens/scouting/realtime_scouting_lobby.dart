@@ -27,6 +27,7 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
     super.initState();
     _fetchBlockedTeams();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,7 +53,6 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
                     future: createUI(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        print("entered");
                         return snapshot.data!;
                       } else if (snapshot.hasError) {
                         print('${snapshot.error}');

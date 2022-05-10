@@ -2,6 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/screens/stats/game_data.dart';
+import 'package:nil/nil.dart';
 
 //todo make stateful
 class TeamGames extends StatelessWidget {
@@ -51,6 +52,13 @@ class TeamGames extends StatelessWidget {
                         itemBuilder: (context, index) {
                           final String gameID = gameIDs[index];
                           return ListTile(
+                            trailing: Global.isAdmin
+                                ? IconButton(
+                                    icon: Icon(Icons.delete),
+                                    onPressed:
+                                        () {}, //todo implement delete game from database
+                                  )
+                                : nil,
                             title: Text(gameID),
                             onTap: () {
                               Navigator.push(

@@ -111,5 +111,6 @@ class Homepage extends StatelessWidget {
         .ref('settings/allow_free_scouting')
         .get()
         .then((value) => value.value as bool);
+    Global.isAdmin = await isAdmin();
   }
 }
