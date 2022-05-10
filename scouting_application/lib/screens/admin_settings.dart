@@ -10,6 +10,7 @@ import 'package:scouting_application/screens/stats/stats_lobby.dart';
 import 'package:scouting_application/themes/custom_themes.dart';
 import 'package:settings_ui/settings_ui.dart';
 
+//TODO use TeamData[] instead of teams[]
 class AdminSettings extends StatefulWidget {
   AdminSettings({Key? key}) : super(key: key);
 

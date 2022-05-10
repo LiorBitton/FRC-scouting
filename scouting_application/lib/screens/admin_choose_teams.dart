@@ -5,7 +5,7 @@ class ChooseTeams extends StatefulWidget {
   ChooseTeams({Key? key, required this.teams, this.alreadySelected = const []})
       : super(key: key);
   final List<String> teams;
-  List<String> alreadySelected;
+  final List<String> alreadySelected;
   @override
   State<ChooseTeams> createState() => _ChooseTeamsState();
 }
@@ -13,10 +13,12 @@ class ChooseTeams extends StatefulWidget {
 class _ChooseTeamsState extends State<ChooseTeams> {
   Set<String> _selectedTeams = {};
   List<bool> _selectedTiles = [];
+  List<String> _initiallySelected = [];
   @override
   void initState() {
     super.initState();
     _selectedTeams.addAll(widget.alreadySelected);
+    _initiallySelected = widget.alreadySelected;
     _selectedTiles = List<bool>.filled(widget.teams.length, false);
   }
 
@@ -38,9 +40,9 @@ class _ChooseTeamsState extends State<ChooseTeams> {
           itemCount: widget.teams.length,
           itemBuilder: (context, index) {
             final String teamID = widget.teams[index];
-            if (widget.alreadySelected.contains(teamID)) {
+            if (_initiallySelected.contains(teamID)) {
               _selectedTiles[index] = true;
-              widget.alreadySelected.remove(teamID);
+              _initiallySelected.remove(teamID);
             }
             return ListTile(
               title: Text(teamID),
