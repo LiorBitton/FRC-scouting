@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/classes/secret_constants.dart';
+import 'package:scouting_application/screens/admin_choose_teams.dart';
+import 'package:scouting_application/screens/stats/stats_lobby.dart';
 import 'package:scouting_application/themes/custom_themes.dart';
 import 'package:settings_ui/settings_ui.dart';
 
@@ -29,7 +31,6 @@ class _AdminSettingsState extends State<AdminSettings> {
   void addAdmin(String email) async {
     DatabaseReference ref = FirebaseDatabase.instance.ref('settings/admins');
     DataSnapshot data = await ref.get();
-    print(data.value);
     List<dynamic> admins = (data.value as List).toList();
     admins.add(email);
     ref.set(admins);
@@ -49,9 +50,9 @@ class _AdminSettingsState extends State<AdminSettings> {
       ),
       body: SettingsList(
         sections: [
-          SettingsSection(title: Text("Event"), tiles: [
+          SettingsSection(title: const Text("Event"), tiles: [
             SettingsTile(
-              title: Text(
+              title: const Text(
                 "Event",
                 maxLines: 1,
               ),
@@ -90,15 +91,20 @@ class _AdminSettingsState extends State<AdminSettings> {
             SettingsTile(
                 title: Text("Remove Teams"),
                 description: Text("Erase team's data."),
-                leading: Icon(Icons.delete_sweep)
-                //todo onPressed: () {}
-                ),
+                leading: Icon(Icons.delete_sweep),
+                onPressed: (_) {
+                  // List<String> teamsToRemove = selectTeams();
+                  // removeFromDatabase(teamsToRemove); TODO
+                }),
             SettingsTile(
-              title: Text("Block Teams"),
-              description: Text("Hide specific teams from scouters."),
-              leading: Icon(Icons.block),
-              //todo onPressed: () {}
-            )
+                title: Text("Block Teams"),
+                description: Text("Hide specific teams from scouters."),
+                leading: Icon(Icons.block),
+                onPressed: (_) {
+                  setState(() {
+                    _handleBlockTeams();
+                  });
+                })
           ])
         ],
       ),
@@ -118,6 +124,42 @@ class _AdminSettingsState extends State<AdminSettings> {
     FirebaseDatabase.instance
         .ref('settings/allow_free_scouting')
         .set(_allowFreeScouting);
+  }
+
+  void removeFromDatabase(List<String> teams) {
+    //todo implement
+  }
+  void _handleBlockTeams() async {
+    List<String> teams = await StatsLobby.fetchTeamsInCurrentEvent();
+    List<String> currentlyBlockedTeams = await _fetchBlockedTeams();
+    _hideFromRealtimeScouting(
+      await selectTeams(teams, alreadySelected: currentlyBlockedTeams),
+    );
+  }
+
+  Future<List<String>> _fetchBlockedTeams() async {
+    final blockedTeamsRef =
+        FirebaseDatabase.instance.ref('settings/blocked_teams');
+    blockedTeamsRef.keepSynced(true);
+    final DataSnapshot blockedTeamsData = await blockedTeamsRef.get();
+    List<String> blockedList = [];
+    if (blockedTeamsData.exists) {
+      final List<dynamic> tempBlockedList = blockedTeamsData.value as List;
+
+      for (var item in tempBlockedList) {
+        blockedList.add(item.toString());
+      }
+    }
+    return blockedList;
+  }
+
+  void _hideFromRealtimeScouting(List<String> teams) async {
+    DatabaseReference ref =
+        FirebaseDatabase.instance.ref("settings/blocked_teams");
+    try {
+      await ref.remove();
+    } catch (e) {}
+    await ref.set(teams);
   }
 
   Future<List<DropdownMenuItem<String>>> fetchEvents() async {
@@ -140,7 +182,7 @@ class _AdminSettingsState extends State<AdminSettings> {
     return out;
   }
 
-  String emailValue = "";
+  String _emailValue = "";
   Future<void> _displayEmailInputDialog(BuildContext context) async {
     return showDialog(
         context: context,
@@ -150,7 +192,7 @@ class _AdminSettingsState extends State<AdminSettings> {
             content: TextField(
               onChanged: (value) {
                 setState(() {
-                  emailValue = value;
+                  _emailValue = value;
                 });
               },
               controller: _textFieldController,
@@ -171,7 +213,7 @@ class _AdminSettingsState extends State<AdminSettings> {
                 icon: Icon(Icons.check),
                 onPressed: () {
                   setState(() {
-                    addAdmin(emailValue);
+                    addAdmin(_emailValue);
                     Navigator.pop(context);
                   });
                 },
@@ -179,5 +221,16 @@ class _AdminSettingsState extends State<AdminSettings> {
             ],
           );
         });
+  }
+
+  Future<List<String>> selectTeams(List<String> teams,
+      {List<String> alreadySelected = const []}) async {
+    var result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                ChooseTeams(teams: teams, alreadySelected: alreadySelected)));
+
+    return result;
   }
 }
