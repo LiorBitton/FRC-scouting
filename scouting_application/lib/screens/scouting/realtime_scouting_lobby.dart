@@ -1,4 +1,3 @@
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:scouting_application/classes/database.dart';
@@ -32,19 +31,12 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
         body: SingleChildScrollView(
           child: Center(
             child: StreamBuilder<dynamic>(
-                stream: scoutedTeamsRef.onValue,
+                stream: Database.instance.getScoutedTeamsStream(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     hiddenTeams.clear();
                     hiddenTeams.addAll(blockedTeams);
-                    if (((snapshot.data as DatabaseEvent).snapshot.value) !=
-                        null) {
-                      Map<String, dynamic> val = Map<String, dynamic>.from(
-                          ((snapshot.data as DatabaseEvent).snapshot.value)
-                              as Map<dynamic, dynamic>);
-
-                      hiddenTeams.addAll(val.keys.toList());
-                    }
+                    hiddenTeams.addAll(snapshot.data);
                   }
                   return FutureBuilder<Wrap>(
                     future: createUI(),
@@ -61,8 +53,6 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
           ),
         ));
   }
-
-  
 
   Future<void> initBlockedTeams() async {
     List<String> tempBlockedTeams = await Database.instance.fetchBlockedTeams();

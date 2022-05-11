@@ -48,7 +48,32 @@ class Database {
         List<String> out = val.keys.toList();
         return out;
       }
+      return [];
     });
     return outStream;
+  }
+
+  Future<List<String>> getCurrentEvent() async {
+    String key = await FirebaseDatabase.instance
+        .ref('settings/current_event_key')
+        .get()
+        .then((value) => value.value.toString());
+    String name = await FirebaseDatabase.instance
+        .ref('settings/current_event_key')
+        .get()
+        .then((value) => value.value.toString());
+    return [key, name];
+  }
+
+  Future<bool> getAllowFreeScouting() async {
+    return await db
+        .ref('settings/allow_free_scouting')
+        .get()
+        .then((value) => value.value as bool);
+  }
+
+  Future<bool> isAdmin(String email) async {
+    DataSnapshot val = await db.ref('settings/admins').get();
+    return (val.value as List<Object?>).contains(email);
   }
 }

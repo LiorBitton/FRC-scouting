@@ -1,5 +1,5 @@
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/screens/admin_settings.dart';
 import 'package:scouting_application/screens/stats/stats_lobby.dart';
@@ -95,22 +95,16 @@ class Homepage extends StatelessWidget {
   Future<bool> isAdmin() async {
     String? email = auth.currentUser!.email;
     if (email != null) {
-      DataSnapshot val =
-          await FirebaseDatabase.instance.ref('settings/admins').get();
-      return (val.value as List<Object?>).contains(email);
+      return Database.instance.isAdmin(email);
     }
     return false;
   }
 
   void initGlobal() async {
-    Global.currentEventKey = await FirebaseDatabase.instance
-        .ref('settings/current_event')
-        .get()
-        .then((value) => value.value.toString());
-    Global.allowFreeScouting = await FirebaseDatabase.instance
-        .ref('settings/allow_free_scouting')
-        .get()
-        .then((value) => value.value as bool);
+    List<String> event = await Database.instance.getCurrentEvent();
+    Global.currentEventKey = event[0];
+    Global.currentEventName = event[1];
+    Global.allowFreeScouting = await Database.instance.getAllowFreeScouting();
     Global.isAdmin = await isAdmin();
   }
 }
