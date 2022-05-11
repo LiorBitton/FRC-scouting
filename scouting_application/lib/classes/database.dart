@@ -76,4 +76,24 @@ class Database {
     DataSnapshot val = await db.ref('settings/admins').get();
     return (val.value as List<Object?>).contains(email);
   }
+
+  void deleteGame(String teamKey, String gameKey, String eventKey) {
+    db.ref("teams/$teamKey/games/$eventKey/$gameKey").remove();
+  }
+
+  Stream<Map<String, dynamic>> getTeamGamesStream(
+      String teamID, String eventKey) {
+    final teamGamesRef = db.ref("teams/$teamID/games/$eventKey");
+    final teamGamesStream = teamGamesRef.onValue;
+    final Stream<Map<String, dynamic>> outStream = teamGamesStream.map((event) {
+      if (event.snapshot.exists) {
+        Map<String, dynamic> val = Map<String, dynamic>.from(
+            (event.snapshot.value) as Map<dynamic, dynamic>);
+
+        return val;
+      }
+      return {} as Map<String, dynamic>;
+    });
+    return outStream;
+  }
 }

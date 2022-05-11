@@ -1,5 +1,5 @@
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/screens/stats/game_data.dart';
 
@@ -21,23 +21,18 @@ class _TeamGamesState extends State<TeamGames> {
         children: [
           Expanded(
             child: StreamBuilder(
-                stream: FirebaseDatabase.instance
-                    .ref(
-                        'teams/${widget.teamID}/games/${Global.currentEventKey}')
-                    .onValue
-                    .asBroadcastStream(),
+                stream: Database.instance
+                    .getTeamGamesStream(widget.teamID, Global.currentEventKey),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.data == {}) {
+                    return Center(child: Text("no games for this team"));
                   } else {
-                    var data = (snapshot.data as DatabaseEvent).snapshot.value;
-                    if (data == null) {
-                      return Center(child: Text("no games for this team"));
-                    }
-                    final info = Map<String, dynamic>.from(
-                        (data as Map<dynamic, dynamic>));
-                    List<String> gameIDs = info.keys.toList();
-                    gameIDs.sort((a, b) {
+                    Map<String, dynamic> games =
+                        snapshot.data as Map<String, dynamic>;
+                    List<String> gameKeys = games.keys.toList();
+                    gameKeys.sort((a, b) {
                       //yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]
                       int stageEqual = a // _[COMP_LEVEL]m
                           .substring(0, a.lastIndexOf("m"))
@@ -53,9 +48,9 @@ class _TeamGamesState extends State<TeamGames> {
                     return ListView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
-                        itemCount: gameIDs.length,
+                        itemCount: gameKeys.length,
                         itemBuilder: (context, index) {
-                          final String gameKey = gameIDs[index];
+                          final String gameKey = gameKeys[index];
                           return ListTile(
                             trailing: Global.isAdmin
                                 ? IconButton(
@@ -76,7 +71,7 @@ class _TeamGamesState extends State<TeamGames> {
                                       builder: (context) => GameData(
                                           teamID: widget.teamID,
                                           data: Map<String, dynamic>.from(
-                                              (info[gameKey]
+                                              (games[gameKey]
                                                   as Map<dynamic, dynamic>)))));
                             },
                           );
@@ -90,8 +85,6 @@ class _TeamGamesState extends State<TeamGames> {
   }
 
   void handleDeleteGame(String teamKey, String gameKey) {
-    FirebaseDatabase.instance
-        .ref("teams/$teamKey/games/${Global.currentEventKey}/$gameKey")
-        .remove();
+    Database.instance.deleteGame(teamKey, gameKey, Global.currentEventKey);
   }
 }

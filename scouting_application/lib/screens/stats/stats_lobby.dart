@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:scouting_application/classes/global.dart';
+import 'package:scouting_application/classes/tba_client.dart';
 import 'package:scouting_application/classes/team_data.dart';
 import 'package:scouting_application/classes/secret_constants.dart';
 import 'package:scouting_application/classes/team_search_delegate.dart';
@@ -13,41 +15,6 @@ import 'package:scouting_application/screens/stats/team_homepage.dart';
 
 class StatsLobby extends StatefulWidget {
   StatsLobby({Key? key}) : super(key: key);
-  static Future<List<String>> fetchTeamsInCurrentEvent() async {
-    final DataSnapshot snapshot =
-        await FirebaseDatabase.instance.ref("settings/current_event").get();
-    String eventKey = "none";
-    if (snapshot.exists) {
-      eventKey = snapshot.value.toString();
-    }
-    if (eventKey == "none") {
-      return [];
-    }
-    var url = Uri.parse(
-        'https://www.thebluealliance.com/api/v3/event/$eventKey/teams/simple');
-    final response = await http.get(url, headers: {
-      'X-TBA-Auth-Key': SecretConstants.TBA_API_KEY,
-      'accept': 'application/json'
-    });
-
-    if (response.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
-      List<dynamic> eventTeams = jsonDecode(response.body);
-      List<String> teams = [];
-      for (var team in eventTeams) {
-        String teamKey = team["key"];
-        teamKey = teamKey.replaceFirst("frc", "");
-        teams.add(teamKey);
-      }
-      return teams;
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to load teams for event $eventKey');
-    }
-  }
-
   @override
   _StatsLobbyState createState() => _StatsLobbyState();
 }
@@ -256,7 +223,8 @@ class _StatsLobbyState extends State<StatsLobby> {
 
   Future<String> createCache() async {
     await loadCache();
-    final List<String> teamsTemp = await StatsLobby.fetchTeamsInCurrentEvent();
+    final List<String> teamsTemp =
+        await TBAClient.instance.fetchTeamsInEvent(Global.currentEventKey);
     if (teamsTemp == []) {
       var ref = FirebaseDatabase.instance.ref('teams');
       DataSnapshot snapshot = await ref.get();
