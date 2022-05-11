@@ -22,7 +22,8 @@ class _TeamGamesState extends State<TeamGames> {
           Expanded(
             child: StreamBuilder(
                 stream: FirebaseDatabase.instance
-                    .ref('teams/${widget.teamID}/games/${Global.current_event}')
+                    .ref(
+                        'teams/${widget.teamID}/games/${Global.currentEventKey}')
                     .onValue
                     .asBroadcastStream(),
                 builder: (context, snapshot) {
@@ -90,7 +91,7 @@ class _TeamGamesState extends State<TeamGames> {
 
   void handleDeleteGame(String teamKey, String gameKey) {
     FirebaseDatabase.instance
-        .ref("teams/$teamKey/games/${Global.current_event}/$gameKey")
+        .ref("teams/$teamKey/games/${Global.currentEventKey}/$gameKey")
         .remove();
   }
 }

@@ -103,7 +103,7 @@ class Homepage extends StatelessWidget {
   }
 
   void initGlobal() async {
-    Global.current_event = await FirebaseDatabase.instance
+    Global.currentEventKey = await FirebaseDatabase.instance
         .ref('settings/current_event')
         .get()
         .then((value) => value.value.toString());

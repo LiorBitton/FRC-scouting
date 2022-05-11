@@ -1,12 +1,9 @@
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/classes/global.dart';
-import 'package:scouting_application/classes/secret_constants.dart';
-import 'package:http/http.dart' as http;
+import 'package:scouting_application/classes/tba_client.dart';
 import 'package:scouting_application/screens/scouting/game_manager.dart';
 
 class RealtimeScoutingLobby extends StatefulWidget {
@@ -25,13 +22,13 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
   @override
   void initState() {
     super.initState();
-    _fetchBlockedTeams();
+    initBlockedTeams();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text(Global.current_event)),
+        appBar: AppBar(title: Text(Global.currentEventName)),
         body: SingleChildScrollView(
           child: Center(
             child: StreamBuilder<dynamic>(
@@ -65,25 +62,17 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
         ));
   }
 
-  final scoutedTeamsRef =
-      FirebaseDatabase.instance.ref("sync/currently_scouted");
+  
 
-  final blockedTeamsRef =
-      FirebaseDatabase.instance.ref('settings/blocked_teams');
-  Future<void> _fetchBlockedTeams() async {
-    blockedTeamsRef.keepSynced(true);
-    final DataSnapshot blockedTeamsData = await blockedTeamsRef.get();
-    final List<dynamic> tempBlockedList = blockedTeamsData.value as List;
-    List<String> blockedList = [];
-    for (var item in tempBlockedList) {
-      blockedList.add(item.toString());
-    }
-    blockedTeams.addAll(blockedList);
+  Future<void> initBlockedTeams() async {
+    List<String> tempBlockedTeams = await Database.instance.fetchBlockedTeams();
+    blockedTeams.addAll(tempBlockedTeams);
   }
 
   Future<Wrap> createUI() async {
     List<Container> content = [];
-    dynamic matches = await fetchMatches();
+    dynamic matches =
+        await TBAClient.instance.fetchMatchesByEvent(Global.currentEventKey);
 
     (matches as List<dynamic>).sort((a, b) {
       //yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]
@@ -235,21 +224,5 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
                     RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14.0),
                 ))));
-  }
-
-  Future<List<dynamic>> fetchMatches() async {
-    var url = Uri.parse(
-        'https://www.thebluealliance.com/api/v3/event/${Global.current_event}/matches/simple');
-    final response = await http.get(url, headers: {
-      'X-TBA-Auth-Key': SecretConstants.TBA_API_KEY,
-      'accept': 'application/json'
-    });
-    List<dynamic> res = [];
-    if (response.statusCode == 200) {
-      res = jsonDecode(response.body);
-    } else {
-      log('error downloading matches');
-    }
-    return res;
   }
 }

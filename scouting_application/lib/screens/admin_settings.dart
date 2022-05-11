@@ -1,12 +1,9 @@
-import 'dart:convert';
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/classes/global.dart';
-import 'package:scouting_application/classes/secret_constants.dart';
+import 'package:scouting_application/classes/tba_client.dart';
 import 'package:scouting_application/screens/admin_choose_teams.dart';
-import 'package:scouting_application/screens/stats/stats_lobby.dart';
 import 'package:scouting_application/themes/custom_themes.dart';
 import 'package:settings_ui/settings_ui.dart';
 
@@ -19,14 +16,18 @@ class AdminSettings extends StatefulWidget {
 }
 
 class _AdminSettingsState extends State<AdminSettings> {
-  String currentEventValue = Global.current_event;
+  String currentEventKey = Global.currentEventKey;
+  String currentEventName = "";
+
+  ///key = event key; value = event name
+  Map<String, String> events = {};
   bool _allowFreeScouting = Global.allowFreeScouting;
   late Future<List<DropdownMenuItem<String>>> futureEvents;
   TextEditingController _textFieldController = TextEditingController();
   @override
   void initState() {
     super.initState();
-    futureEvents = fetchEvents();
+    futureEvents = buildEventsDropdownList();
   }
 
   void addAdmin(String email) async {
@@ -63,12 +64,13 @@ class _AdminSettingsState extends State<AdminSettings> {
                   if (snapshot.hasData) {
                     return DropdownButton(
                         iconSize: 0,
-                        value: currentEventValue,
+                        value: currentEventKey,
                         items: snapshot.data!,
                         onChanged: (val) {
                           setState(() {
                             //todo save event name to display in realtime scouting
-                            currentEventValue = val.toString();
+                            currentEventKey = val.toString();
+                            currentEventName = events[currentEventKey] ?? "";
                           });
                           _saveValues();
                         });
@@ -114,73 +116,38 @@ class _AdminSettingsState extends State<AdminSettings> {
   }
 
   void _saveValues() {
-    _updatedbValues();
-    Global.current_event = currentEventValue;
+    Database.instance
+        .setCurrentEvent(key: currentEventKey, name: currentEventName);
+    Global.currentEventKey = currentEventKey;
+    Global.currentEventName = currentEventName;
     Global.allowFreeScouting = _allowFreeScouting;
-  }
-
-  void _updatedbValues() {
-    FirebaseDatabase.instance
-        .ref('settings/current_event')
-        .set(currentEventValue);
-    FirebaseDatabase.instance
-        .ref('settings/allow_free_scouting')
-        .set(_allowFreeScouting);
   }
 
   void removeFromDatabase(List<String> teams) {
     //todo implement
   }
   void _handleBlockTeams() async {
-    List<String> teams = await StatsLobby.fetchTeamsInCurrentEvent();
-    List<String> currentlyBlockedTeams = await _fetchBlockedTeams();
-    _hideFromRealtimeScouting(
+    List<String> teams =
+        await TBAClient.instance.fetchTeamsInEvent(currentEventKey);
+    List<String> currentlyBlockedTeams =
+        await Database.instance.fetchBlockedTeams();
+    Database.instance.blockTeamsFromScouting(
       await selectTeams(teams, alreadySelected: currentlyBlockedTeams),
     );
   }
 
-  Future<List<String>> _fetchBlockedTeams() async {
-    final blockedTeamsRef =
-        FirebaseDatabase.instance.ref('settings/blocked_teams');
-    blockedTeamsRef.keepSynced(true);
-    final DataSnapshot blockedTeamsData = await blockedTeamsRef.get();
-    List<String> blockedList = [];
-    if (blockedTeamsData.exists) {
-      final List<dynamic> tempBlockedList = blockedTeamsData.value as List;
-
-      for (var item in tempBlockedList) {
-        blockedList.add(item.toString());
-      }
-    }
-    return blockedList;
-  }
-
-  void _hideFromRealtimeScouting(List<String> teams) async {
-    DatabaseReference ref =
-        FirebaseDatabase.instance.ref("settings/blocked_teams");
-    try {
-      await ref.remove();
-    } catch (e) {}
-    await ref.set(teams);
-  }
-
-  Future<List<DropdownMenuItem<String>>> fetchEvents() async {
-    int year = new DateTime.now().year;
-    var url = Uri.parse(
-        'https://www.thebluealliance.com/api/v3/district/${year}isr/events/simple');
-    final response = await http.get(url, headers: {
-      'X-TBA-Auth-Key': SecretConstants.TBA_API_KEY,
-      'accept': 'application/json'
-    });
+  Future<List<DropdownMenuItem<String>>> buildEventsDropdownList() async {
+    events = await TBAClient.instance.fetchIsraelEvents();
     List<DropdownMenuItem<String>> out = [];
-    if (response.statusCode == 200) {
-      List<dynamic> res = jsonDecode(response.body);
-      for (var event in res) {
-        String name = (event as Map<String, dynamic>)['name'];
-        String id = event['key'];
-        out.add(DropdownMenuItem(value: id, child: Text(name)));
-      }
+
+    for (var eventKey in events.keys) {
+      String name = events[eventKey].toString();
+      out.add(DropdownMenuItem(
+        value: eventKey,
+        child: Text(name),
+      ));
     }
+
     return out;
   }
 

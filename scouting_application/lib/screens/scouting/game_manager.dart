@@ -53,7 +53,7 @@ class GameManager extends StatefulWidget {
         .child('teams')
         .child('$teamID')
         .child('games')
-        .child(Global.current_event)
+        .child(Global.currentEventKey)
         .child('$matchID');
     Map<String, dynamic> data = {};
     List<EverCollector> dataCollectors = [];
