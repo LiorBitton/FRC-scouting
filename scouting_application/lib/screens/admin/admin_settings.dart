@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/classes/tba_client.dart';
-import 'package:scouting_application/screens/admin_choose_teams.dart';
+import 'package:scouting_application/screens/admin/admin_choose_events.dart';
+import 'package:scouting_application/screens/admin/admin_choose_teams.dart';
 import 'package:scouting_application/themes/custom_themes.dart';
 import 'package:settings_ui/settings_ui.dart';
 
@@ -78,17 +79,28 @@ class _AdminSettingsState extends State<AdminSettings> {
                 },
               ),
             ),
-            SettingsTile.switchTile(
-                leading: Icon(Icons.event_available),
-                initialValue: _allowFreeScouting,
-                activeSwitchColor: CustomTheme.teamColor,
-                onToggle: (val) {
+            SettingsTile(
+                title: Text("Show Data From"),
+                description: Text("Choose events to show data from."),
+                leading: Icon(Icons.leaderboard),
+                onPressed: (_) {
                   setState(() {
-                    _allowFreeScouting = val;
+                    _handleChooseEvents();
                   });
-                  _saveValues();
-                },
-                title: Text("Allow Free Scouting"))
+                }),
+            SettingsTile.switchTile(
+              leading: Icon(Icons.event_available),
+              initialValue: _allowFreeScouting,
+              activeSwitchColor: CustomTheme.teamColor,
+              onToggle: (val) {
+                setState(() {
+                  _allowFreeScouting = val;
+                });
+                _saveValues();
+              },
+              title: Text("Allow Free Scouting"),
+              description: Text("Use this if TBA has match schedule problems."),
+            )
           ]),
           SettingsSection(title: Text("Database"), tiles: [
             SettingsTile(
@@ -126,6 +138,17 @@ class _AdminSettingsState extends State<AdminSettings> {
   void removeFromDatabase(List<String> teams) {
     //todo implement
   }
+  void _handleChooseEvents() async {
+    final Map<String, String> events =
+        await TBAClient.instance.fetchIsraelEvents();
+
+    final Map<String, String> alreadySelected =
+        await Database.instance.getSelectedEvents();
+    final Map<String, String> selectedEvents =
+        await selectEvents(events, alreadySelected: alreadySelected);
+    Database.instance.selectEvents(selectedEvents);
+  }
+
   void _handleBlockTeams() async {
     List<String> teams =
         await TBAClient.instance.fetchTeamsInEvent(currentEventKey);
@@ -190,6 +213,17 @@ class _AdminSettingsState extends State<AdminSettings> {
             ],
           );
         });
+  }
+
+  Future<Map<String, String>> selectEvents(Map<String, String> events,
+      {Map<String, String> alreadySelected = const {}}) async {
+    var result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ChooseEvents(
+                events: events, alreadySelected: alreadySelected)));
+
+    return result;
   }
 
   Future<List<String>> selectTeams(List<String> teams,

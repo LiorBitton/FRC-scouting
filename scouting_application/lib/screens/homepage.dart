@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/classes/global.dart';
-import 'package:scouting_application/screens/admin_settings.dart';
+import 'package:scouting_application/screens/admin/admin_settings.dart';
 import 'package:scouting_application/screens/stats/stats_lobby.dart';
 import 'package:scouting_application/screens/scouting/scouting_menu.dart';
 import 'package:scouting_application/screens/google_sign_in.dart';

@@ -117,6 +117,25 @@ class Database {
     db.ref('sync/currently_scouted/$teamID').remove();
   }
 
+  ///Get events that were selected by an admin to show data in stats screens
+  ///
+  ///returns a map key = eventKey;value = eventName;
+  Future<Map<String, String>> getSelectedEvents() async {
+    final ref = db.ref("settings/data_from_events");
+    try {
+      Map<String, String> events = Map<String, String>.from(
+          (await ref.get()).value as Map<dynamic, dynamic>);
+      return events;
+    } catch (e) {
+      print(e);
+      return {};
+    }
+  }
+
+  void selectEvents(Map<String, String> events) {
+    db.ref("settings/data_from_events").set(events);
+  }
+
   Future<bool> notifyStartScouting(String teamID) async {
     final dest = db.ref("sync/currently_scouted/$teamID");
     bool exists = await dest.once().then((DatabaseEvent snapshot) {
