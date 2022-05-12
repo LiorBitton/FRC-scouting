@@ -1,5 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/screens/homepage.dart';
 import 'package:scouting_application/screens/scouting/scouting_tab.dart';
@@ -10,9 +11,6 @@ import 'package:scouting_application/screens/scouting/tabs/teleoperated.dart';
 import 'package:scouting_application/widgets/collectors/ever_collector.dart';
 
 class GameManager extends StatefulWidget {
-  //GameManager.matchNumber = matchNumber;
-  // GameManager.teamID = teamID;
-  // GameManager.isBlueAlliance = isSelected[0];
   GameManager(
       {Key? key,
       required this.isBlueAll,
@@ -45,7 +43,6 @@ class GameManager extends StatefulWidget {
   ///
   ///
   static void submitGame(BuildContext context) {
-    // firebase_core.Firebase.initializeApp();
     final fb = FirebaseDatabase.instance;
     final ref = fb.ref();
     notifyScoutingFinished();
@@ -71,13 +68,7 @@ class GameManager extends StatefulWidget {
   }
 
   static void notifyScoutingFinished() {
-    final fb = FirebaseDatabase.instance;
-    final ref = fb.ref();
-    ref
-        .child('sync')
-        .child('currently_scouted')
-        .child(GameManager.teamID.toString())
-        .remove();
+    Database.instance.notifyScoutingFinished(GameManager.teamID.toString());
   }
 
   static void reset() {
@@ -132,6 +123,7 @@ class _GameManagerState extends State<GameManager> {
                         actions: [
                           IconButton(
                               onPressed: () {
+                                GameManager.reset();
                                 _notifyScoutingFinished();
                                 Navigator.push(
                                     context,
@@ -179,21 +171,7 @@ class _GameManagerState extends State<GameManager> {
   }
 
   Future<bool> _notifyScoutingTeam() async {
-    final fb = FirebaseDatabase.instance;
-    final ref = fb.ref();
-    final dest = ref
-        .child('sync')
-        .child('currently_scouted')
-        .child(widget.teamNumber.toString());
-    bool exists = await dest.once().then((DatabaseEvent snapshot) {
-      return snapshot.snapshot.exists;
-    });
-    if (exists) {
-      return false;
-    } else {
-      await dest.set(widget.teamNumber.toString());
-      return true;
-    }
+    return Database.instance.notifyStartScouting(widget.teamNumber.toString());
   }
 
   void _notifyScoutingFinished() {

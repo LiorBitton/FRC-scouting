@@ -72,6 +72,10 @@ class Database {
         .then((value) => value.value as bool);
   }
 
+  void setAllowFreeScouting(bool allow) {
+    db.ref('settings/allow_free_scouting').set(allow);
+  }
+
   Future<bool> isAdmin(String email) async {
     DataSnapshot val = await db.ref('settings/admins').get();
     return (val.value as List<Object?>).contains(email);
@@ -81,10 +85,22 @@ class Database {
     db.ref("teams/$teamKey/games/$eventKey/$gameKey").remove();
   }
 
+  Future<bool> teamHasGames(String teamID, String eventKey) async {
+    final teamGamesRef = db.ref("teams/$teamID/games/$eventKey");
+    bool exists = await teamGamesRef.once().then((value) {
+      return value.snapshot.exists;
+    });
+    return exists;
+  }
+
   Stream<Map<String, dynamic>> getTeamGamesStream(
       String teamID, String eventKey) {
     final teamGamesRef = db.ref("teams/$teamID/games/$eventKey");
     final teamGamesStream = teamGamesRef.onValue;
+
+    if (teamGamesRef.path.isEmpty) {
+      return {} as Stream<Map<String, dynamic>>;
+    }
     final Stream<Map<String, dynamic>> outStream = teamGamesStream.map((event) {
       if (event.snapshot.exists) {
         Map<String, dynamic> val = Map<String, dynamic>.from(
@@ -95,5 +111,22 @@ class Database {
       return {} as Map<String, dynamic>;
     });
     return outStream;
+  }
+
+  void notifyScoutingFinished(String teamID) {
+    db.ref('sync/currently_scouted/$teamID').remove();
+  }
+
+  Future<bool> notifyStartScouting(String teamID) async {
+    final dest = db.ref("sync/currently_scouted/$teamID");
+    bool exists = await dest.once().then((DatabaseEvent snapshot) {
+      return snapshot.snapshot.exists;
+    });
+    if (exists) {
+      return false;
+    } else {
+      await dest.set(teamID);
+      return true;
+    }
   }
 }

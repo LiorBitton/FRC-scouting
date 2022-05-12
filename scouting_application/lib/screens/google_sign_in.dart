@@ -15,7 +15,8 @@ class GoogleSignInScreen extends StatefulWidget {
 class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
   FirebaseAuth auth = FirebaseAuth.instance;
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     auth.authStateChanges().listen((User? user) {
       if (user == null) {
       } else {
@@ -23,6 +24,10 @@ class _GoogleSignInScreenState extends State<GoogleSignInScreen> {
             context, MaterialPageRoute(builder: (context) => Homepage()));
       }
     });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
         child: SignInButton(
       Buttons.Google,

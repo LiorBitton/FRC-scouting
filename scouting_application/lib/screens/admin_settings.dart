@@ -68,7 +68,6 @@ class _AdminSettingsState extends State<AdminSettings> {
                         items: snapshot.data!,
                         onChanged: (val) {
                           setState(() {
-                            //todo save event name to display in realtime scouting
                             currentEventKey = val.toString();
                             currentEventName = events[currentEventKey] ?? "";
                           });
@@ -118,6 +117,7 @@ class _AdminSettingsState extends State<AdminSettings> {
   void _saveValues() {
     Database.instance
         .setCurrentEvent(key: currentEventKey, name: currentEventName);
+    Database.instance.setAllowFreeScouting(_allowFreeScouting);
     Global.currentEventKey = currentEventKey;
     Global.currentEventName = currentEventName;
     Global.allowFreeScouting = _allowFreeScouting;

@@ -7,10 +7,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/classes/tba_client.dart';
 import 'package:scouting_application/classes/team_data.dart';
-import 'package:scouting_application/classes/secret_constants.dart';
 import 'package:scouting_application/classes/team_search_delegate.dart';
 // import 'package:scouting_application/screens/analysis_gallery.dart';
-import 'package:http/http.dart' as http;
 import 'package:scouting_application/screens/stats/team_homepage.dart';
 
 class StatsLobby extends StatefulWidget {
@@ -104,13 +102,11 @@ class _StatsLobbyState extends State<StatsLobby> {
   }
 
   Future<String> fetchTeamLogoAsString(String teamNumber) async {
-    int year = new DateTime.now().year;
     if (teamData.containsKey(teamNumber)) {
       try {
         String b64logo = teamData[teamNumber]!.getAvatar();
         if (b64logo == "none") {
           //if team didnt upload an avatar
-          // print("team #$teamNumber doesnt have an avatar");
           return "none";
         }
         if (b64logo != "") {
@@ -120,35 +116,10 @@ class _StatsLobbyState extends State<StatsLobby> {
         }
       } catch (e) {}
     }
-    var url = Uri.parse(
-        'https://www.thebluealliance.com/api/v3/team/frc$teamNumber/media/$year');
-    final response = await http.get(url, headers: {
-      'X-TBA-Auth-Key': SecretConstants.TBA_API_KEY,
-      'accept': 'application/json'
-    });
-    if (response.statusCode == 200) {
-      List<dynamic> res = jsonDecode(response.body);
-      for (dynamic media in res) {
-        //Fetching team's logo
-        try {
-          if (media["type"] == "avatar") {
-            String b64logo = res[0]['details']['base64Image'].toString();
-            teamData[teamNumber]!.setAvatar(b64logo);
-            // print("saved $teamNumber photo to json");
-            return b64logo;
-          }
-        } catch (exception) {
-          print(exception);
-          debugPrint('failed to download logo of $teamNumber');
-          return "";
-        }
-      }
-      teamData[teamNumber]!.setAvatar("none");
-      return "none";
-    } else {
-      // If the server did not return a 200 OK response,
-      throw Exception('Failed to load Team $teamNumber image');
-    }
+    String b64avatar =
+        await TBAClient.instance.fetchTeamLogoAsString(teamNumber);
+    teamData[teamNumber]!.setAvatar(b64avatar);
+    return b64avatar;
   }
 
   Image? imageFromBase64String(String base64String) {
@@ -158,36 +129,19 @@ class _StatsLobbyState extends State<StatsLobby> {
     } catch (e) {
       return null;
     }
-    return null;
   }
 
   Future<String> fetchTeamNickname(String teamNumber) async {
-    // if (!nicknamesLoaded) await loadCache();
     if (teamData.containsKey(teamNumber)) {
-      // print("loaded $teamNumber from json");
       return teamData[teamNumber]!.getName();
     }
 
-    var url = Uri.parse(
-        'https://www.thebluealliance.com/api/v3/team/frc$teamNumber/simple');
-    final response = await http.get(url, headers: {
-      'X-TBA-Auth-Key': SecretConstants.TBA_API_KEY,
-      'accept': 'application/json'
-    });
-
-    if (response.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
-      String nickname = jsonDecode(response.body)["nickname"];
-      if (!teamData.containsKey(teamNumber)) {
-        teamData.putIfAbsent(
-            teamNumber, () => TeamData(name: nickname, avatar: ""));
-        // print("saved $teamNumber to json");
-      }
+    String nickname = await TBAClient.instance.fetchTeamNickname(teamNumber);
+    if (!teamData.containsKey(teamNumber)) {
+      teamData.putIfAbsent(
+          teamNumber, () => TeamData(name: nickname, avatar: ""));
       return nickname;
     } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
       throw Exception('Failed to load Team $teamNumber nickname');
     }
   }

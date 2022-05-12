@@ -4,9 +4,10 @@ import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/screens/stats/game_data.dart';
 
 class TeamGames extends StatefulWidget {
-  TeamGames({Key? key, required this.teamID}) : super(key: key);
+  TeamGames({Key? key, required this.teamID, required this.eventKey})
+      : super(key: key);
   final String teamID;
-
+  final String eventKey;
   @override
   State<TeamGames> createState() => _TeamGamesState();
 }
@@ -16,70 +17,86 @@ class _TeamGamesState extends State<TeamGames> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: Column(
-        children: [
-          Expanded(
-            child: StreamBuilder(
-                stream: Database.instance
-                    .getTeamGamesStream(widget.teamID, Global.currentEventKey),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return Center(child: CircularProgressIndicator());
-                  } else if (snapshot.data == {}) {
-                    return Center(child: Text("no games for this team"));
-                  } else {
-                    Map<String, dynamic> games =
-                        snapshot.data as Map<String, dynamic>;
-                    List<String> gameKeys = games.keys.toList();
-                    gameKeys.sort((a, b) {
-                      //yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]
-                      int stageEqual = a // _[COMP_LEVEL]m
-                          .substring(0, a.lastIndexOf("m"))
-                          .compareTo(b.substring(0, b.lastIndexOf("m")));
-                      if (stageEqual != 0) {
-                        return stageEqual;
-                      }
+      appBar: AppBar(
+          title: Text("Team ${widget.teamID} - ${widget.eventKey} Games")),
+      body: FutureBuilder(
+        future: Database.instance.teamHasGames(widget.teamID, widget.eventKey),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return LinearProgressIndicator();
+          }
+          return !(snapshot.data as bool)
+              ? Center(
+                  child: Text(
+                      "No games for team ${widget.teamID} in event ${widget.eventKey}"))
+              : Column(
+                  children: [
+                    StreamBuilder(
+                        stream: Database.instance.getTeamGamesStream(
+                            widget.teamID, Global.currentEventKey),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return Center(child: CircularProgressIndicator());
+                          } else if (snapshot.data == {}) {
+                            return Center(
+                                child: Text("no games for this team"));
+                          } else {
+                            Map<String, dynamic> games =
+                                snapshot.data as Map<String, dynamic>;
+                            List<String> gameKeys = games.keys.toList();
+                            gameKeys.sort((a, b) {
+                              //yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]
+                              int stageEqual = a // _[COMP_LEVEL]m
+                                  .substring(0, a.lastIndexOf("m"))
+                                  .compareTo(
+                                      b.substring(0, b.lastIndexOf("m")));
+                              if (stageEqual != 0) {
+                                return stageEqual;
+                              }
 
-                      return int.parse(a.substring(a.lastIndexOf("m") + 1)) -
-                          int.parse(b.substring(
-                              b.lastIndexOf("m") + 1)); //[MATCH_NUMBER]
-                    });
-                    return ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: gameKeys.length,
-                        itemBuilder: (context, index) {
-                          final String gameKey = gameKeys[index];
-                          return ListTile(
-                            trailing: Global.isAdmin
-                                ? IconButton(
-                                    icon: Icon(Icons.delete),
-                                    onPressed: () {
-                                      setState(() {
-                                        handleDeleteGame(
-                                            widget.teamID, gameKey);
-                                      });
+                              return int.parse(
+                                      a.substring(a.lastIndexOf("m") + 1)) -
+                                  int.parse(b.substring(
+                                      b.lastIndexOf("m") + 1)); //[MATCH_NUMBER]
+                            });
+                            return ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: gameKeys.length,
+                                itemBuilder: (context, index) {
+                                  final String gameKey = gameKeys[index];
+                                  return ListTile(
+                                    trailing: Global.isAdmin
+                                        ? IconButton(
+                                            icon: Icon(Icons.delete),
+                                            onPressed: () {
+                                              setState(() {
+                                                handleDeleteGame(
+                                                    widget.teamID, gameKey);
+                                              });
+                                            },
+                                          )
+                                        : Text(""),
+                                    title: Text(gameKey),
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) => GameData(
+                                                  teamID: widget.teamID,
+                                                  data:
+                                                      Map<String, dynamic>.from(
+                                                          (games[gameKey]
+                                                              as Map<dynamic,
+                                                                  dynamic>)))));
                                     },
-                                  )
-                                : Text(""),
-                            title: Text(gameKey),
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => GameData(
-                                          teamID: widget.teamID,
-                                          data: Map<String, dynamic>.from(
-                                              (games[gameKey]
-                                                  as Map<dynamic, dynamic>)))));
-                            },
-                          );
-                        });
-                  }
-                }),
-          ),
-        ],
+                                  );
+                                });
+                          }
+                        }),
+                  ],
+                );
+        },
       ),
     );
   }
