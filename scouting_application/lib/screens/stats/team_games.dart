@@ -32,8 +32,8 @@ class _TeamGamesState extends State<TeamGames> {
               : Column(
                   children: [
                     StreamBuilder(
-                        stream: Database.instance.getTeamGamesStream(
-                            widget.teamID, Global.currentEventKey),
+                        stream: Database.instance
+                            .getTeamGamesStream(widget.teamID, widget.eventKey),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
                             return Center(child: CircularProgressIndicator());

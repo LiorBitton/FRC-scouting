@@ -11,8 +11,23 @@ class Database {
     if (name == "none") {
       name = key;
     }
-    db.ref("settings/current_event_key").set(key);
-    db.ref("settings/current_event_name").set(name);
+    db.ref("settings/current_event/key").set(key);
+    db.ref("settings/current_event/name").set(name);
+  }
+
+  Future<List<String>> getTeamsRecordedEventsKeys(String teamID) async {
+    try {
+      List<String> out = Map<String, dynamic>.from(
+              (await db.ref("teams/${int.parse(teamID)}/games").get()).value
+                  as Map<dynamic, dynamic>)
+          .keys
+          .toList();
+      print(out);
+      return out;
+    } catch (e) {
+      print(e);
+      return [];
+    }
   }
 
   void blockTeamsFromScouting(List<String> teams) async {
@@ -55,11 +70,11 @@ class Database {
 
   Future<List<String>> getCurrentEvent() async {
     String key = await FirebaseDatabase.instance
-        .ref('settings/current_event_key')
+        .ref('settings/current_event/key')
         .get()
         .then((value) => value.value.toString());
     String name = await FirebaseDatabase.instance
-        .ref('settings/current_event_key')
+        .ref('settings/current_event/name')
         .get()
         .then((value) => value.value.toString());
     return [key, name];

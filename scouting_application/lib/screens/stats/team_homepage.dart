@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:scouting_application/classes/global.dart';
+import 'package:scouting_application/screens/stats/team_events.dart';
 import 'package:scouting_application/screens/stats/team_photo_gallery.dart';
-import 'package:scouting_application/screens/stats/team_games.dart';
 
 class TeamHomepage extends StatelessWidget {
   TeamHomepage({Key? key, required this.teamNumber}) : super(key: key);
@@ -36,9 +35,8 @@ class TeamHomepage extends StatelessWidget {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => TeamGames(
+                          builder: (context) => TeamEvents(
                                 teamID: teamNumber,
-                                eventKey: Global.currentEventKey,
                               )));
                 }),
           ],
