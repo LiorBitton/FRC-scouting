@@ -15,7 +15,7 @@ class ScoutingMenu extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Global.allowFreeScouting
+                Global.instance.allowFreeScouting
                     ? MenuButton(
                         title: 'Free',
                         onPressed: () {

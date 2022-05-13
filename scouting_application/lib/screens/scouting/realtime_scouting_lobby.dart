@@ -27,7 +27,7 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text(Global.currentEventName)),
+        appBar: AppBar(title: Text(Global.instance.currentEventName)),
         body: SingleChildScrollView(
           child: Center(
             child: StreamBuilder<dynamic>(
@@ -61,8 +61,8 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
 
   Future<Wrap> createUI() async {
     List<Container> content = [];
-    dynamic matches =
-        await TBAClient.instance.fetchMatchesByEvent(Global.currentEventKey);
+    dynamic matches = await TBAClient.instance
+        .fetchMatchesByEvent(Global.instance.currentEventKey);
 
     (matches as List<dynamic>).sort((a, b) {
       //yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]

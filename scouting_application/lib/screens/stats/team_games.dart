@@ -18,7 +18,8 @@ class _TeamGamesState extends State<TeamGames> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text("Team ${widget.teamID} - ${widget.eventKey} Games")),
+          title: Text(
+              "Team ${widget.teamID} - ${widget.eventKey.substring(4)} Games")),
       body: FutureBuilder(
         future: Database.instance.teamHasGames(widget.teamID, widget.eventKey),
         builder: (context, snapshot) {
@@ -66,7 +67,7 @@ class _TeamGamesState extends State<TeamGames> {
                                 itemBuilder: (context, index) {
                                   final String gameKey = gameKeys[index];
                                   return ListTile(
-                                    trailing: Global.isAdmin
+                                    trailing: Global.instance.isAdmin
                                         ? IconButton(
                                             icon: Icon(Icons.delete),
                                             onPressed: () {
@@ -102,6 +103,7 @@ class _TeamGamesState extends State<TeamGames> {
   }
 
   void handleDeleteGame(String teamKey, String gameKey) {
-    Database.instance.deleteGame(teamKey, gameKey, Global.currentEventKey);
+    Database.instance
+        .deleteGame(teamKey, gameKey, Global.instance.currentEventKey);
   }
 }

@@ -13,12 +13,13 @@ class Database {
     }
     db.ref("settings/current_event/key").set(key);
     db.ref("settings/current_event/name").set(name);
+    db.ref("settings/data_from_events").update({key: name});
   }
 
   Future<List<String>> getTeamsRecordedEventsKeys(String teamID) async {
     try {
       List<String> out = Map<String, dynamic>.from(
-              (await db.ref("teams/${int.parse(teamID)}/games").get()).value
+              (await db.ref("teams/${int.parse(teamID)}").get()).value
                   as Map<dynamic, dynamic>)
           .keys
           .toList();
@@ -68,25 +69,6 @@ class Database {
     return outStream;
   }
 
-  Future<List<String>> getCurrentEvent() async {
-    String key = await FirebaseDatabase.instance
-        .ref('settings/current_event/key')
-        .get()
-        .then((value) => value.value.toString());
-    String name = await FirebaseDatabase.instance
-        .ref('settings/current_event/name')
-        .get()
-        .then((value) => value.value.toString());
-    return [key, name];
-  }
-
-  Future<bool> getAllowFreeScouting() async {
-    return await db
-        .ref('settings/allow_free_scouting')
-        .get()
-        .then((value) => value.value as bool);
-  }
-
   void setAllowFreeScouting(bool allow) {
     db.ref('settings/allow_free_scouting').set(allow);
   }
@@ -97,11 +79,11 @@ class Database {
   }
 
   void deleteGame(String teamKey, String gameKey, String eventKey) {
-    db.ref("teams/$teamKey/games/$eventKey/$gameKey").remove();
+    db.ref("teams/$teamKey/$eventKey/$gameKey").remove();
   }
 
   Future<bool> teamHasGames(String teamID, String eventKey) async {
-    final teamGamesRef = db.ref("teams/$teamID/games/$eventKey");
+    final teamGamesRef = db.ref("teams/$teamID/$eventKey");
     bool exists = await teamGamesRef.once().then((value) {
       return value.snapshot.exists;
     });
@@ -110,7 +92,7 @@ class Database {
 
   Stream<Map<String, dynamic>> getTeamGamesStream(
       String teamID, String eventKey) {
-    final teamGamesRef = db.ref("teams/$teamID/games/$eventKey");
+    final teamGamesRef = db.ref("teams/$teamID/$eventKey");
     final teamGamesStream = teamGamesRef.onValue;
 
     if (teamGamesRef.path.isEmpty) {
@@ -161,6 +143,23 @@ class Database {
     } else {
       await dest.set(teamID);
       return true;
+    }
+  }
+
+  Future<Map<String, dynamic>> getSettings() async {
+    final DatabaseReference ref = db.ref("settings");
+    final DataSnapshot snapshot = await ref.get();
+    if (snapshot.exists) {
+      return Map<String, dynamic>.from(snapshot.value as Map<dynamic, dynamic>);
+    } else {
+      Map<String, dynamic> defaultSettings = {
+        "admins":["liorb5000@gmail.com"],
+        "allow_free_scouting": false,
+        "current_event": {"key": "none", "name": "none"},
+        "data_from_events": {}
+      };
+      ref.set(defaultSettings);
+      return defaultSettings;
     }
   }
 }

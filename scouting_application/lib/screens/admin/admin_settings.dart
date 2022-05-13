@@ -17,12 +17,12 @@ class AdminSettings extends StatefulWidget {
 }
 
 class _AdminSettingsState extends State<AdminSettings> {
-  String currentEventKey = Global.currentEventKey;
+  String currentEventKey = Global.instance.currentEventKey;
   String currentEventName = "";
 
   ///key = event key; value = event name
   Map<String, String> events = {};
-  bool _allowFreeScouting = Global.allowFreeScouting;
+  bool _allowFreeScouting = Global.instance.allowFreeScouting;
   late Future<List<DropdownMenuItem<String>>> futureEvents;
   TextEditingController _textFieldController = TextEditingController();
   @override
@@ -130,18 +130,17 @@ class _AdminSettingsState extends State<AdminSettings> {
     Database.instance
         .setCurrentEvent(key: currentEventKey, name: currentEventName);
     Database.instance.setAllowFreeScouting(_allowFreeScouting);
-    Global.currentEventKey = currentEventKey;
-    Global.currentEventName = currentEventName;
-    Global.allowFreeScouting = _allowFreeScouting;
+    Global.instance.currentEventKey = currentEventKey;
+    Global.instance.currentEventName = currentEventName;
+    Global.instance.allowFreeScouting = _allowFreeScouting;
   }
 
   void removeFromDatabase(List<String> teams) {
     //todo implement
   }
   void _handleChooseEvents() async {
-    final Map<String, String> events =
-        await TBAClient.instance.fetchIsraelEvents();
-
+    Map<String, String> events = await TBAClient.instance.fetchIsraelEvents();
+    events.remove(Global.instance.currentEventKey);
     final Map<String, String> alreadySelected =
         await Database.instance.getSelectedEvents();
     final Map<String, String> selectedEvents =

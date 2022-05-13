@@ -8,7 +8,6 @@ import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/classes/tba_client.dart';
 import 'package:scouting_application/classes/team_data.dart';
 import 'package:scouting_application/classes/team_search_delegate.dart';
-// import 'package:scouting_application/screens/analysis_gallery.dart';
 import 'package:scouting_application/screens/stats/team_homepage.dart';
 
 class StatsLobby extends StatefulWidget {
@@ -177,8 +176,8 @@ class _StatsLobbyState extends State<StatsLobby> {
 
   Future<String> createCache() async {
     await loadCache();
-    final List<String> teamsTemp =
-        await TBAClient.instance.fetchTeamsInEvent(Global.currentEventKey);
+    final List<String> teamsTemp = await TBAClient.instance
+        .fetchTeamsInEvent(Global.instance.currentEventKey);
     if (teamsTemp == []) {
       var ref = FirebaseDatabase.instance.ref('teams');
       DataSnapshot snapshot = await ref.get();
@@ -199,7 +198,4 @@ class _StatsLobbyState extends State<StatsLobby> {
     saveCache();
     return "okay";
   }
-
-  //
-
 }

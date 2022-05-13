@@ -101,10 +101,7 @@ class Homepage extends StatelessWidget {
   }
 
   void initGlobal() async {
-    List<String> event = await Database.instance.getCurrentEvent();
-    Global.currentEventKey = event[0];
-    Global.currentEventName = event[1];
-    Global.allowFreeScouting = await Database.instance.getAllowFreeScouting();
-    Global.isAdmin = await isAdmin();
+    Global.instance.fromJson(await Database.instance.getSettings());
+    Global.instance.setIsAdmin(await isAdmin());
   }
 }

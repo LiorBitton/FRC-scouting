@@ -17,8 +17,6 @@ class TeamData {
   void setAvatar(String avatar) {
     this.avatar = avatar;
   }
-  //final int id;
-  // final String title;
 
   TeamData({
     required this.name,
@@ -35,7 +33,6 @@ class TeamData {
       return TeamData(
         name: json['name'],
         avatar: json['avatar'],
-        // title: json['title'],
       );
     } catch (e) {
       print(e);

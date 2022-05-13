@@ -55,8 +55,8 @@ class TeamEvents extends StatelessWidget {
     List<String> recordedEvents =
         await Database.instance.getTeamsRecordedEventsKeys(teamID);
     Map<String, String> out = {};
-    for (String eventKey in selectedEvents.keys) {
-      if (recordedEvents.contains(eventKey)) {
+    for (String eventKey in recordedEvents) {
+      if (selectedEvents.keys.contains(eventKey)) {
         out.putIfAbsent(eventKey, () => selectedEvents[eventKey].toString());
       }
     }
