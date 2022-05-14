@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:camera/camera.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class Database {
   final FirebaseDatabase db = FirebaseDatabase.instance;
@@ -19,7 +23,7 @@ class Database {
   Future<List<String>> getTeamsRecordedEventsKeys(String teamID) async {
     try {
       List<String> out = Map<String, dynamic>.from(
-              (await db.ref("teams/${int.parse(teamID)}").get()).value
+              (await db.ref("teams/${int.parse(teamID)}/events").get()).value
                   as Map<dynamic, dynamic>)
           .keys
           .toList();
@@ -79,11 +83,11 @@ class Database {
   }
 
   void deleteGame(String teamKey, String gameKey, String eventKey) {
-    db.ref("teams/$teamKey/$eventKey/$gameKey").remove();
+    db.ref("teams/$teamKey/events/$eventKey/$gameKey").remove();
   }
 
   Future<bool> teamHasGames(String teamID, String eventKey) async {
-    final teamGamesRef = db.ref("teams/$teamID/$eventKey");
+    final teamGamesRef = db.ref("teams/${int.parse(teamID)}/events/$eventKey");
     bool exists = await teamGamesRef.once().then((value) {
       return value.snapshot.exists;
     });
@@ -92,7 +96,7 @@ class Database {
 
   Stream<Map<String, dynamic>> getTeamGamesStream(
       String teamID, String eventKey) {
-    final teamGamesRef = db.ref("teams/$teamID/$eventKey");
+    final teamGamesRef = db.ref("teams/$teamID/events/$eventKey");
     final teamGamesStream = teamGamesRef.onValue;
 
     if (teamGamesRef.path.isEmpty) {
@@ -153,7 +157,7 @@ class Database {
       return Map<String, dynamic>.from(snapshot.value as Map<dynamic, dynamic>);
     } else {
       Map<String, dynamic> defaultSettings = {
-        "admins":["liorb5000@gmail.com"],
+        "admins": ["liorb5000@gmail.com"],
         "allow_free_scouting": false,
         "current_event": {"key": "none", "name": "none"},
         "data_from_events": {}
@@ -161,5 +165,30 @@ class Database {
       ref.set(defaultSettings);
       return defaultSettings;
     }
+  }
+
+  Future uploadImage(XFile? imageFile, String teamID) async {
+    if (imageFile == null) return;
+    File file = File(imageFile.path);
+    final ref = FirebaseStorage.instance.ref();
+    final imageRef = ref.child('teams/$teamID/${file.path.split("/").last}');
+    TaskSnapshot snapshot = await imageRef.putFile(file);
+    if (snapshot.state == TaskState.success) {
+      final String downloadUrl = await snapshot.ref.getDownloadURL();
+      final ref = FirebaseDatabase.instance.ref();
+      final imageRef = ref.child('teams/${int.parse(teamID)}/images').push();
+      imageRef.set(downloadUrl);
+    }
+  }
+
+  Future<List<String>> getTeamImages(String teamID) async {
+    DataSnapshot snapshot =
+        await db.ref("teams/${int.parse(teamID)}/images").get();
+    if (!snapshot.exists) {
+      return [];
+    }
+    Map<String, String> images =
+        Map<String, String>.from(snapshot.value as Map<dynamic, dynamic>);
+    return images.values.toList();
   }
 }

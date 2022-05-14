@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/classes/tba_client.dart';
+import 'package:scouting_application/screens/scouting/add_team_photo.dart';
 
 class TeamPhotoGallery extends StatelessWidget {
   TeamPhotoGallery({Key? key, required this.teamNumber}) : super(key: key);
@@ -11,7 +13,21 @@ class TeamPhotoGallery extends StatelessWidget {
   Widget build(BuildContext context) {
     futureImages = fetchTeamPhotos();
     return Scaffold(
-      appBar: AppBar(title: Text("Team $teamNumber Photos")),
+      appBar: AppBar(
+        title: Text("Team $teamNumber Photos"),
+        actions: [
+          IconButton(
+            iconSize: 30,
+            icon: Icon(Icons.add_photo_alternate),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => AddTeamPhoto(teamID: teamNumber)));
+            },
+          )
+        ],
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -46,6 +62,9 @@ class TeamPhotoGallery extends StatelessWidget {
         await TBAClient.instance.fetchTeamPhotos(teamNumber);
     List<String> urlImages = images["url"]!;
     List<String> b64images = images["b64"]!;
+    List<String> databaseImages =
+        await Database.instance.getTeamImages(teamNumber);
+    urlImages.addAll(databaseImages);
     List<Image> out = [];
     for (String url in urlImages) {
       out.add(Image.network(url));

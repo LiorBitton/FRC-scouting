@@ -40,20 +40,6 @@ class ScoutingMenu extends StatelessWidget {
                             builder: (context) => RealtimeScoutingLobby()));
                   },
                 ),
-                SizedBox(
-                  height: 5,
-                  width: 5,
-                ),
-                IconButton(
-                  iconSize: 50,
-                  icon: Icon(Icons.add_photo_alternate),
-                  onPressed: () {
-                    // Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //         builder: (context) => ScoutGeneral()));
-                  },
-                )
               ]),
         ));
   }
