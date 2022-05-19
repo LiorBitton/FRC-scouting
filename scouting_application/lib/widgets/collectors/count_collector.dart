@@ -9,8 +9,8 @@ class CountCollector extends StatefulWidget implements EverCollector {
   _CountCollectorState createState() => _CountCollectorState();
 
   @override
-  String dataTag;
-  String title;
+  final String dataTag;
+  final String title;
   int _value = 0;
   @override
   String getDataTag() {
@@ -35,6 +35,7 @@ class _CountCollectorState extends State<CountCollector> {
     return Column(
       children: [
         FloatingActionButton(
+            heroTag: widget.dataTag,
             child: Text('${widget._value}'),
             onPressed: _incrementCounter,
             shape: CircleBorder()),
