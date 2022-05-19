@@ -44,11 +44,7 @@ class TeamPhotoGallery extends StatelessWidget {
                 } else if (snapshot.hasError) {
                   print('${snapshot.error}');
                 }
-                return Image.asset(
-                  "assets/loading.gif",
-                  height: 125.0,
-                  width: 125.0,
-                );
+                return LinearProgressIndicator();
               },
             ),
           ],

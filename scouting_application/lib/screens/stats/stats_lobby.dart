@@ -57,12 +57,7 @@ class _StatsLobbyState extends State<StatsLobby> {
                         future: createCache(),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
-                            return Center(
-                                child: Image.asset(
-                              "assets/loading.gif",
-                              height: 125.0,
-                              width: 125.0,
-                            ));
+                            return LinearProgressIndicator();
                           } else {
                             allowSearch = true;
                             return ListView.builder(
