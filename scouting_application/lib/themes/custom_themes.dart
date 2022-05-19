@@ -14,7 +14,7 @@ class CustomTheme {
         colorScheme: ColorScheme.dark(),
         dividerColor: Colors.white,
         primaryColor: teamColor,
-        scaffoldBackgroundColor: Colors.black,
+        scaffoldBackgroundColor: Color.fromARGB(200, 84, 136, 68),
         appBarTheme: AppBarTheme(
           color: teamColor,
           titleTextStyle: GoogleFonts.acme(fontSize: 25),
@@ -41,7 +41,7 @@ class CustomTheme {
         brightness: Brightness.light,
         colorScheme: ColorScheme.light(),
         primaryColor: teamColor,
-        scaffoldBackgroundColor: Colors.white,
+        scaffoldBackgroundColor: Color.fromARGB(255, 199, 233, 171),
         appBarTheme: AppBarTheme(
             color: teamColor, titleTextStyle: GoogleFonts.acme(fontSize: 25)),
         iconTheme: IconThemeData(color: teamColor),
