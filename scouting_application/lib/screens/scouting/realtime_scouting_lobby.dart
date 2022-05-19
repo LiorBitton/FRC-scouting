@@ -14,6 +14,7 @@ class RealtimeScoutingLobby extends StatefulWidget {
 
 class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
   late Future<Wrap> futureMatches;
+  bool isDarkMode = false;
 
   ///Teams that either being scouted at the moment or were chosen to be hidden by admin
   Set<String> hiddenTeams = new Set<String>();
@@ -26,32 +27,40 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
 
   @override
   Widget build(BuildContext context) {
+    var brightness = MediaQuery.of(context).platformBrightness;
+    isDarkMode = brightness == Brightness.dark;
     return Scaffold(
-        appBar: AppBar(title: Text(Global.instance.currentEventName)),
-        body: SingleChildScrollView(
-          child: Center(
-            child: StreamBuilder<dynamic>(
-                stream: Database.instance.getScoutedTeamsStream(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    hiddenTeams.clear();
-                    hiddenTeams.addAll(blockedTeams);
-                    hiddenTeams.addAll(snapshot.data);
-                  }
-                  return FutureBuilder<Wrap>(
-                    future: createUI(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return snapshot.data!;
-                      } else if (snapshot.hasError) {
-                        print('${snapshot.error}');
-                      }
-                      return const CircularProgressIndicator();
-                    },
-                  );
-                }),
-          ),
-        ));
+        body: CustomScrollView(slivers: [
+      SliverAppBar(
+          title: Text(Global.instance.currentEventName),
+          floating: true,
+          stretch: true),
+      StreamBuilder<dynamic>(
+          stream: Database.instance.getScoutedTeamsStream(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              hiddenTeams.clear();
+              hiddenTeams.addAll(blockedTeams);
+              hiddenTeams.addAll(snapshot.data);
+            }
+            return FutureBuilder<SliverList>(
+              future: createUI(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return snapshot.data!;
+                } else if (snapshot.hasError) {
+                  print('${snapshot.error}');
+                }
+                return SliverList(
+                    delegate: SliverChildBuilderDelegate(((context, index) {
+                  if (index == 0)
+                    return Container(child: LinearProgressIndicator());
+                  return Container(child: Text(""));
+                })));
+              },
+            );
+          })
+    ]));
   }
 
   Future<void> initBlockedTeams() async {
@@ -59,7 +68,7 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
     blockedTeams.addAll(tempBlockedTeams);
   }
 
-  Future<Wrap> createUI() async {
+  Future<SliverList> createUI() async {
     List<Container> content = [];
     dynamic matches = await TBAClient.instance
         .fetchMatchesByEvent(Global.instance.currentEventKey);
@@ -84,10 +93,13 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
       Container? matchCont = getMatchContainer(tempMatch);
       if (matchCont != null) content.add(matchCont);
     }
-    return Wrap(
-      direction: Axis.vertical,
-      spacing: 50,
-      children: content,
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        ((context, index) {
+          return content[index];
+        }),
+        childCount: content.length,
+      ),
     );
   }
 
@@ -98,8 +110,8 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
     //   return null; //dont show match if already played
     List<dynamic> blueAlliance = match['alliances']['blue']['team_keys'];
     List<dynamic> redAlliance = match['alliances']['red']['team_keys'];
-    List<ElevatedButton> blueButtons = [];
-    List<ElevatedButton> redButtons = [];
+    List<TeamButton> blueButtons = [];
+    List<TeamButton> redButtons = [];
 
     ///
     final String matchNumber = match['match_number'].toString();
@@ -111,13 +123,13 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
     ///
     for (int i = 0; i < blueAlliance.length; i++) {
       blueAlliance[i] = (blueAlliance[i] as String).replaceAll('frc', '');
-      ElevatedButton? bluebtn =
+      TeamButton bluebtn =
           getTeamButton(true, blueAlliance[i].toString(), matchKey);
-      if (bluebtn != null) blueButtons.add(bluebtn);
+      blueButtons.add(bluebtn);
       redAlliance[i] = (redAlliance[i] as String).replaceAll('frc', '');
-      ElevatedButton? redbtn =
+      TeamButton redbtn =
           getTeamButton(false, redAlliance[i].toString(), matchKey);
-      if (redbtn != null) redButtons.add(redbtn);
+      redButtons.add(redbtn);
     }
 
     switch (matchType) {
@@ -134,18 +146,27 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
         matchTitle = "Qual #$matchNumber";
     }
     final double buttonSpacing = 10;
+    MediaQuery.of(context).size.width;
+
     return Container(
-        width: 280,
+        margin: EdgeInsetsDirectional.fromSTEB(50, 20, 50, 20),
         height: 250,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),
-          color: Colors.grey[100]!,
+          color: isDarkMode ? Colors.grey[900]! : Colors.white24,
           boxShadow: [
             BoxShadow(
-                color: Colors.grey[500]!,
-                blurRadius: 10,
+                //bottom shadow
+                color: isDarkMode ? Colors.grey[800]! : Colors.grey[600]!,
+                blurRadius: isDarkMode ? 2 : 15,
                 offset: const Offset(4, 4),
-                spreadRadius: 1)
+                spreadRadius: isDarkMode ? 0.01 : 1),
+            BoxShadow(
+                //top shadow
+                color: isDarkMode ? Colors.grey[400]! : Colors.white,
+                blurRadius: isDarkMode ? 0 : 02,
+                offset: const Offset(-4, -4),
+                spreadRadius: isDarkMode ? 0.03 : 1)
           ],
         ),
         child: Column(
@@ -165,6 +186,7 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
                       textAlign: TextAlign.left,
                       style: TextStyle(
                           fontSize: 38,
+                          color: isDarkMode ? Colors.grey[300] : Colors.black,
                           fontStyle: FontStyle.normal,
                           fontWeight: FontWeight.w900),
                     ),
@@ -191,28 +213,51 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
             ]));
   }
 
-  ElevatedButton? getTeamButton(bool isBlue, String teamID, String matchKey) {
-    return hiddenTeams.contains(teamID)
-        ? null
-        : ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => GameManager(
-                          isBlueAll: isBlue,
-                          matchKey: matchKey,
-                          teamNumber: int.parse(teamID))));
-            },
-            child: Text(teamID,
-                style: GoogleFonts.roboto(
-                    fontWeight: FontWeight.w700, fontSize: 26)),
-            style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(
-                    isBlue ? Colors.blue : Colors.red),
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14.0),
-                ))));
+  TeamButton getTeamButton(bool isBlue, String teamID, String matchKey) {
+    return TeamButton(
+        isBlue: isBlue,
+        teamID: teamID,
+        matchKey: matchKey,
+        isActivated: !hiddenTeams.contains(teamID));
+  }
+}
+
+class TeamButton extends StatelessWidget {
+  const TeamButton(
+      {Key? key,
+      required this.isBlue,
+      required this.teamID,
+      required this.matchKey,
+      this.isActivated})
+      : super(key: key);
+  final bool isBlue;
+  final String teamID;
+  final String matchKey;
+  final isActivated;
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+        onPressed: isActivated
+            ? () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => GameManager(
+                            isBlueAll: isBlue,
+                            matchKey: matchKey,
+                            teamNumber: int.parse(teamID))));
+              }
+            : null,
+        child: Text(teamID,
+            style:
+                GoogleFonts.roboto(fontWeight: FontWeight.w700, fontSize: 26)),
+        style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all<Color>(isActivated
+                ? (isBlue ? Colors.blue : Colors.red)
+                : Colors.grey[700]!),
+            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14.0),
+            ))));
   }
 }
