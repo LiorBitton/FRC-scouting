@@ -3,7 +3,7 @@ import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/screens/admin/admin_settings.dart';
 import 'package:scouting_application/screens/scouting/scouting_menu.dart';
-import 'package:scouting_application/screens/google_sign_in.dart';
+import 'package:scouting_application/screens/login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:scouting_application/screens/stats/stats_lobby.dart';
 import 'package:scouting_application/themes/custom_themes.dart';
@@ -11,13 +11,14 @@ import 'package:scouting_application/themes/custom_themes.dart';
 class Homepage extends StatelessWidget {
   Homepage({Key? key}) : super(key: key);
   final FirebaseAuth auth = FirebaseAuth.instance;
+  bool allowedToPop = false;
   @override
   Widget build(BuildContext context) {
     onStart(context);
     var brightness = MediaQuery.of(context).platformBrightness;
     bool isDarkMode = brightness == Brightness.dark;
     return WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: () async => allowedToPop,
       child: Scaffold(
           appBar: AppBar(
             title: Row(
@@ -32,6 +33,12 @@ class Homepage extends StatelessWidget {
             ),
             automaticallyImplyLeading: false,
             actions: [
+              IconButton(
+                icon: Icon(Icons.person_off),
+                onPressed: () {
+                  _signOut(context);
+                },
+              ),
               FutureBuilder<bool>(
                 future: isAdmin(),
                 builder: (context, snapshot) {
@@ -114,16 +121,18 @@ class Homepage extends StatelessWidget {
     );
   }
 
-  Future<void> _signOut() async {
-    await auth.signOut();
+  Future<void> _signOut(BuildContext context) async {
+    allowedToPop = true;
+    await FirebaseAuth.instance.signOut();
+    Navigator.pop(context);
   }
 
   void onStart(BuildContext context) {
     var currentUser = auth.currentUser;
 
     if (currentUser == null) {
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => GoogleSignInScreen()));
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => LoginPage()));
     } else {
       initGlobal();
     }
@@ -138,7 +147,16 @@ class Homepage extends StatelessWidget {
   }
 
   void initGlobal() async {
-    Global.instance.fromJson(await Database.instance.getSettings());
-    Global.instance.setIsAdmin(await isAdmin());
+    try {
+      Global.instance.fromJson(await Database.instance.getSettings());
+      Global.instance.setIsAdmin(await isAdmin());
+    } catch (e) {
+      Global.instance.allowFreeScouting = true;
+      Global.instance.isAdmin = false;
+      Global.instance.currentEventKey = "";
+      Global.instance.currentEventName = "";
+      Global.instance.relevantEvents = {};
+      Global.instance.offlineEvent = true;
+    }
   }
 }

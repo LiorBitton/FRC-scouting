@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:scouting_application/screens/google_sign_in.dart';
+import 'package:scouting_application/screens/login_page.dart';
 import 'package:scouting_application/themes/custom_themes.dart';
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
 
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
       title: 'EverScout',
       themeMode: ThemeMode.system,
       theme: CustomTheme.lightTheme,
-      home: GoogleSignInScreen(),
+      home: LoginPage(),
       darkTheme: CustomTheme.darkTheme,
     );
   }
