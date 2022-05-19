@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/screens/homepage.dart';
+import 'package:scouting_application/screens/scouting/display_qr.dart';
 import 'package:scouting_application/screens/scouting/scouting_tab.dart';
 import 'package:scouting_application/screens/scouting/tabs/autonomous.dart';
 import 'package:scouting_application/screens/scouting/tabs/endgame.dart';
@@ -42,15 +45,8 @@ class GameManager extends StatefulWidget {
   ///Upload the data from the game to the project's RealtimeDatabase
   ///
   ///
-  static void submitGame(BuildContext context) {
-    final fb = FirebaseDatabase.instance;
-    final ref = fb.ref();
+  static void submitGame(BuildContext context) async {
     notifyScoutingFinished();
-    final dest = ref
-        .child('teams')
-        .child('$teamID')
-        .child(Global.instance.currentEventKey)
-        .child('$matchID');
     Map<String, dynamic> data = {};
     List<EverCollector> dataCollectors = [];
     for (ScoutingTab tab in tabs) {
@@ -60,10 +56,45 @@ class GameManager extends StatefulWidget {
       data.putIfAbsent(collector.getDataTag(), () => collector.getValue());
     }
     data.putIfAbsent('is_blue_alliance', () => isBlueAlliance);
-    dest.set(data);
+    if (Global.instance.offlineEvent) {
+      displayDataAsQR(context, data, matchID, teamID.toString());
+    } else {
+      try {
+        final fb = FirebaseDatabase.instance;
+        final ref = fb.ref();
+        final dest = ref
+            .child('teams')
+            .child('$teamID')
+            .child(Global.instance.currentEventKey)
+            .child('$matchID');
+        //limit connection to  an 8 seconds trial, else show QR
+        await dest.set(data).then((value) {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => Homepage()));
+        }).timeout(Duration(seconds: 8), onTimeout: () {
+          displayDataAsQR(context, data, matchID, teamID.toString());
+        });
+      } catch (e) {
+        print(e);
+        displayDataAsQR(context, data, matchID, teamID.toString());
+      }
+    }
+
     reset();
+  }
+
+  ///Takes match data as a Map and displays it as a QR
+  static void displayDataAsQR(BuildContext context, Map<String, dynamic> data,
+      String matchKey, String teamID) {
+    Map<String, dynamic> out = {
+      "matchKey": matchKey,
+      "teamID": teamID,
+      "data": data
+    };
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => Homepage()));
+        context,
+        MaterialPageRoute(
+            builder: (context) => DisplayQr(data: out.toString())));
   }
 
   static void notifyScoutingFinished() {
