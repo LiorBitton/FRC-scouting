@@ -70,9 +70,17 @@ class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
 
   Future<SliverList> createUI() async {
     List<Container> content = [];
-    dynamic matches = await TBAClient.instance
-        .fetchMatchesByEvent(Global.instance.currentEventKey);
-
+    dynamic matches;
+    try {
+      matches = await TBAClient.instance
+          .fetchMatchesByEvent(Global.instance.currentEventKey);
+    } catch (e) {
+      print(e);
+      // Navigator.pop(context);
+      Global.instance.allowFreeScouting = true;
+      // Global.instance.offlineEvent = true;
+      matches = [];
+    }
     (matches as List<dynamic>).sort((a, b) {
       //yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]
       String aKey = a["key"];

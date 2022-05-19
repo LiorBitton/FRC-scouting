@@ -6,6 +6,7 @@ class Global {
   static Global _instance = Global._privateConstructor();
 
   static Global get instance => _instance;
+  bool offlineEvent = false;
   String currentEventKey = "";
   String currentEventName = "";
   bool allowFreeScouting = false;
