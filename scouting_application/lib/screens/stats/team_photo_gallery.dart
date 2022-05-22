@@ -28,27 +28,31 @@ class TeamPhotoGallery extends StatelessWidget {
           )
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            FutureBuilder<List<Image>>(
-              future: futureImages,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  if ((snapshot.data as List<Image>).isEmpty) {
-                    return Text("There are no photos of this team");
-                  }
-                  return Column(
-                    children: snapshot.data!,
-                  );
-                } else if (snapshot.hasError) {
-                  print('${snapshot.error}');
-                }
-                return LinearProgressIndicator();
+      body: FutureBuilder<List<Image>>(
+        future: futureImages,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            if ((snapshot.data as List<Image>).isEmpty) {
+              return Text("There are no photos of this team");
+            }
+            List<Image> imgs = snapshot.data as List<Image>;
+            return ListView.separated(
+              itemBuilder: (BuildContext context, int index) {
+                return imgs.elementAt(index);
               },
-            ),
-          ],
-        ),
+              itemCount: imgs.length,
+              separatorBuilder: (BuildContext context, int index) {
+                return Divider(
+                  color: Colors.transparent,
+                  thickness: 5,
+                );
+              },
+            );
+          } else if (snapshot.hasError) {
+            print('${snapshot.error}');
+          }
+          return LinearProgressIndicator();
+        },
       ),
     );
   }

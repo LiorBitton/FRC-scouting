@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scouting_application/screens/scouting/game_manager.dart';
 import 'package:scouting_application/widgets/digit_text_field.dart';
-import 'package:scouting_application/widgets/menu_button.dart';
 import 'package:scouting_application/widgets/show_alert_dialog.dart';
 
 class FreeScoutingLobby extends StatefulWidget {
@@ -60,8 +59,8 @@ class _FreeScoutingLobbyState extends State<FreeScoutingLobby> {
                 },
                 isSelected: isSelected,
               ),
-              MenuButton(
-                  title: 'Start',
+              FloatingActionButton(
+                  child: Text('Start'),
                   onPressed: () {
                     if (teamNumberController.text.length < 4 ||
                         matchNumberController.text.isEmpty) {

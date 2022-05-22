@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/screens/admin/admin_settings.dart';
+import 'package:scouting_application/screens/scouting/realtime_scouting_lobby.dart';
 import 'package:scouting_application/screens/scouting/scouting_menu.dart';
 import 'package:scouting_application/screens/login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:scouting_application/screens/stats/stats_lobby.dart';
 import 'package:scouting_application/themes/custom_themes.dart';
+import 'package:scouting_application/widgets/menu_button.dart';
 
 class Homepage extends StatelessWidget {
   Homepage({Key? key}) : super(key: key);
@@ -62,58 +64,29 @@ class Homepage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  decoration: ShapeDecoration(
-                      color: Colors.white,
-                      shape: CircleBorder(),
-                      shadows: [
-                        BoxShadow(
-                          color: Colors.white,
-                          spreadRadius: 8,
-                          blurRadius: 0,
-                        )
-                      ]),
-                  padding: EdgeInsets.all(8),
-                  child: IconButton(
-                      icon: Icon(Icons.touch_app_rounded),
-                      iconSize: 60,
-                      color: isDarkMode
-                          ? CustomTheme.darkTheme.scaffoldBackgroundColor
-                          : CustomTheme.lightTheme.scaffoldBackgroundColor,
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ScoutingMenu()));
-                      }),
+                MenuButton(
+                  isPrimary: true,
+                  icon: Icon(Icons.touch_app_rounded),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                Global.instance.allowFreeScouting
+                                    ? ScoutingMenu()
+                                    : RealtimeScoutingLobby()));
+                  },
                 ),
                 SizedBox(
                   height: 30,
                 ),
-                Container(
-                  decoration: ShapeDecoration(
-                      color: isDarkMode
-                          ? CustomTheme.darkTheme.scaffoldBackgroundColor
-                          : CustomTheme.lightTheme.scaffoldBackgroundColor,
-                      shape: CircleBorder(),
-                      shadows: [
-                        BoxShadow(
-                          color: Colors.white,
-                          spreadRadius: 8,
-                          blurRadius: 0,
-                        )
-                      ]),
-                  padding: EdgeInsets.all(8),
-                  child: IconButton(
-                      color: Colors.white,
-                      icon: Icon(Icons.query_stats_rounded),
-                      iconSize: 60,
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => StatsLobby()));
-                      }),
+                MenuButton(
+                  isPrimary: false,
+                  icon: Icon(Icons.leaderboard_rounded),
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => StatsLobby()));
+                  },
                 ),
               ],
             ),
@@ -158,5 +131,83 @@ class Homepage extends StatelessWidget {
       Global.instance.relevantEvents = {};
       Global.instance.offlineEvent = true;
     }
+  }
+}
+
+class PrimaryMenuButton extends StatelessWidget {
+  const PrimaryMenuButton({
+    Key? key,
+    required this.isDarkMode,
+    required this.icon,
+  }) : super(key: key);
+  final Widget icon;
+  final bool isDarkMode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration:
+          ShapeDecoration(color: Colors.white, shape: CircleBorder(), shadows: [
+        BoxShadow(
+          color: Colors.white,
+          spreadRadius: 8,
+          blurRadius: 0,
+        )
+      ]),
+      padding: EdgeInsets.all(8),
+      child: IconButton(
+          icon: icon,
+          iconSize: 60,
+          color: isDarkMode
+              ? CustomTheme.darkTheme.scaffoldBackgroundColor
+              : CustomTheme.lightTheme.scaffoldBackgroundColor,
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Global.instance.allowFreeScouting
+                        ? ScoutingMenu()
+                        : RealtimeScoutingLobby()));
+          }),
+    );
+  }
+}
+
+class SecondaryMenuButton extends StatelessWidget {
+  const SecondaryMenuButton({
+    Key? key,
+    required this.isDarkMode,
+    required this.icon,
+    required this.isPrimary,
+  }) : super(key: key);
+  final bool isPrimary;
+  final Widget icon;
+  final bool isDarkMode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: ShapeDecoration(
+          color: isDarkMode
+              ? CustomTheme.darkTheme.scaffoldBackgroundColor
+              : CustomTheme.lightTheme.scaffoldBackgroundColor,
+          shape: CircleBorder(),
+          shadows: [
+            BoxShadow(
+              color: Colors.white,
+              spreadRadius: 8,
+              blurRadius: 0,
+            )
+          ]),
+      padding: EdgeInsets.all(8),
+      child: IconButton(
+          color: Colors.white,
+          icon: icon,
+          iconSize: 60,
+          onPressed: () {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => StatsLobby()));
+          }),
+    );
   }
 }

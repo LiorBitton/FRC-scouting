@@ -14,12 +14,14 @@ class CustomTheme {
         colorScheme: ColorScheme.dark(),
         dividerColor: Colors.white,
         primaryColor: teamColor,
-        scaffoldBackgroundColor: Color.fromARGB(200, 84, 136, 68),
+        scaffoldBackgroundColor: darkTeamColor,
         appBarTheme: AppBarTheme(
           color: teamColor,
           titleTextStyle: GoogleFonts.acme(fontSize: 25),
         ),
         iconTheme: IconThemeData(color: teamColor),
+        progressIndicatorTheme: ProgressIndicatorThemeData(
+            linearTrackColor: darkTeamColor, color: lightTeamColor),
         textTheme: TextTheme(
             bodyText1: GoogleFonts.roboto(fontWeight: FontWeight.bold)),
         buttonTheme: ButtonThemeData(
@@ -36,16 +38,20 @@ class CustomTheme {
   }
 
   static const Color teamColor = Color.fromRGBO(107, 181, 46, 100);
+  static const Color lightTeamColor = Color.fromARGB(255, 199, 233, 171);
+  static const Color darkTeamColor = Color.fromARGB(200, 84, 136, 68);
   static ThemeData get lightTheme {
     return ThemeData(
         brightness: Brightness.light,
         colorScheme: ColorScheme.light(),
         primaryColor: teamColor,
-        scaffoldBackgroundColor: Color.fromARGB(255, 199, 233, 171),
+        scaffoldBackgroundColor: lightTeamColor,
         appBarTheme: AppBarTheme(
             color: teamColor, titleTextStyle: GoogleFonts.acme(fontSize: 25)),
         iconTheme: IconThemeData(color: teamColor),
         fontFamily: 'Montserrat', //3
+        progressIndicatorTheme: ProgressIndicatorThemeData(
+            linearTrackColor: darkTeamColor, color: lightTeamColor),
         textTheme: TextTheme(
             bodyText1: GoogleFonts.roboto(
                 fontWeight: FontWeight.bold, color: Colors.black)),

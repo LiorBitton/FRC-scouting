@@ -9,6 +9,7 @@ import 'package:scouting_application/classes/tba_client.dart';
 import 'package:scouting_application/classes/team_data.dart';
 import 'package:scouting_application/classes/team_search_delegate.dart';
 import 'package:scouting_application/screens/stats/team_homepage.dart';
+import 'package:scouting_application/themes/custom_themes.dart';
 
 class StatsLobby extends StatefulWidget {
   StatsLobby({Key? key}) : super(key: key);
@@ -60,31 +61,38 @@ class _StatsLobbyState extends State<StatsLobby> {
                             return LinearProgressIndicator();
                           } else {
                             allowSearch = true;
-                            return ListView.builder(
-                                shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
-                                itemCount: teams.length,
-                                itemBuilder: (context, index) {
-                                  String team = teams[index];
-                                  return ListTile(
-                                    title: Text(
-                                      team,
-                                    ),
-                                    subtitle:
-                                        Text("${teamData[team]!.getName()}"),
-                                    leading: imageFromBase64String(
-                                            teamData[team]!.getAvatar()) ??
-                                        Icon(Icons.people),
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  TeamHomepage(
-                                                      teamNumber: team)));
-                                    },
-                                  );
-                                });
+                            return ListView.separated(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: teams.length,
+                              itemBuilder: (context, index) {
+                                String team = teams[index];
+                                return ListTile(
+                                  title: Text(
+                                    team,
+                                  ),
+                                  subtitle:
+                                      Text("${teamData[team]!.getName()}"),
+                                  leading: imageFromBase64String(
+                                          teamData[team]!.getAvatar()) ??
+                                      Icon(Icons.people),
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => TeamHomepage(
+                                                teamNumber: team)));
+                                  },
+                                );
+                              },
+                              separatorBuilder:
+                                  (BuildContext context, int index) {
+                                return Divider(
+                                  color: CustomTheme.teamColor, // Colors.black,
+                                  thickness: 3,
+                                );
+                              },
+                            );
                           }
                         })
                   ],
@@ -173,13 +181,16 @@ class _StatsLobbyState extends State<StatsLobby> {
     await loadCache();
     final List<String> teamsTemp = await TBAClient.instance
         .fetchTeamsInEvent(Global.instance.currentEventKey);
+
     if (teamsTemp == []) {
       var ref = FirebaseDatabase.instance.ref('teams');
-      DataSnapshot snapshot = await ref.get();
-      var data = snapshot.value;
-      final info = Map<String, dynamic>.from((data as Map<dynamic, dynamic>));
-      teams = info.keys.toList();
-      teams.remove("9999");
+      DataSnapshot snapshot = await ref.get().timeout(Duration(seconds: 5));
+      if (snapshot.exists) {
+        var data = snapshot.value;
+        final info = Map<String, dynamic>.from((data as Map<dynamic, dynamic>));
+        teams = info.keys.toList();
+        teams.remove("9999");
+      }
     } else {
       teams = teamsTemp;
     }

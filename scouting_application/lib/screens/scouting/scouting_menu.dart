@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:scouting_application/classes/global.dart';
-import 'package:scouting_application/screens/scouting/realtime_scouting_lobby.dart';
 import 'package:scouting_application/screens/scouting/free_scouting_lobby.dart';
+import 'package:scouting_application/screens/scouting/realtime_scouting_lobby.dart';
 import 'package:scouting_application/widgets/menu_button.dart';
 
 class ScoutingMenu extends StatelessWidget {
@@ -17,7 +17,8 @@ class ScoutingMenu extends StatelessWidget {
               children: [
                 Global.instance.allowFreeScouting
                     ? MenuButton(
-                        title: 'Free',
+                        isPrimary: true,
+                        icon: Icon(Icons.free_cancellation),
                         onPressed: () {
                           Navigator.push(
                               context,
@@ -27,19 +28,17 @@ class ScoutingMenu extends StatelessWidget {
                       )
                     : Text(""),
                 SizedBox(
-                  height: 5,
-                  width: 5,
+                  height: 30,
                 ),
-                IconButton(
-                  iconSize: 50,
-                  icon: Icon(Icons.add_task),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => RealtimeScoutingLobby()));
-                  },
-                ),
+                MenuButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => RealtimeScoutingLobby()));
+                    },
+                    isPrimary: !Global.instance.allowFreeScouting,
+                    icon: Icon(Icons.add_task))
               ]),
         ));
   }

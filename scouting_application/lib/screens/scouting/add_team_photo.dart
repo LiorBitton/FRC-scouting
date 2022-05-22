@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:scouting_application/classes/database.dart';
-import 'package:scouting_application/widgets/menu_button.dart';
 
 class AddTeamPhoto extends StatefulWidget {
   AddTeamPhoto({Key? key, required this.teamID}) : super(key: key);
@@ -125,8 +124,8 @@ class _AddTeamPhotoState extends State<AddTeamPhoto> {
     File file = File(imageFile!.path);
     return Column(children: [
       Image.file(file),
-      MenuButton(
-          title: 'submit',
+      FloatingActionButton(
+          child: Text("submit"),
           onPressed: () {
             Database.instance.uploadImage(imageFile, widget.teamID);
             Navigator.pop(context);

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:scouting_application/screens/scouting/scouting_tab.dart';
 import 'package:scouting_application/widgets/collectors/duration_collector.dart';
 import 'package:scouting_application/widgets/collectors/ever_collector.dart';
-import 'package:scouting_application/widgets/menu_button.dart';
 import 'package:scouting_application/widgets/collectors/text_collector.dart';
 
 class PlaystyleTab extends StatefulWidget implements ScoutingTab {
@@ -38,8 +37,8 @@ class _PlaystyleTabState extends State<PlaystyleTab>
         widget.commentCollector,
         widget.inactiveDuration,
         Spacer(),
-        MenuButton(
-            title: 'submit',
+        FloatingActionButton(
+            child: Text("submit"),
             onPressed: () {
               widget.onSubmit(context);
             })
