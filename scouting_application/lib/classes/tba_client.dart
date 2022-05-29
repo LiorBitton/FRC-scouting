@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:http/http.dart' as http;
 import 'package:scouting_application/classes/secret_constants.dart';
 
@@ -14,23 +15,25 @@ class TBAClient {
   Future<List<String>> fetchTeamsInEvent(String eventKey) async {
     var url = Uri.parse(
         'https://www.thebluealliance.com/api/v3/event/$eventKey/teams/simple');
-    final response = await http.get(url, headers: _headers);
-
-    if (response.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
-      List<dynamic> eventTeams = jsonDecode(response.body);
+    try {
+      final response = await http.get(url, headers: _headers);
       List<String> teams = [];
-      for (var team in eventTeams) {
-        String teamKey = team["key"];
-        teamKey = teamKey.replaceFirst("frc", "");
-        teams.add(teamKey);
+      if (response.statusCode == 200) {
+        // If the server did return a 200 OK response,
+        // then parse the JSON.
+        List<dynamic> eventTeams = jsonDecode(response.body);
+        for (var team in eventTeams) {
+          String teamKey = team["key"];
+          teamKey = teamKey.replaceFirst("frc", "");
+          teams.add(teamKey);
+        }
+      } else {
+        FirebaseCrashlytics.instance
+            .log("did not recieve a 200 response for teams in $eventKey");
       }
       return teams;
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to load teams for event $eventKey');
+    } catch (e) {
+      throw e;
     }
   }
 
@@ -40,28 +43,36 @@ class TBAClient {
     int year = new DateTime.now().year;
     var url = Uri.parse(
         'https://www.thebluealliance.com/api/v3/district/${year}isr/events/simple');
-    final response = await http.get(url, headers: _headers);
-    Map<String, String> events = {};
-    if (response.statusCode == 200) {
-      List<dynamic> res = jsonDecode(response.body);
-      for (var event in res) {
-        String name = (event as Map<String, dynamic>)['name'];
-        String key = event['key'];
-        events[key] = name;
+    try {
+      final response = await http.get(url, headers: _headers);
+      Map<String, String> events = {};
+      if (response.statusCode == 200) {
+        List<dynamic> res = jsonDecode(response.body);
+        for (var event in res) {
+          String name = (event as Map<String, dynamic>)['name'];
+          String key = event['key'];
+          events[key] = name;
+        }
       }
+      return events;
+    } catch (e) {
+      FirebaseCrashlytics.instance.log("Failed to fetch Israeli events");
+      return {};
     }
-    return events;
   }
 
   Future<List<dynamic>> fetchMatchesByEvent(String eventKey) async {
     var url = Uri.parse(
         'https://www.thebluealliance.com/api/v3/event/$eventKey/matches/simple');
-    final response = await http.get(url, headers: _headers);
     List<dynamic> res = [];
-    if (response.statusCode == 200) {
-      res = jsonDecode(response.body);
-    } else {
-      print('error downloading matches for event :$eventKey');
+    try {
+      final response = await http.get(url, headers: _headers);
+      if (response.statusCode == 200) {
+        res = jsonDecode(response.body);
+      }
+    } catch (e) {
+      FirebaseCrashlytics.instance
+          .log('error downloading matches for event :$eventKey');
     }
     return res;
   }
@@ -69,17 +80,21 @@ class TBAClient {
   Future<String> fetchTeamNickname(String teamNumber) async {
     var url = Uri.parse(
         'https://www.thebluealliance.com/api/v3/team/frc$teamNumber/simple');
-    final response = await http.get(url, headers: _headers);
-
-    if (response.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
-      String nickname = jsonDecode(response.body)["nickname"];
+    try {
+      final response = await http.get(url, headers: _headers);
+      String nickname = "";
+      if (response.statusCode == 200) {
+        // If the server did return a 200 OK response,
+        // then parse the JSON.
+        nickname = jsonDecode(response.body)["nickname"];
+      }
       return nickname;
-    } else {
+    } catch (e) {
       // If the server did not return a 200 OK response,
       // then throw an exception.
-      throw Exception('Failed to load Team $teamNumber nickname');
+      FirebaseCrashlytics.instance
+          .log('Failed to load Team $teamNumber nickname');
+      return "";
     }
   }
 
@@ -87,30 +102,31 @@ class TBAClient {
     int year = new DateTime.now().year;
     var url = Uri.parse(
         'https://www.thebluealliance.com/api/v3/team/frc$teamID/media/$year');
-    final response = await http.get(url, headers: _headers);
-    List<String> b64images = [];
-    List<String> urlImages = [];
-    if (response.statusCode == 200) {
-      List<dynamic> res = jsonDecode(response.body);
-      for (var mediaItem in res) {
-        if (mediaItem["type"] == "avatar") continue;
-        try {
-          String temp = mediaItem['direct_url'];
-          urlImages.add(temp);
-          print("image from url");
-        } catch (Exception) {
+    try {
+      final response = await http.get(url, headers: _headers);
+      List<String> b64images = [];
+      List<String> urlImages = [];
+      if (response.statusCode == 200) {
+        List<dynamic> res = jsonDecode(response.body);
+        for (var mediaItem in res) {
+          if (mediaItem["type"] == "avatar") continue;
           try {
-            //if the photo is the logo of the team
-            b64images.add(mediaItem['details']['base64Image']);
-            print("image from b64");
-          } catch (Exception) {}
+            String temp = mediaItem['direct_url'];
+            urlImages.add(temp);
+            print("image from url");
+          } catch (e) {
+            try {
+              //if the photo is the logo of the team
+              b64images.add(mediaItem['details']['base64Image']);
+              print("image from b64");
+            } catch (e) {}
+          }
         }
       }
       return {"url": urlImages, "b64": b64images};
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to load TBATeam');
+    } catch (e) {
+      FirebaseCrashlytics.instance.log('Failed to load TBATeam');
+      return {};
     }
   }
 

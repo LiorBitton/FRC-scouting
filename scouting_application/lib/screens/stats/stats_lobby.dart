@@ -19,14 +19,18 @@ class StatsLobby extends StatefulWidget {
 
 class _StatsLobbyState extends State<StatsLobby> {
   List<String> teams = [];
-  List<List<String>> teamsData = [];
   Map<String, TeamData> teamData = {};
   bool nicknamesLoaded = false;
-  bool allowSearch = false;
+
+  int progress = 0;
+  int target = 1;
+  late Future<String> readyForStart;
   @override
   void initState() {
     super.initState();
-    loadCache();
+    try {
+      readyForStart = createCache();
+    } catch (e) {}
   }
 
   @override
@@ -35,16 +39,22 @@ class _StatsLobbyState extends State<StatsLobby> {
         appBar: AppBar(
           title: Text('Stats'),
           actions: [
-            allowSearch
-                ? IconButton(
-                    onPressed: () {
-                      showSearch(
-                          context: context,
-                          delegate: TeamSearchDelegate(teams),
-                          useRootNavigator: true);
-                    },
-                    icon: Icon(Icons.search))
-                : Text("")
+            FutureBuilder<String>(
+                future: readyForStart,
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return Container();
+                  } else {
+                    return IconButton(
+                        onPressed: () {
+                          showSearch(
+                              context: context,
+                              delegate: TeamSearchDelegate(teams),
+                              useRootNavigator: true);
+                        },
+                        icon: Icon(Icons.search));
+                  }
+                })
           ],
         ),
         body: Column(
@@ -55,18 +65,19 @@ class _StatsLobbyState extends State<StatsLobby> {
                 child: Column(
                   children: [
                     FutureBuilder<String>(
-                        future: createCache(),
+                        future: readyForStart,
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
-                            return LinearProgressIndicator();
+                            return LinearProgressIndicator(
+                              value: progress / target,
+                            );
                           } else {
-                            allowSearch = true;
                             return ListView.separated(
                               shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemCount: teams.length,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: teamData.length,
                               itemBuilder: (context, index) {
-                                String team = teams[index];
+                                String team = teamData.keys.elementAt(index);
                                 return ListTile(
                                   title: Text(
                                     team,
@@ -87,7 +98,7 @@ class _StatsLobbyState extends State<StatsLobby> {
                               },
                               separatorBuilder:
                                   (BuildContext context, int index) {
-                                return Divider(
+                                return const Divider(
                                   color: CustomTheme.teamColor, // Colors.black,
                                   thickness: 3,
                                 );
@@ -179,27 +190,51 @@ class _StatsLobbyState extends State<StatsLobby> {
 
   Future<String> createCache() async {
     await loadCache();
-    final List<String> teamsTemp = await TBAClient.instance
-        .fetchTeamsInEvent(Global.instance.currentEventKey);
-
-    if (teamsTemp == []) {
+    List<String> teamsTemp = [];
+    try {
+      teamsTemp = await TBAClient.instance
+          .fetchTeamsInEvent(Global.instance.currentEventKey)
+          .timeout(const Duration(seconds: 5), onTimeout: () {
+        return [];
+      });
+    } catch (e) {
+      print("I caught an error look: \n $e");
+    }
+    if (teamsTemp.isEmpty) {
+      //If no connection to TBA
+      //Show all teams info in Database
       var ref = FirebaseDatabase.instance.ref('teams');
-      DataSnapshot snapshot = await ref.get().timeout(Duration(seconds: 5));
-      if (snapshot.exists) {
-        var data = snapshot.value;
-        final info = Map<String, dynamic>.from((data as Map<dynamic, dynamic>));
-        teams = info.keys.toList();
-        teams.remove("9999");
+      try {
+        // DataSnapshot snapshot =
+        await ref.get().then((snapshot) {
+          if (snapshot.exists) {
+            var data = snapshot.value;
+            final info =
+                Map<String, dynamic>.from((data as Map<dynamic, dynamic>));
+            teams = info.keys.toList();
+            teams.remove("9999");
+          }
+        }).timeout(Duration(seconds: 5), onTimeout: () {
+          throw Exception("no connection to firebase too");
+        });
+      } catch (e) {
+        //If no connection from Database and TBA
+        // for(String team in teamData.keys)
+        print("no connection at all");
       }
     } else {
       teams = teamsTemp;
     }
     teams.sort((a, b) => int.parse(a).compareTo(int.parse(b)));
-
+    target = teams.length;
+    print(teams.length);
     for (String team in teams) {
       String name = await fetchTeamNickname(team);
       String avatar = await fetchTeamLogoAsString(team);
       teamData.putIfAbsent(team, () => TeamData(name: name, avatar: avatar));
+      setState(() {
+        progress++;
+      });
     }
     saveCache();
     return "okay";
