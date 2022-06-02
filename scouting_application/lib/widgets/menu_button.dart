@@ -2,12 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:scouting_application/themes/custom_themes.dart';
 
 class MenuButton extends StatelessWidget {
-  const MenuButton({
+  MenuButton({
     Key? key,
     required this.onPressed,
     required this.isPrimary,
     required this.icon,
+    this.iconSize = 60,
+    this.padding = 8,
+    this.extraPadding = 8,
   }) : super(key: key);
+  static final double MENU_SIZE = 60;
+  final double padding;
+  final double extraPadding;
+  final double iconSize;
   final bool isPrimary;
   final Widget icon;
   final void Function()? onPressed;
@@ -23,18 +30,20 @@ class MenuButton extends StatelessWidget {
               shadows: [
                 BoxShadow(
                   color: Colors.white,
-                  spreadRadius: 8,
+                  spreadRadius: extraPadding,
                   blurRadius: 0,
                 )
               ]),
-          padding: EdgeInsets.all(8),
-          child: IconButton(
-              icon: icon,
-              iconSize: 60,
-              color: isDarkMode
-                  ? CustomTheme.darkTheme.scaffoldBackgroundColor
-                  : CustomTheme.lightTheme.scaffoldBackgroundColor,
-              onPressed: onPressed));
+          padding: EdgeInsets.all(padding),
+          child: Center(
+            child: IconButton(
+                icon: icon,
+                iconSize: iconSize,
+                color: isDarkMode
+                    ? CustomTheme.darkTheme.scaffoldBackgroundColor
+                    : CustomTheme.lightTheme.scaffoldBackgroundColor,
+                onPressed: onPressed),
+          ));
     } else {
       return Container(
         decoration: ShapeDecoration(
@@ -45,15 +54,15 @@ class MenuButton extends StatelessWidget {
             shadows: [
               BoxShadow(
                 color: Colors.white,
-                spreadRadius: 8,
+                spreadRadius: extraPadding,
                 blurRadius: 0,
               )
             ]),
-        padding: EdgeInsets.all(8),
+        padding: EdgeInsets.all(padding),
         child: IconButton(
             color: Colors.white,
             icon: icon,
-            iconSize: 60,
+            iconSize: iconSize,
             onPressed: onPressed),
       );
     }

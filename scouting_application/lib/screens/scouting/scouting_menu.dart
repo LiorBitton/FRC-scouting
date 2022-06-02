@@ -17,6 +17,7 @@ class ScoutingMenu extends StatelessWidget {
               children: [
                 Global.instance.allowFreeScouting
                     ? MenuButton(
+                        iconSize: MenuButton.MENU_SIZE,
                         isPrimary: true,
                         icon: Icon(Icons.free_cancellation),
                         onPressed: () {
@@ -31,6 +32,7 @@ class ScoutingMenu extends StatelessWidget {
                   height: 30,
                 ),
                 MenuButton(
+                    iconSize: MenuButton.MENU_SIZE,
                     onPressed: () {
                       Navigator.push(
                           context,
