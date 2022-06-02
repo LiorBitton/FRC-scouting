@@ -28,8 +28,17 @@ class SwitchCollector extends StatefulWidget implements EverCollector {
 class _SwitchCollectorState extends State<SwitchCollector> {
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        Text(
+          '${widget.title}',
+          textScaleFactor: 2,
+        ),
+        SizedBox(
+          width: 20,
+        ),
         FlutterSwitch(
           width: 100.0,
           height: 55.0,
@@ -47,17 +56,15 @@ class _SwitchCollectorState extends State<SwitchCollector> {
             width: 5.0,
           ),
           activeColor: Color.fromRGBO(107, 181, 46, 0.5),
-          inactiveColor: ThemeProvider().isLightMode?Colors.white: Colors.black,
-           //Colors.white,
+          inactiveColor:
+              ThemeProvider().isLightMode ? Colors.white : Colors.black,
+          //Colors.white,
           onToggle: (val) {
             setState(() {
               widget._isSwitched = val;
             });
           },
         ),
-        Center(
-            child: Text('${widget.title}',
-                style: CustomTheme.darkTheme.textTheme.bodyText1))
       ],
     );
   }

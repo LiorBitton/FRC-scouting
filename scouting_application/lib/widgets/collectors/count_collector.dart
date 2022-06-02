@@ -32,14 +32,17 @@ class _CountCollectorState extends State<CountCollector> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        Text('${widget.title}'),
+        SizedBox(width: 15),
         FloatingActionButton(
             heroTag: widget.dataTag,
             child: Text('${widget._value}'),
             onPressed: _incrementCounter,
             shape: CircleBorder()),
-        Text('${widget.title}')
       ],
     );
   }

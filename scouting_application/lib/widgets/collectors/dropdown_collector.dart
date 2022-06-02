@@ -33,9 +33,11 @@ class DropDownCollector<T> extends StatefulWidget implements EverCollector {
 class _DropDownCollectorState<T> extends State<DropDownCollector> {
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(widget.title),
+        SizedBox(width: 20),
         DropdownButton<T>(
             value: widget.value,
             items: getDropDownItems(),
