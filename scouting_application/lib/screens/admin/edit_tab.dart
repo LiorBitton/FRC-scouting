@@ -17,32 +17,31 @@ class _EditTabState extends State<EditTab> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Row(
-            children: [
-              MenuButton(
-                onPressed: () {
-                  _handleSave();
-                },
-                isPrimary: false,
-                icon: Icon(Icons.save),
-                iconSize: 30,
-                extraPadding: 2,
-                padding: 2,
-              ),
-              MenuButton(
-                onPressed: () {
-                  _handleNewCollector();
-                },
-                isPrimary: false,
-                icon: Icon(Icons.plus_one),
-                iconSize: 30,
-                extraPadding: 2,
-                padding: 2,
-              ),
-            ],
-          ),
+        floatingActionButton: Wrap(
+          direction: Axis.vertical,
+          children: [
+            MenuButton(
+              onPressed: () {
+                _handleNewCollector();
+              },
+              isPrimary: false,
+              icon: const Icon(Icons.plus_one),
+              iconSize: 30,
+              extraPadding: 2,
+              padding: 2,
+            ),
+            const SizedBox(height: 10),
+            MenuButton(
+              onPressed: () {
+                _handleSave();
+              },
+              isPrimary: false,
+              icon: const Icon(Icons.save),
+              iconSize: 30,
+              extraPadding: 2,
+              padding: 2,
+            ),
+          ],
         ),
         appBar: AppBar(
           title: Text("Design ${widget.tabName}"),
@@ -57,7 +56,6 @@ class _EditTabState extends State<EditTab> {
           children: [
             for (var item in _collectors)
               ListTile(
-                  leading: Icon(Icons.drag_handle_rounded),
                   title: IgnorePointer(child: item),
                   key: Key(item.getDataTag()))
           ],
@@ -87,9 +85,13 @@ class _EditTabState extends State<EditTab> {
             MaterialPageRoute(
                 builder: (context) => CollectorCreator(
                     senderTag: widget.tabName.substring(0, 2).toLowerCase()))))
-        as EverCollector;
-    setState(() {
-      _collectors.add(newWidget);
-    });
+        as EverCollector?;
+    print(newWidget.toString());
+    if (newWidget != null)
+      setState(() {
+        _collectors.add(newWidget);
+        print(_collectors);
+        print("added to collectors");
+      });
   }
 }

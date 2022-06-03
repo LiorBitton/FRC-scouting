@@ -6,7 +6,7 @@ class TextCollector extends EverCollector {
       {Key? key, required dataTag, required title, required this.hintText})
       : super(key: key, title: title, dataTag: dataTag);
   final String hintText;
-  final TextEditingController controller = new TextEditingController();
+  String value = "";
   @override
   _TextCollectorState createState() => _TextCollectorState();
 
@@ -17,21 +17,30 @@ class TextCollector extends EverCollector {
 
   @override
   getValue() {
-    return controller.text;
+    return value;
   }
 }
 
 class _TextCollectorState extends State<TextCollector> {
+  TextEditingController _controller = new TextEditingController();
   @override
   void dispose() {
-    widget.controller.dispose();
+    _controller.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(() {
+      widget.value = _controller.text;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: widget.controller,
+      controller: _controller,
       decoration: InputDecoration(
           border: OutlineInputBorder(), hintText: widget.hintText),
     );
