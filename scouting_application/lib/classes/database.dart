@@ -191,4 +191,8 @@ class Database {
         Map<String, String>.from(snapshot.value as Map<dynamic, dynamic>);
     return images.values.toList();
   }
+
+  void setTabLayout(String tabName, List<String> tabLayout) {
+    db.ref("settings/tabs/$tabName").set(tabLayout);
+  }
 }
