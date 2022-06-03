@@ -12,10 +12,10 @@ class Global {
   bool allowFreeScouting = false;
   Map<String, String> relevantEvents = {};
   bool isAdmin = false;
-  void setIsAdmin(bool isAdmin) {
-    this.isAdmin = isAdmin;
-  }
-
+  List<String> autoCollectors = [];
+  List<String> teleCollectors = [];
+  List<String> endCollectors = [];
+  List<String> generalCollectors = [];
   Global._constructor(
       {required this.allowFreeScouting,
       required this.currentEventKey,
@@ -37,5 +37,9 @@ class Global {
     } catch (e) {
       print(e);
     }
+  }
+
+  void setIsAdmin(bool isAdmin) {
+    this.isAdmin = isAdmin;
   }
 }

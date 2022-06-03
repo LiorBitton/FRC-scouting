@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/screens/admin/admin_settings.dart';
@@ -119,9 +123,12 @@ class Homepage extends StatelessWidget {
   }
 
   void initGlobal() async {
+    Map<String, List<String>> tabs = {};
     try {
       Global.instance.fromJson(await Database.instance.getSettings());
       Global.instance.setIsAdmin(await isAdmin());
+      tabs = await Database.instance.getTabLayout();
+      saveTabsToLocal(tabs); //todo check if tab loading works
     } catch (e) {
       Global.instance.allowFreeScouting = true;
       Global.instance.isAdmin = false;
@@ -129,6 +136,42 @@ class Homepage extends StatelessWidget {
       Global.instance.currentEventName = "";
       Global.instance.relevantEvents = {};
       Global.instance.offlineEvent = true;
+      if (tabs.isEmpty) {
+        tabs = await getTabsFromLocal();
+        if (tabs.isEmpty) {
+          print("error with tabs");
+        }
+      }
+    }
+    Global.instance.autoCollectors = tabs["Autonomous"] as List<String>;
+    Global.instance.teleCollectors = tabs["Teleop"] as List<String>;
+    Global.instance.endCollectors = tabs["Endgame"] as List<String>;
+    Global.instance.generalCollectors = tabs["General"] as List<String>;
+  }
+
+  void saveTabsToLocal(Map<String, List<String>> tabs) async {
+    final String filename = "tabs.json";
+    final directory = await getApplicationDocumentsDirectory();
+    final File file = File('${directory.path}/$filename');
+    try {
+      String out = jsonEncode(tabs);
+      file.writeAsString(out);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<Map<String, List<String>>> getTabsFromLocal() async {
+    final String filename = "tabs.json";
+    final directory = await getApplicationDocumentsDirectory();
+    final File file = File('${directory.path}/$filename');
+    try {
+      Map<String, List<String>> res =
+          jsonDecode(await file.readAsString()) as Map<String, List<String>>;
+      return res;
+    } catch (e) {
+      print(e);
+      return {};
     }
   }
 }

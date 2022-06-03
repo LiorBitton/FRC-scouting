@@ -195,4 +195,26 @@ class Database {
   void setTabLayout(String tabName, List<String> tabLayout) {
     db.ref("settings/tabs/$tabName").set(tabLayout);
   }
+
+  Future<Map<String, List<String>>> getTabLayout() async {
+    DataSnapshot snapshot = await db.ref("settings/tabs").get();
+    if (!snapshot.exists) {
+      return {};
+    }
+    Map<String, List<String>> tabs =
+        Map<String, List<String>>.from(snapshot.value as Map<dynamic, dynamic>);
+    return tabs;
+  }
+
+  Future<int> getLastTabsUpdate() async {
+    DataSnapshot snapshot = await db.ref("settings/tabs/last_update").get();
+    if (!snapshot.exists) {
+      return 0;
+    }
+    return snapshot.value as int;
+  }
+
+  void setLastTabsUpdate(int millisecondsSinceEpoch) {
+    db.ref("settings/tabs/last_update").set(millisecondsSinceEpoch);
+  }
 }
