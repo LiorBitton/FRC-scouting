@@ -5,6 +5,7 @@ import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/classes/tba_client.dart';
 import 'package:scouting_application/screens/admin/admin_choose_events.dart';
 import 'package:scouting_application/screens/admin/admin_choose_teams.dart';
+import 'package:scouting_application/screens/admin/new_season_lobby.dart';
 import 'package:scouting_application/themes/custom_themes.dart';
 import 'package:settings_ui/settings_ui.dart';
 
@@ -119,6 +120,19 @@ class _AdminSettingsState extends State<AdminSettings> {
                   setState(() {
                     _handleBlockTeams();
                   });
+                })
+          ]),
+          SettingsSection(title: Text("Collection"), tiles: [
+            SettingsTile(
+                title: Text("Set Parameters"),
+                description:
+                    Text("Choose what information to gather each game"),
+                leading: Icon(Icons.mode),
+                onPressed: (_) {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => NewSeasonLobby()));
                 })
           ])
         ],
