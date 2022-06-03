@@ -50,30 +50,6 @@ class _ScoutAutonomousState extends State<ScoutAutonomous>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Row(
-      children: [
-        Expanded(
-          child: GridView(
-            children: [
-              widget.upperCollector,
-              widget.lowerCollector,
-              widget.missLowerCollector,
-              widget.missUpperCollector,
-              SizedBox(height: 1, width: 1),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  widget.taxiSwitch,
-                ],
-              ),
-            ],
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3, mainAxisSpacing: 0, crossAxisSpacing: 0),
-          ),
-        ),
-      ],
-    ));
+    return Scaffold(body: Column(children: widget.getCollectors()));
   }
 }

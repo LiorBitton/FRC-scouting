@@ -8,6 +8,7 @@ class EndgameTab extends StatefulWidget implements ScoutingTab {
   EndgameTab({Key? key}) : super(key: key);
 
   DurationCollector climbTimeCollector = DurationCollector(
+    title: "Climb time",
     dataTag: "climb_time",
     icon: Icon(Icons.elevator_rounded),
   );
@@ -30,7 +31,6 @@ class _EndgameTabState extends State<EndgameTab>
     with AutomaticKeepAliveClientMixin<EndgameTab> {
   @override
   bool get wantKeepAlive => true;
-  bool didClimb = false;
   @override
   void initState() {
     super.initState();
@@ -38,26 +38,6 @@ class _EndgameTabState extends State<EndgameTab>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Column(
-      // var newList = ;
-      children: new List.from(widget.getCollectors())
-        ..addAll([
-          Expanded(
-            child: GridView(
-              children: [
-                SizedBox(height: 1, width: 1),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [],
-                ),
-              ],
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3, mainAxisSpacing: 0, crossAxisSpacing: 0),
-            ),
-          ),
-        ]),
-    ));
+    return Scaffold(body: Column(children: widget.getCollectors()));
   }
 }

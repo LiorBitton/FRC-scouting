@@ -5,6 +5,7 @@ import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/classes/tba_client.dart';
 import 'package:scouting_application/screens/scouting/add_team_photo.dart';
 
+// ignore: must_be_immutable
 class TeamPhotoGallery extends StatelessWidget {
   TeamPhotoGallery({Key? key, required this.teamNumber}) : super(key: key);
   final String teamNumber;

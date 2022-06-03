@@ -16,8 +16,6 @@ class Homepage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     onStart(context);
-    var brightness = MediaQuery.of(context).platformBrightness;
-    bool isDarkMode = brightness == Brightness.dark;
     return WillPopScope(
       onWillPop: () async => allowedToPop,
       child: Scaffold(

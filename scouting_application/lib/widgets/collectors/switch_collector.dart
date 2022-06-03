@@ -3,14 +3,12 @@ import 'package:flutter_switch/flutter_switch.dart';
 import 'package:scouting_application/themes/custom_themes.dart';
 import 'package:scouting_application/widgets/collectors/ever_collector.dart';
 
-class SwitchCollector extends StatefulWidget implements EverCollector {
-  SwitchCollector({Key? key, required this.title, required this.dataTag})
-      : super(key: key);
+class SwitchCollector extends EverCollector {
+  SwitchCollector({Key? key, required title, required dataTag})
+      : super(key: key, title: title, dataTag: dataTag);
   bool _isSwitched = false;
-  final String title;
   @override
   _SwitchCollectorState createState() => _SwitchCollectorState();
-
   @override
   getValue() {
     return _isSwitched;
@@ -20,9 +18,6 @@ class SwitchCollector extends StatefulWidget implements EverCollector {
   String getDataTag() {
     return dataTag;
   }
-
-  @override
-  String dataTag;
 }
 
 class _SwitchCollectorState extends State<SwitchCollector> {

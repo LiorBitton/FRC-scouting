@@ -1,23 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:scouting_application/widgets/collectors/ever_collector.dart';
 
-class DropDownCollector<T> extends StatefulWidget implements EverCollector {
+// ignore: must_be_immutable
+class DropDownCollector<T> extends EverCollector {
   DropDownCollector(
-      {Key? key,
-      required this.dataTag,
-      required this.options,
-      required this.title})
-      : super(key: key) {
+      {Key? key, required dataTag, required this.options, required title})
+      : super(key: key, dataTag: dataTag, title: title) {
     value = options[0];
   }
-  List<T> options;
+  final List<T> options;
   late T value;
-  String title;
   @override
   State<DropDownCollector> createState() => _DropDownCollectorState();
-
-  @override
-  String dataTag;
 
   @override
   String getDataTag() {

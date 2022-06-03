@@ -16,23 +16,34 @@ class NewSeasonLobby extends StatelessWidget {
         appBar: AppBar(),
         body: Column(
           children: [
-            IconButton(
-                icon: Icon(Icons.abc),
+            TextButton(
+                style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.amber)),
+                child: Text(
+                  "Create Auton",
+                  maxLines: 1,
+                ),
                 onPressed: (() {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => EditAutonomous()));
+                          builder: (context) => EditTab(
+                                tabName: "Autonomous",
+                              )));
                 })),
-            CountCollector(title: "test", dataTag: "Count"),
+            Spacer(),
+            CountCollector(title: "Count", dataTag: "Count"),
             DropDownCollector(
                 dataTag: "dropDown",
                 options: ["option 1", "option2", "option3"],
                 title: "Dropdown"),
-            PlusMinusCollector(title: "plus minus", dataTag: "Plus Minus"),
+            PlusMinusCollector(title: "Plus Minus", dataTag: "Plus Minus"),
             SwitchCollector(title: "Switch", dataTag: "Switch"),
-            DurationCollector(dataTag: "duration"),
-            TextCollector(dataTag: "text", hintText: "Free Text")
+            DurationCollector(title: "Duration", dataTag: "duration"),
+            TextCollector(
+                title: "title", dataTag: "text", hintText: "Free Text"),
+            Spacer()
           ],
         ));
   }

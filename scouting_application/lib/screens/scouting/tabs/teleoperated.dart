@@ -46,23 +46,6 @@ class _TeleoperatedTabState extends State<TeleoperatedTab>
   int test = 0;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Row(
-      children: [
-        Expanded(
-          child: GridView(
-            children: [
-              widget.lowerCollector,
-              widget.upperCollector,
-              widget.missLowerCollector,
-              widget.missUpperCollector,
-              SizedBox(height: 1, width: 1),
-            ],
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3, mainAxisSpacing: 0, crossAxisSpacing: 0),
-          ),
-        ),
-      ],
-    ));
+    return Scaffold(body: Column(children: widget.getCollectors()));
   }
 }

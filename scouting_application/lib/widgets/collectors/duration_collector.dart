@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:holding_gesture/holding_gesture.dart';
 import 'package:scouting_application/widgets/collectors/ever_collector.dart';
 
-class DurationCollector extends StatefulWidget implements EverCollector {
+class DurationCollector extends EverCollector {
   Icon? icon;
   double _duration = 0;
-  @override
-  String dataTag;
 
-  DurationCollector({Key? key, required this.dataTag, this.icon})
-      : super(key: key);
+  DurationCollector({Key? key, required dataTag, required title, this.icon})
+      : super(key: key, dataTag: dataTag, title: title);
   @override
   _DurationCollectorState createState() => _DurationCollectorState();
 

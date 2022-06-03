@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:scouting_application/widgets/collectors/ever_collector.dart';
 
-class CountCollector extends StatefulWidget implements EverCollector {
-  CountCollector({Key? key, required this.title, required this.dataTag})
-      : super(key: key);
+// ignore: must_be_immutable
+class CountCollector extends EverCollector {
+  CountCollector({Key? key, required title, required dataTag})
+      : super(key: key, dataTag: dataTag, title: title);
 
   @override
   _CountCollectorState createState() => _CountCollectorState();
 
-  @override
-  final String dataTag;
-  final String title;
   int _value = 0;
   @override
   String getDataTag() {

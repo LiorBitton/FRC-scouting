@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:scouting_application/widgets/collectors/ever_collector.dart';
 import 'package:scouting_application/widgets/menu_button.dart';
 
-class PlusMinusCollector extends StatefulWidget implements EverCollector {
-  PlusMinusCollector({Key? key, required this.title, required this.dataTag})
-      : super(key: key);
-  final String title;
+class PlusMinusCollector extends EverCollector {
+  PlusMinusCollector({
+    Key? key,
+    required dataTag,
+    required title,
+  }) : super(key: key, title: title, dataTag: dataTag);
   int _counter = 0;
-  String dataTag;
   @override
   _PlusMinusCollectorState createState() => _PlusMinusCollectorState();
 

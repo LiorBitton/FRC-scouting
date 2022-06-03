@@ -8,9 +8,11 @@ class PlaystyleTab extends StatefulWidget implements ScoutingTab {
   PlaystyleTab({Key? key, required this.onSubmit}) : super(key: key);
   final Function onSubmit;
   DurationCollector inactiveDuration = DurationCollector(
-      dataTag: 'inactive_time', icon: Icon(Icons.report_problem));
+      title: "inactive",
+      dataTag: 'inactive_time',
+      icon: Icon(Icons.report_problem));
   TextCollector commentCollector =
-      TextCollector(dataTag: 'comment', hintText: 'comment');
+      TextCollector(title: "comment", dataTag: 'comment', hintText: 'comment');
   @override
   _PlaystyleTabState createState() => _PlaystyleTabState();
 
@@ -23,26 +25,27 @@ class PlaystyleTab extends StatefulWidget implements ScoutingTab {
 class _PlaystyleTabState extends State<PlaystyleTab>
     with AutomaticKeepAliveClientMixin<PlaystyleTab> {
   bool get wantKeepAlive => true;
-
+  List<Widget> _layout = [];
   @override
   void initState() {
     super.initState();
+    _layout = [];
+    _layout.addAll(widget.getCollectors());
+    _layout.addAll([
+      Spacer(),
+      FloatingActionButton(
+          child: Text("submit"),
+          onPressed: () {
+            widget.onSubmit(context);
+          })
+    ]);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: Column(
-      children: [
-        widget.commentCollector,
-        widget.inactiveDuration,
-        Spacer(),
-        FloatingActionButton(
-            child: Text("submit"),
-            onPressed: () {
-              widget.onSubmit(context);
-            })
-      ],
+      children: _layout,
     ));
   }
 }

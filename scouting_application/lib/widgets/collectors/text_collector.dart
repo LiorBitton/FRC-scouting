@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:scouting_application/widgets/collectors/ever_collector.dart';
 
-class TextCollector extends StatefulWidget implements EverCollector {
-  TextCollector({Key? key, required this.dataTag, required this.hintText})
-      : super(key: key);
+class TextCollector extends EverCollector {
+  TextCollector(
+      {Key? key, required dataTag, required title, required this.hintText})
+      : super(key: key, title: title, dataTag: dataTag);
   final String hintText;
   final TextEditingController controller = new TextEditingController();
   @override
   _TextCollectorState createState() => _TextCollectorState();
-
-  @override
-  String dataTag;
 
   @override
   String getDataTag() {
