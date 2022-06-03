@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:scouting_application/screens/scouting/scouting_tab.dart';
 import 'package:scouting_application/widgets/collectors/duration_collector.dart';
-import 'package:scouting_application/widgets/collectors/ever_collector.dart';
 import 'package:scouting_application/widgets/collectors/text_collector.dart';
 
-class PlaystyleTab extends StatefulWidget implements ScoutingTab {
-  PlaystyleTab({Key? key, required this.onSubmit}) : super(key: key);
+class GeneralTab extends ScoutingTab {
+  GeneralTab({Key? key, required this.onSubmit, required collectors})
+      : super(key: key, collectors: collectors);
   final Function onSubmit;
   DurationCollector inactiveDuration = DurationCollector(
       title: "inactive",
@@ -15,15 +15,10 @@ class PlaystyleTab extends StatefulWidget implements ScoutingTab {
       TextCollector(title: "comment", dataTag: 'comment', hintText: 'comment');
   @override
   _PlaystyleTabState createState() => _PlaystyleTabState();
-
-  @override
-  List<EverCollector> getCollectors() {
-    return [inactiveDuration, commentCollector];
-  }
 }
 
-class _PlaystyleTabState extends State<PlaystyleTab>
-    with AutomaticKeepAliveClientMixin<PlaystyleTab> {
+class _PlaystyleTabState extends State<GeneralTab>
+    with AutomaticKeepAliveClientMixin<GeneralTab> {
   bool get wantKeepAlive => true;
   List<Widget> _layout = [];
   @override

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:scouting_application/screens/scouting/scouting_tab.dart';
 import 'package:scouting_application/widgets/collectors/count_collector.dart';
-import 'package:scouting_application/widgets/collectors/ever_collector.dart';
 import 'package:scouting_application/widgets/collectors/plus_minus_collector.dart';
 
-class TeleoperatedTab extends StatefulWidget implements ScoutingTab {
-  TeleoperatedTab({Key? key}) : super(key: key);
+class TeleoperatedTab extends ScoutingTab {
+  TeleoperatedTab({Key? key, required collectors})
+      : super(key: key, collectors: collectors);
   PlusMinusCollector upperCollector = PlusMinusCollector(
     title: "UPPER",
     dataTag: "tele_upper",
@@ -21,16 +21,6 @@ class TeleoperatedTab extends StatefulWidget implements ScoutingTab {
       CountCollector(title: 'UPPER MISS', dataTag: 'tele_up_miss');
   @override
   _TeleoperatedTabState createState() => _TeleoperatedTabState();
-
-  @override
-  List<EverCollector> getCollectors() {
-    return [
-      lowerCollector,
-      upperCollector,
-      missLowerCollector,
-      missUpperCollector
-    ];
-  }
 }
 
 class _TeleoperatedTabState extends State<TeleoperatedTab>

@@ -58,6 +58,21 @@ class NewSeasonLobby extends StatelessWidget {
                                 tabName: "Endgame",
                               )));
                 })),
+            TextButton(
+                style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.amber)),
+                child: Text(
+                  "Create General",
+                ),
+                onPressed: (() {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => EditTab(
+                                tabName: "General",
+                              )));
+                })),
             // Spacer(),
             // CountCollector(title: "Count", dataTag: "Count"),
             // DropDownCollector(

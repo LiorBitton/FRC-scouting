@@ -9,7 +9,7 @@ import 'package:scouting_application/screens/scouting/display_qr.dart';
 import 'package:scouting_application/screens/scouting/scouting_tab.dart';
 import 'package:scouting_application/screens/scouting/tabs/autonomous.dart';
 import 'package:scouting_application/screens/scouting/tabs/endgame.dart';
-import 'package:scouting_application/screens/scouting/tabs/playstyle.dart';
+import 'package:scouting_application/screens/scouting/tabs/general.dart';
 import 'package:scouting_application/screens/scouting/tabs/teleoperated.dart';
 import 'package:scouting_application/widgets/collectors/ever_collector.dart';
 
@@ -23,7 +23,7 @@ class GameManager extends StatefulWidget {
   static ScoutAutonomous autonomous = new ScoutAutonomous();
   static TeleoperatedTab teleoperated = new TeleoperatedTab();
   static EndgameTab endgame = new EndgameTab();
-  static PlaystyleTab playstyle = new PlaystyleTab(
+  static GeneralTab playstyle = new GeneralTab(
     onSubmit: (BuildContext context) {
       submitGame(context);
     },
@@ -105,7 +105,7 @@ class GameManager extends StatefulWidget {
     autonomous = new ScoutAutonomous();
     teleoperated = new TeleoperatedTab();
     endgame = new EndgameTab();
-    playstyle = new PlaystyleTab(
+    playstyle = new GeneralTab(
       onSubmit: (BuildContext context) {
         submitGame(context);
       },
@@ -184,7 +184,7 @@ class _GameManagerState extends State<GameManager> {
                                 icon:
                                     Icon(Icons.elevator, color: Colors.white)),
                             Tab(
-                              child: Text("Playstyle",
+                              child: Text("General",
                                   style: TextStyle(color: Colors.white)),
                               icon: Icon(Icons.alt_route, color: Colors.white),
                             )
