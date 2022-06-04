@@ -22,8 +22,6 @@ class CustomTheme {
         iconTheme: IconThemeData(color: teamColor),
         progressIndicatorTheme: ProgressIndicatorThemeData(
             linearTrackColor: darkTeamColor, color: lightTeamColor),
-        textTheme: TextTheme(
-            bodyText1: GoogleFonts.roboto(fontWeight: FontWeight.bold)),
         buttonTheme: ButtonThemeData(
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18.0),
@@ -52,9 +50,6 @@ class CustomTheme {
         fontFamily: 'Montserrat', //3
         progressIndicatorTheme: ProgressIndicatorThemeData(
             linearTrackColor: darkTeamColor, color: lightTeamColor),
-        textTheme: TextTheme(
-            bodyText1: GoogleFonts.roboto(
-                fontWeight: FontWeight.bold, color: Colors.black)),
         buttonTheme: ButtonThemeData(
           // 4
           shape:
