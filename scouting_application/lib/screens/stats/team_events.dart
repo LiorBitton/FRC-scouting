@@ -21,13 +21,6 @@ class TeamEvents extends StatelessWidget {
               }
               Map<String, String> events =
                   Map<String, String>.from(snapshot.data!);
-              if (events.length == 1) {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => TeamGames(
-                            teamID: teamID, eventKey: events.keys.first)));
-              }
               return ListView.builder(
                   itemCount: events.length,
                   itemBuilder: ((context, index) {

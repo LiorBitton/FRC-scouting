@@ -34,7 +34,7 @@ class TeamHomepage extends StatelessWidget {
                 future: skipTeamsEventsScreen(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
-                    return LinearProgressIndicator();
+                    return CircularProgressIndicator();
                   }
                   List<dynamic> res = snapshot.data as List<dynamic>;
                   return IconButton(

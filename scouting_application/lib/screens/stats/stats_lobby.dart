@@ -227,7 +227,6 @@ class _StatsLobbyState extends State<StatsLobby> {
     }
     teams.sort((a, b) => int.parse(a).compareTo(int.parse(b)));
     target = teams.length;
-    print(teams.length);
     for (String team in teams) {
       String name = await fetchTeamNickname(team);
       String avatar = await fetchTeamLogoAsString(team);

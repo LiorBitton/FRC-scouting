@@ -83,7 +83,7 @@ class Database {
   }
 
   void deleteGame(String teamKey, String gameKey, String eventKey) {
-    db.ref("teams/$teamKey/events/$eventKey/$gameKey").remove();
+    db.ref("teams/$teamKey/$eventKey/$gameKey").remove();
   }
 
   Future<bool> teamHasGames(String teamID, String eventKey) async {

@@ -18,7 +18,7 @@ class DurationCollector extends EverCollector {
 
   @override
   getValue() {
-    return _duration.ceil();
+    return "${_duration.ceil().toString()} sec";
   }
 }
 

@@ -72,7 +72,7 @@ class GameManager extends StatefulWidget {
         final ref = fb.ref();
         final dest = ref
             .child('teams')
-            .child('$teamID')
+            .child('$teamID/events')
             .child(Global.instance.currentEventKey)
             .child('$matchID');
         //limit connection to  an 8 seconds trial, else show QR
