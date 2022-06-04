@@ -7,11 +7,14 @@ import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/screens/homepage.dart';
 import 'package:scouting_application/screens/scouting/display_qr.dart';
 import 'package:scouting_application/screens/scouting/scouting_tab.dart';
-import 'package:scouting_application/screens/scouting/tabs/autonomous.dart';
-import 'package:scouting_application/screens/scouting/tabs/endgame.dart';
 import 'package:scouting_application/screens/scouting/tabs/general.dart';
-import 'package:scouting_application/screens/scouting/tabs/teleoperated.dart';
+import 'package:scouting_application/widgets/collectors/count_collector.dart';
+import 'package:scouting_application/widgets/collectors/dropdown_collector.dart';
+import 'package:scouting_application/widgets/collectors/duration_collector.dart';
 import 'package:scouting_application/widgets/collectors/ever_collector.dart';
+import 'package:scouting_application/widgets/collectors/plus_minus_collector.dart';
+import 'package:scouting_application/widgets/collectors/switch_collector.dart';
+import 'package:scouting_application/widgets/collectors/text_collector.dart';
 
 class GameManager extends StatefulWidget {
   GameManager(
@@ -20,10 +23,15 @@ class GameManager extends StatefulWidget {
       required this.matchKey,
       required this.teamNumber})
       : super(key: key);
-  static ScoutAutonomous autonomous = new ScoutAutonomous();
-  static TeleoperatedTab teleoperated = new TeleoperatedTab();
-  static EndgameTab endgame = new EndgameTab();
+  static ScoutingTab autonomous = new ScoutingTab(
+    collectors: toEverCollectorList(Global.instance.autoCollectors),
+  );
+  static ScoutingTab teleoperated = new ScoutingTab(
+      collectors: toEverCollectorList(Global.instance.teleCollectors));
+  static ScoutingTab endgame = new ScoutingTab(
+      collectors: toEverCollectorList(Global.instance.endCollectors));
   static GeneralTab playstyle = new GeneralTab(
+    collectors: toEverCollectorList(Global.instance.generalCollectors),
     onSubmit: (BuildContext context) {
       submitGame(context);
     },
@@ -102,10 +110,14 @@ class GameManager extends StatefulWidget {
   }
 
   static void reset() {
-    autonomous = new ScoutAutonomous();
-    teleoperated = new TeleoperatedTab();
-    endgame = new EndgameTab();
+    autonomous = new ScoutingTab(
+        collectors: toEverCollectorList(Global.instance.autoCollectors));
+    teleoperated = new ScoutingTab(
+        collectors: toEverCollectorList(Global.instance.teleCollectors));
+    endgame = new ScoutingTab(
+        collectors: toEverCollectorList(Global.instance.endCollectors));
     playstyle = new GeneralTab(
+      collectors: toEverCollectorList(Global.instance.generalCollectors),
       onSubmit: (BuildContext context) {
         submitGame(context);
       },
@@ -114,6 +126,44 @@ class GameManager extends StatefulWidget {
     teamID = 0;
     isBlueAlliance = false;
     tabs = [autonomous, teleoperated, endgame, playstyle];
+  }
+
+  static List<EverCollector> toEverCollectorList(List<String> collectors) {
+    List<EverCollector> out = [];
+    for (int i = 0; i < collectors.length; ++i) {
+      EverCollector? collector = toEverCollector(collectors[i]);
+      if (collector != null) out.add(collector);
+    }
+    return out;
+  }
+
+  static EverCollector? toEverCollector(String collector) {
+    //title;dataTag;type;option1,option2,option3(only for dropdown)
+    final List<String> split = collector.split(";");
+    if (split.length != 4 && split.length != 3) {
+      print("error occured with $collector translation");
+      return null;
+    }
+    final String title = split[0];
+    final String dataTag = split[1];
+    final String type = split[2];
+    switch (type) {
+      case "plu":
+        return PlusMinusCollector(dataTag: dataTag, title: title);
+      case "dur":
+        return DurationCollector(dataTag: dataTag, title: title);
+      case "swi":
+        return SwitchCollector(title: title, dataTag: dataTag);
+      case "dro":
+        final List<String> options = split[3].split(",");
+        return DropDownCollector(
+            dataTag: dataTag, options: options, title: title);
+      case "tex":
+        return TextCollector(dataTag: dataTag, title: title, hintText: title);
+      case "cou":
+        return CountCollector(title: title, dataTag: dataTag);
+    }
+    return null;
   }
 
   @override
@@ -148,8 +198,7 @@ class _GameManagerState extends State<GameManager> {
                   length: 4,
                   child: Scaffold(
                       appBar: AppBar(
-                        title: Text(
-                            'match: #${GameManager.matchID} | team: #${GameManager.teamID}'),
+                        title: Text('Scouting Team ${GameManager.teamID}'),
                         actions: [
                           IconButton(
                               onPressed: () {
@@ -196,12 +245,21 @@ class _GameManagerState extends State<GameManager> {
               );
             }
           }
-          return CircularProgressIndicator();
+          return Scaffold(
+              body: Center(
+            child: Wrap(
+                direction: Axis.vertical,
+                alignment: WrapAlignment.center,
+                children: [CircularProgressIndicator(), Text("Loading...")]),
+          ));
         }));
   }
 
   Future<bool> _notifyScoutingTeam() async {
-    return Database.instance.notifyStartScouting(widget.teamNumber.toString());
+    if (Global.instance.offlineEvent) return true;
+    return await Database.instance
+        .notifyStartScouting(widget.teamNumber.toString())
+        .onError((error, stackTrace) => true);
   }
 
   void _notifyScoutingFinished() {

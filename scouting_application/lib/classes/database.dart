@@ -141,7 +141,7 @@ class Database {
     final dest = db.ref("sync/currently_scouted/$teamID");
     bool exists = await dest.once().then((DatabaseEvent snapshot) {
       return snapshot.snapshot.exists;
-    });
+    }).timeout(Duration(seconds: 5));
     if (exists) {
       return false;
     } else {
@@ -196,13 +196,13 @@ class Database {
     db.ref("settings/tabs/$tabName").set(tabLayout);
   }
 
-  Future<Map<String, List<String>>> getTabLayout() async {
+  Future<Map<String, List<dynamic>>> getTabLayout() async {
     DataSnapshot snapshot = await db.ref("settings/tabs").get();
     if (!snapshot.exists) {
       return {};
     }
-    Map<String, List<String>> tabs =
-        Map<String, List<String>>.from(snapshot.value as Map<dynamic, dynamic>);
+    Map<String, List<dynamic>> tabs = Map<String, List<dynamic>>.from(
+        snapshot.value as Map<dynamic, dynamic>);
     return tabs;
   }
 

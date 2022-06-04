@@ -123,13 +123,15 @@ class Homepage extends StatelessWidget {
   }
 
   void initGlobal() async {
-    Map<String, List<String>> tabs = {};
+    Map<String, List<dynamic>> tabs = {};
     try {
-      Global.instance.fromJson(await Database.instance.getSettings());
+      Global.instance.fromJson(
+          await Database.instance.getSettings().timeout(Duration(seconds: 7)));
       Global.instance.setIsAdmin(await isAdmin());
       tabs = await Database.instance.getTabLayout();
-      saveTabsToLocal(tabs); //todo check if tab loading works
+      saveTabsToLocal(tabs);
     } catch (e) {
+      print(e);
       Global.instance.allowFreeScouting = true;
       Global.instance.isAdmin = false;
       Global.instance.currentEventKey = "";
@@ -143,16 +145,23 @@ class Homepage extends StatelessWidget {
         }
       }
     }
-    Global.instance.autoCollectors = tabs["Autonomous"] as List<String>;
-    Global.instance.teleCollectors = tabs["Teleop"] as List<String>;
-    Global.instance.endCollectors = tabs["Endgame"] as List<String>;
-    Global.instance.generalCollectors = tabs["General"] as List<String>;
+    if (tabs.isNotEmpty) {
+      Global.instance.autoCollectors =
+          tabs["Autonomous"]!.map((e) => e.toString()).toList();
+      Global.instance.teleCollectors =
+          tabs["Teleop"]!.map((e) => e.toString()).toList();
+      Global.instance.endCollectors =
+          tabs["Endgame"]!.map((e) => e.toString()).toList();
+      Global.instance.generalCollectors =
+          tabs["General"]!.map((e) => e.toString()).toList();
+    }
   }
 
-  void saveTabsToLocal(Map<String, List<String>> tabs) async {
+  void saveTabsToLocal(Map<String, List<dynamic>> tabs) async {
     final String filename = "tabs.json";
     final directory = await getApplicationDocumentsDirectory();
     final File file = File('${directory.path}/$filename');
+    if (!file.existsSync()) file.createSync(recursive: true);
     try {
       String out = jsonEncode(tabs);
       file.writeAsString(out);
@@ -161,13 +170,14 @@ class Homepage extends StatelessWidget {
     }
   }
 
-  Future<Map<String, List<String>>> getTabsFromLocal() async {
+  Future<Map<String, List<dynamic>>> getTabsFromLocal() async {
     final String filename = "tabs.json";
     final directory = await getApplicationDocumentsDirectory();
     final File file = File('${directory.path}/$filename');
+    if (!file.existsSync()) return {};
     try {
-      Map<String, List<String>> res =
-          jsonDecode(await file.readAsString()) as Map<String, List<String>>;
+      Map<String, List<dynamic>> res = Map<String, List<dynamic>>.from(
+          jsonDecode(await file.readAsString()) as Map<String, dynamic>);
       return res;
     } catch (e) {
       print(e);
