@@ -25,25 +25,31 @@ class DurationCollector extends EverCollector {
 class _DurationCollectorState extends State<DurationCollector> {
   @override
   Widget build(BuildContext context) {
-    return HoldDetector(
-      onHold: _incrementTime,
-      holdTimeout: Duration(milliseconds: 100),
-      enableHapticFeedback: true,
-      child: CircleAvatar(
-          radius: 40,
-          child: Column(
-            children: [
-              FittedBox(
-                child: IconButton(
-                    color: Colors.white,
-                    onPressed: () {},
-                    icon: widget.icon ?? Icon(Icons.timer)),
-              ),
-              FittedBox(
-                  child: Text('${widget._duration.toStringAsFixed(1)}',
-                      style: TextStyle(color: Colors.white)))
-            ],
-          )),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        HoldDetector(
+          onHold: _incrementTime,
+          holdTimeout: Duration(milliseconds: 100),
+          enableHapticFeedback: true,
+          child: CircleAvatar(
+              radius: 40,
+              child: Column(
+                children: [
+                  FittedBox(
+                    child: IconButton(
+                        color: Colors.white,
+                        onPressed: () {},
+                        icon: widget.icon ?? Icon(Icons.timer)),
+                  ),
+                  FittedBox(
+                      child: Text('${widget._duration.toStringAsFixed(1)}',
+                          style: TextStyle(color: Colors.white)))
+                ],
+              )),
+        ),
+      ],
     );
   }
 

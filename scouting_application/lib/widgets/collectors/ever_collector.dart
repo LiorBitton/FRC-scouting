@@ -16,7 +16,7 @@ abstract class EverCollector extends StatefulWidget {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return "$title;;$dataTag;;${this.runtimeType.toString().substring(0, 3).toLowerCase()}";
+    return "$title;$dataTag;${this.runtimeType.toString().substring(0, 3).toLowerCase()}";
   }
 
   @override
