@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:scouting_application/classes/global.dart';
-import 'package:scouting_application/screens/scouting/free_scouting_lobby.dart';
-import 'package:scouting_application/screens/scouting/realtime_scouting_lobby.dart';
+import 'package:scouting_application/screens/scouting/free_scouting.dart';
+import 'package:scouting_application/screens/scouting/realtime_scouting.dart';
 import 'package:scouting_application/widgets/menu_button.dart';
 
 class ScoutingMenu extends StatelessWidget {
@@ -24,7 +24,7 @@ class ScoutingMenu extends StatelessWidget {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => FreeScoutingLobby()));
+                                  builder: (context) => FreeScouting()));
                         },
                       )
                     : Text(""),
@@ -37,7 +37,7 @@ class ScoutingMenu extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => RealtimeScoutingLobby()));
+                              builder: (context) => RealtimeScouting()));
                     },
                     isPrimary: !Global.instance.allowFreeScouting,
                     icon: Icon(Icons.add_task))

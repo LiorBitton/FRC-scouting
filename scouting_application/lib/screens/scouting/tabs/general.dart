@@ -7,10 +7,10 @@ class GeneralTab extends ScoutingTab {
       : super(key: key, collectors: collectors);
   final Function onSubmit;
   @override
-  _PlaystyleTabState createState() => _PlaystyleTabState();
+  _GeneralTabState createState() => _GeneralTabState();
 }
 
-class _PlaystyleTabState extends State<GeneralTab>
+class _GeneralTabState extends State<GeneralTab>
     with AutomaticKeepAliveClientMixin<GeneralTab> {
   bool get wantKeepAlive => true;
   List<Widget> _layout = [];
@@ -22,6 +22,7 @@ class _PlaystyleTabState extends State<GeneralTab>
     _layout.addAll([
       Spacer(),
       MenuTextButton(
+          key: Key("ok"),
           text: "submit",
           onPressed: () {
             widget.onSubmit(context);

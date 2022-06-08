@@ -5,14 +5,14 @@ import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/classes/tba_client.dart';
 import 'package:scouting_application/screens/scouting/game_manager.dart';
 
-class RealtimeScoutingLobby extends StatefulWidget {
-  RealtimeScoutingLobby({Key? key}) : super(key: key);
+class RealtimeScouting extends StatefulWidget {
+  RealtimeScouting({Key? key}) : super(key: key);
 
   @override
-  State<RealtimeScoutingLobby> createState() => _RealtimeScoutingLobbyState();
+  State<RealtimeScouting> createState() => _RealtimeScoutingState();
 }
 
-class _RealtimeScoutingLobbyState extends State<RealtimeScoutingLobby> {
+class _RealtimeScoutingState extends State<RealtimeScouting> {
   late Future<Wrap> futureMatches;
   bool isDarkMode = false;
 

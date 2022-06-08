@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:scouting_application/classes/database.dart';
+import 'package:scouting_application/widgets/menu_button.dart';
+import 'package:scouting_application/widgets/menu_text_button.dart';
 
 class AddTeamPhoto extends StatefulWidget {
   AddTeamPhoto({Key? key, required this.teamID}) : super(key: key);
@@ -26,12 +28,6 @@ class _AddTeamPhotoState extends State<AddTeamPhoto> {
     super.initState();
   }
 
-  // commentsController.dispose();
-  //  final commentsController = TextEditingController();
-//  TextField(
-  // controller: commentsController,
-  // decoration: InputDecoration(
-  //     border: OutlineInputBorder(), hintText: 'Comments/Issues')),
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,11 +38,8 @@ class _AddTeamPhotoState extends State<AddTeamPhoto> {
           children: [
             imageUploaded
                 ? getAfterSelectionUI()
-                // : getBeforeSelectionUI(context)
-
                 : Center(
-                    child: IconButton(
-                      iconSize: 80,
+                    child: MenuButton(
                       onPressed: () async {
                         await _showSelectionDialog(context);
                         if (imageFile != null)
@@ -55,6 +48,7 @@ class _AddTeamPhotoState extends State<AddTeamPhoto> {
                           });
                       },
                       icon: Icon(Icons.add_a_photo_rounded),
+                      isPrimary: true,
                     ),
                   ),
           ],
@@ -75,7 +69,9 @@ class _AddTeamPhotoState extends State<AddTeamPhoto> {
                     _openGallery(context);
                   },
                 ),
-                Padding(padding: EdgeInsets.all(100)),
+                Padding(padding: EdgeInsets.all(8)),
+                Divider(),
+                Padding(padding: EdgeInsets.all(8)),
                 GestureDetector(
                   child: Text("Camera"),
                   onTap: () {
@@ -88,35 +84,6 @@ class _AddTeamPhotoState extends State<AddTeamPhoto> {
         });
   }
 
-  Center getBeforeSelectionUI(BuildContext context) {
-    return Center(
-        child: Wrap(
-      direction: Axis.horizontal,
-      spacing: 40,
-      children: [
-        IconButton(
-            iconSize: 50,
-            icon: Icon(Icons.add_to_photos),
-            onPressed: () {
-              setState(() {
-                _openGallery(context);
-                imageUploaded = true;
-              });
-            }),
-        IconButton(
-            iconSize: 50,
-            icon: Icon(Icons.camera_enhance),
-            onPressed: () {
-              setState(() {
-                _openCamera(context);
-
-                imageUploaded = true;
-              });
-            })
-      ],
-    ));
-  }
-
   Column getAfterSelectionUI() {
     if (imageFile == null) {
       return Column();
@@ -124,12 +91,13 @@ class _AddTeamPhotoState extends State<AddTeamPhoto> {
     File file = File(imageFile!.path);
     return Column(children: [
       Image.file(file),
-      FloatingActionButton(
-          child: Text("submit"),
+      SizedBox(height: 15),
+      MenuTextButton(
           onPressed: () {
             Database.instance.uploadImage(imageFile, widget.teamID);
             Navigator.pop(context);
-          })
+          },
+          text: "submit")
     ]);
   }
 

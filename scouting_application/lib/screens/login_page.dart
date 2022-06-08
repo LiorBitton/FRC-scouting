@@ -26,33 +26,39 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(title: Text("Login")),
-        body: Center(
-            child: FittedBox(
-          child: ElevatedButton(
-            style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all<Color?>(Colors.white),
-                foregroundColor:
-                    MaterialStateProperty.all<Color?>(Colors.black),
-                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14.0),
-                ))),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset("assets/google_logo.png", scale: 20),
-                Center(child: Text("Login With Google"))
-              ],
-            ),
-            onPressed: () {
-              googleLogin();
-            },
+    return WillPopScope(
+      onWillPop: (() async => false),
+      child: Scaffold(
+          appBar: AppBar(
+            title: Text("Login"),
+            automaticallyImplyLeading: false,
           ),
-        )));
+          body: Center(
+              child: FittedBox(
+            child: ElevatedButton(
+              style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all<Color?>(Colors.white),
+                  foregroundColor:
+                      MaterialStateProperty.all<Color?>(Colors.black),
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14.0),
+                  ))),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset("assets/google_logo.png", scale: 20),
+                  Center(child: Text("Login With Google"))
+                ],
+              ),
+              onPressed: () {
+                googleLogin();
+              },
+            ),
+          ))),
+    );
   }
 
   Future<void> googleLogin() async {

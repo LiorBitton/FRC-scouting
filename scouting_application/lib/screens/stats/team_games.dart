@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/screens/stats/game_data.dart';
+import 'package:scouting_application/themes/custom_themes.dart';
 
 class TeamGames extends StatefulWidget {
   TeamGames({Key? key, required this.teamID, required this.eventKey})
@@ -60,39 +61,45 @@ class _TeamGamesState extends State<TeamGames> {
                                   int.parse(b.substring(
                                       b.lastIndexOf("m") + 1)); //[MATCH_NUMBER]
                             });
-                            return ListView.builder(
-                                shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
-                                itemCount: gameKeys.length,
-                                itemBuilder: (context, index) {
-                                  final String gameKey = gameKeys[index];
-                                  return ListTile(
-                                    trailing: Global.instance.isAdmin
-                                        ? IconButton(
-                                            icon: Icon(Icons.delete),
-                                            onPressed: () {
-                                              setState(() {
-                                                handleDeleteGame(
-                                                    widget.teamID, gameKey);
-                                              });
-                                            },
-                                          )
-                                        : Text(""),
-                                    title: Text(gameKey),
-                                    onTap: () {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => GameData(
-                                                  teamID: widget.teamID,
-                                                  data:
-                                                      Map<String, dynamic>.from(
-                                                          (games[gameKey]
-                                                              as Map<dynamic,
-                                                                  dynamic>)))));
-                                    },
-                                  );
-                                });
+                            return ListView.separated(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: gameKeys.length,
+                              itemBuilder: (context, index) {
+                                final String gameKey = gameKeys[index];
+                                return ListTile(
+                                  trailing: Global.instance.isAdmin
+                                      ? IconButton(
+                                          icon: Icon(Icons.delete),
+                                          onPressed: () {
+                                            setState(() {
+                                              handleDeleteGame(
+                                                  widget.teamID, gameKey);
+                                            });
+                                          },
+                                        )
+                                      : Text(""),
+                                  title: Text(gameKey),
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => GameData(
+                                                teamID: widget.teamID,
+                                                data: Map<String, dynamic>.from(
+                                                    (games[gameKey] as Map<
+                                                        dynamic, dynamic>)))));
+                                  },
+                                );
+                              },
+                              separatorBuilder:
+                                  (BuildContext context, int index) {
+                                return const Divider(
+                                  color: CustomTheme.teamColor, // Colors.black,
+                                  thickness: 3,
+                                );
+                              },
+                            );
                           }
                         }),
                   ],

@@ -36,7 +36,7 @@ class DisplayQr extends StatelessWidget {
                 iconSize: 50,
                 icon: Icon(Icons.check_circle_outline),
                 onPressed: () {
-                  Navigator.removeRouteBelow(context,
+                  Navigator.push(context,
                       MaterialPageRoute(builder: (context) => Homepage()));
                 },
                 isPrimary: false,

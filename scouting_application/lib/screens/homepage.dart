@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/screens/admin/admin_settings.dart';
-import 'package:scouting_application/screens/scouting/realtime_scouting_lobby.dart';
+import 'package:scouting_application/screens/scouting/realtime_scouting.dart';
 import 'package:scouting_application/screens/scouting/scouting_menu.dart';
 import 'package:scouting_application/screens/login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -76,7 +76,7 @@ class Homepage extends StatelessWidget {
                             builder: (context) =>
                                 Global.instance.allowFreeScouting
                                     ? ScoutingMenu()
-                                    : RealtimeScoutingLobby()));
+                                    : RealtimeScouting()));
                   },
                 ),
                 SizedBox(
@@ -100,7 +100,8 @@ class Homepage extends StatelessWidget {
   Future<void> _signOut(BuildContext context) async {
     allowedToPop = true;
     await FirebaseAuth.instance.signOut();
-    Navigator.pop(context);
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => LoginPage()));
   }
 
   void onStart(BuildContext context) {
@@ -128,8 +129,6 @@ class Homepage extends StatelessWidget {
       Global.instance.fromJson(
           await Database.instance.getSettings().timeout(Duration(seconds: 7)));
       Global.instance.setIsAdmin(await isAdmin());
-      tabs = await Database.instance.getTabLayout();
-      saveTabsToLocal(tabs);
     } catch (e) {
       print(e);
       Global.instance.allowFreeScouting = true;
@@ -138,12 +137,13 @@ class Homepage extends StatelessWidget {
       Global.instance.currentEventName = "";
       Global.instance.relevantEvents = {};
       Global.instance.offlineEvent = true;
-      if (tabs.isEmpty) {
-        tabs = await getTabsFromLocal();
-        if (tabs.isEmpty) {
-          print("error with tabs");
-        }
-      }
+    }
+    try {
+      tabs = await Database.instance.getTabLayout();
+      saveTabsToLocal(tabs);
+    } catch (e) {
+      print(e);
+      tabs = await getTabsFromLocal();
     }
     if (tabs.isNotEmpty) {
       Global.instance.autoCollectors =
@@ -154,6 +154,8 @@ class Homepage extends StatelessWidget {
           tabs["Endgame"]!.map((e) => e.toString()).toList();
       Global.instance.generalCollectors =
           tabs["General"]!.map((e) => e.toString()).toList();
+    } else {
+      SnackBar(content: Text("Could not find scouting req on device"));
     }
   }
 
