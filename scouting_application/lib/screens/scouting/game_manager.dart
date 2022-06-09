@@ -22,7 +22,11 @@ class GameManager extends StatefulWidget {
       required this.isBlueAll,
       required this.matchKey,
       required this.teamNumber})
-      : super(key: key);
+      : super(key: key) {
+    teamID = teamNumber;
+    matchID = matchKey;
+    isBlueAlliance = isBlueAll;
+  }
   static ScoutingTab autonomous = new ScoutingTab(
     collectors: toEverCollectorList(Global.instance.autoCollectors),
   );
@@ -75,7 +79,7 @@ class GameManager extends StatefulWidget {
             .child('$teamID/events')
             .child(Global.instance.currentEventKey)
             .child('$matchID');
-        //limit connection to  an 8 seconds trial, else show QR
+        //limit connection to an 8 seconds trial, else show QR
         await dest.set(data).then((value) {
           Navigator.push(
               context, MaterialPageRoute(builder: (context) => Homepage()));
@@ -268,7 +272,7 @@ class _GameManagerState extends State<GameManager> {
     ref
         .child('sync')
         .child('currently_scouted')
-        .child(GameManager.teamID.toString())
+        .child(widget.teamNumber.toString())
         .remove();
   }
 }
