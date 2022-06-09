@@ -61,7 +61,11 @@ class TeamSearchDelegate extends SearchDelegate {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => TeamHomepage(teamNumber: team)));
+                        builder: (context) => TeamHomepage(
+                              teamNumber: team,
+                              teamAvatar: null,
+                              teamName: "", //todo
+                            )));
               });
         });
   }

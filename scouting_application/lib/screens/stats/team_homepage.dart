@@ -1,24 +1,43 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/screens/stats/team_events.dart';
 import 'package:scouting_application/screens/stats/team_games.dart';
 import 'package:scouting_application/screens/stats/team_photo_gallery.dart';
 
 class TeamHomepage extends StatelessWidget {
-  TeamHomepage({Key? key, required this.teamNumber}) : super(key: key);
+  TeamHomepage(
+      {Key? key,
+      required this.teamNumber,
+      required this.teamAvatar,
+      required this.teamName})
+      : super(key: key);
   final String teamNumber;
-
-  void initState() {}
-
+  final String teamName;
+  final Widget? teamAvatar;
   @override
   Widget build(BuildContext context) {
-    initState();
     return Scaffold(
         appBar: AppBar(title: Text("Team $teamNumber")),
         body: Center(
             child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
+            SizedBox(height: 20),
+            Wrap(
+              direction: Axis.vertical,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                teamAvatar ?? Container(),
+                Text(
+                  teamName,
+                  maxLines: 3,
+                  softWrap: true,
+                  style: GoogleFonts.acme(fontSize: 25, color: Colors.white),
+                  textScaleFactor: 2,
+                )
+              ],
+            ),
             IconButton(
                 icon: Icon(Icons.image_search),
                 iconSize: 50,

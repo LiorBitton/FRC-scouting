@@ -47,7 +47,6 @@ class CustomTheme {
         appBarTheme: AppBarTheme(
             color: teamColor, titleTextStyle: GoogleFonts.acme(fontSize: 25)),
         iconTheme: IconThemeData(color: teamColor),
-        fontFamily: 'Montserrat', //3
         progressIndicatorTheme: ProgressIndicatorThemeData(
             linearTrackColor: darkTeamColor, color: lightTeamColor),
         buttonTheme: ButtonThemeData(

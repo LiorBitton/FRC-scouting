@@ -78,21 +78,21 @@ class _StatsLobbyState extends State<StatsLobby> {
                               itemCount: teamData.length,
                               itemBuilder: (context, index) {
                                 String team = teamData.keys.elementAt(index);
+                                String teamName = teamData[team]!.getName();
+                                Widget? teamAvatar = imageFromBase64String(
+                                    teamData[team]!.getAvatar());
                                 return ListTile(
-                                  title: Text(
-                                    team,
-                                  ),
-                                  subtitle:
-                                      Text("${teamData[team]!.getName()}"),
-                                  leading: imageFromBase64String(
-                                          teamData[team]!.getAvatar()) ??
-                                      Icon(Icons.people),
+                                  title: Text(team),
+                                  subtitle: Text(teamName),
+                                  leading: teamAvatar ?? Icon(Icons.people),
                                   onTap: () {
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) => TeamHomepage(
-                                                teamNumber: team)));
+                                                teamNumber: team,
+                                                teamName: teamName,
+                                                teamAvatar: teamAvatar)));
                                   },
                                 );
                               },
