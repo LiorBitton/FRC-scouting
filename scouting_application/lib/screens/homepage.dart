@@ -13,13 +13,26 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:scouting_application/screens/stats/stats_lobby.dart';
 import 'package:scouting_application/widgets/menu_button.dart';
 
-class Homepage extends StatelessWidget {
+class Homepage extends StatefulWidget {
   Homepage({Key? key}) : super(key: key);
+
+  @override
+  State<Homepage> createState() => _HomepageState();
+}
+
+class _HomepageState extends State<Homepage> {
   final FirebaseAuth auth = FirebaseAuth.instance;
   bool allowedToPop = false;
+  late Future<bool> futureReady;
+  @override
+  void initState() {
+    super.initState();
+
+    futureReady = onStart(context);
+  }
+
   @override
   Widget build(BuildContext context) {
-    onStart(context);
     return WillPopScope(
       onWillPop: () async => allowedToPop,
       child: Scaffold(
@@ -62,37 +75,46 @@ class Homepage extends StatelessWidget {
             ],
           ),
           body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                MenuButton(
-                  iconSize: MenuButton.MENU_SIZE,
-                  isPrimary: true,
-                  icon: Icon(Icons.touch_app_rounded),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                Global.instance.allowFreeScouting
-                                    ? ScoutingMenu()
-                                    : RealtimeScouting()));
-                  },
-                ),
-                SizedBox(
-                  height: 30,
-                ),
-                MenuButton(
-                  iconSize: MenuButton.MENU_SIZE,
-                  isPrimary: false,
-                  icon: Icon(Icons.leaderboard_rounded),
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => StatsLobby()));
-                  },
-                ),
-              ],
-            ),
+            child: FutureBuilder(
+                future: futureReady,
+                builder:
+                    (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                  return snapshot.hasData
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            MenuButton(
+                              iconSize: MenuButton.MENU_SIZE,
+                              isPrimary: true,
+                              icon: Icon(Icons.touch_app_rounded),
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            Global.instance.allowFreeScouting
+                                                ? ScoutingMenu()
+                                                : RealtimeScouting()));
+                              },
+                            ),
+                            SizedBox(
+                              height: 30,
+                            ),
+                            MenuButton(
+                              iconSize: MenuButton.MENU_SIZE,
+                              isPrimary: false,
+                              icon: Icon(Icons.leaderboard_rounded),
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => StatsLobby()));
+                              },
+                            ),
+                          ],
+                        )
+                      : Text("Loading...");
+                }),
           )),
     );
   }
@@ -104,15 +126,16 @@ class Homepage extends StatelessWidget {
         context, MaterialPageRoute(builder: (context) => LoginPage()));
   }
 
-  void onStart(BuildContext context) {
+  Future<bool> onStart(BuildContext context) async {
     var currentUser = auth.currentUser;
 
     if (currentUser == null) {
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => LoginPage()));
     } else {
-      initGlobal();
+      return initGlobal();
     }
+    return false;
   }
 
   Future<bool> isAdmin() async {
@@ -123,11 +146,11 @@ class Homepage extends StatelessWidget {
     return false;
   }
 
-  void initGlobal() async {
+  Future<bool> initGlobal() async {
+    if (Global.instance.offlineEvent) return true;
     Map<String, List<dynamic>> tabs = {};
     try {
-      Global.instance.fromJson(
-          await Database.instance.getSettings().timeout(Duration(seconds: 7)));
+      Global.instance.fromJson(await Database.instance.getSettings());
       Global.instance.setIsAdmin(await isAdmin());
     } catch (e) {
       print(e);
@@ -143,7 +166,11 @@ class Homepage extends StatelessWidget {
       saveTabsToLocal(tabs);
     } catch (e) {
       print(e);
-      tabs = await getTabsFromLocal();
+      try {
+        tabs = await getTabsFromLocal();
+      } catch (e) {
+        print(e);
+      }
     }
     if (tabs.isNotEmpty) {
       Global.instance.autoCollectors =
@@ -157,6 +184,7 @@ class Homepage extends StatelessWidget {
     } else {
       SnackBar(content: Text("Could not find scouting req on device"));
     }
+    return true;
   }
 
   void saveTabsToLocal(Map<String, List<dynamic>> tabs) async {
