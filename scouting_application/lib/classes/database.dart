@@ -7,7 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 class Database {
   final FirebaseDatabase db = FirebaseDatabase.instance;
   Database._privateConstructor();
-
+  static const int TIMEOUT_TIME = 5;
   static final Database _instance = Database._privateConstructor();
 
   static Database get instance => _instance;
@@ -46,7 +46,8 @@ class Database {
   Future<List<String>> fetchBlockedTeams() async {
     final blockedTeamsRef = db.ref('settings/blocked_teams');
     blockedTeamsRef.keepSynced(true);
-    final DataSnapshot blockedTeamsData = await blockedTeamsRef.get();
+    final DataSnapshot blockedTeamsData =
+        await blockedTeamsRef.get().timeout(Duration(seconds: TIMEOUT_TIME));
     List<String> blockedList = [];
     if (blockedTeamsData.exists) {
       final List<dynamic> tempBlockedList = blockedTeamsData.value as List;
@@ -78,7 +79,10 @@ class Database {
   }
 
   Future<bool> isAdmin(String email) async {
-    DataSnapshot val = await db.ref('settings/admins').get();
+    DataSnapshot val = await db
+        .ref('settings/admins')
+        .get()
+        .timeout(Duration(seconds: TIMEOUT_TIME));
     return (val.value as List<Object?>).contains(email);
   }
 
@@ -141,7 +145,7 @@ class Database {
     final dest = db.ref("sync/currently_scouted/$teamID");
     bool exists = await dest.once().then((DatabaseEvent snapshot) {
       return snapshot.snapshot.exists;
-    }).timeout(Duration(seconds: 5));
+    }).timeout(Duration(seconds: TIMEOUT_TIME));
     if (exists) {
       return false;
     } else {
@@ -152,7 +156,8 @@ class Database {
 
   Future<Map<String, dynamic>> getSettings() async {
     final DatabaseReference ref = db.ref("settings");
-    final DataSnapshot snapshot = await ref.get();
+    final DataSnapshot snapshot =
+        await ref.get().timeout(Duration(seconds: TIMEOUT_TIME));
     if (snapshot.exists) {
       return Map<String, dynamic>.from(snapshot.value as Map<dynamic, dynamic>);
     } else {
@@ -182,8 +187,10 @@ class Database {
   }
 
   Future<List<String>> getTeamImages(String teamID) async {
-    DataSnapshot snapshot =
-        await db.ref("teams/${int.parse(teamID)}/images").get();
+    DataSnapshot snapshot = await db
+        .ref("teams/${int.parse(teamID)}/images")
+        .get()
+        .timeout(Duration(seconds: TIMEOUT_TIME));
     if (!snapshot.exists) {
       return [];
     }
@@ -197,7 +204,10 @@ class Database {
   }
 
   Future<Map<String, List<dynamic>>> getTabLayout() async {
-    DataSnapshot snapshot = await db.ref("settings/tabs").get();
+    DataSnapshot snapshot = await db
+        .ref("settings/tabs")
+        .get()
+        .timeout(Duration(seconds: TIMEOUT_TIME));
     if (!snapshot.exists) {
       return {};
     }
@@ -207,7 +217,10 @@ class Database {
   }
 
   Future<int> getLastTabsUpdate() async {
-    DataSnapshot snapshot = await db.ref("settings/tabs/last_update").get();
+    DataSnapshot snapshot = await db
+        .ref("settings/tabs/last_update")
+        .get()
+        .timeout(Duration(seconds: TIMEOUT_TIME));
     if (!snapshot.exists) {
       return 0;
     }
