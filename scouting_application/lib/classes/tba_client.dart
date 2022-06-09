@@ -113,12 +113,10 @@ class TBAClient {
           try {
             String temp = mediaItem['direct_url'];
             urlImages.add(temp);
-            print("image from url");
           } catch (e) {
             try {
               //if the photo is the logo of the team
               b64images.add(mediaItem['details']['base64Image']);
-              print("image from b64");
             } catch (e) {}
           }
         }
