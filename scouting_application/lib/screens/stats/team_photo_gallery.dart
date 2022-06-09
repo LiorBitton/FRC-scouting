@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:scouting_application/classes/secret_constants.dart';
+import 'package:scouting_application/classes/database.dart';
+import 'package:scouting_application/classes/tba_client.dart';
+import 'package:scouting_application/screens/scouting/add_team_photo.dart';
 
+// ignore: must_be_immutable
 class TeamPhotoGallery extends StatelessWidget {
   TeamPhotoGallery({Key? key, required this.teamNumber}) : super(key: key);
   final String teamNumber;
@@ -11,63 +13,67 @@ class TeamPhotoGallery extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     futureImages = fetchTeamPhotos();
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          FutureBuilder<List<Image>>(
-              future: futureImages,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return Column(
-                    children: snapshot.data!,
-                  );
-                } else if (snapshot.hasError) {
-                  print('${snapshot.error}');
-                }
-                return const CircularProgressIndicator();
-              }),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Team $teamNumber Photos"),
+        actions: [
+          IconButton(
+            iconSize: 30,
+            icon: Icon(Icons.add_photo_alternate),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => AddTeamPhoto(teamID: teamNumber)));
+            },
+          )
         ],
+      ),
+      body: FutureBuilder<List<Image>>(
+        future: futureImages,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            if ((snapshot.data as List<Image>).isEmpty) {
+              return Text("There are no photos of this team");
+            }
+            List<Image> imgs = snapshot.data as List<Image>;
+            return ListView.separated(
+              itemBuilder: (BuildContext context, int index) {
+                return imgs.elementAt(index);
+              },
+              itemCount: imgs.length,
+              separatorBuilder: (BuildContext context, int index) {
+                return Divider(
+                  color: Colors.transparent,
+                  thickness: 5,
+                );
+              },
+            );
+          } else if (snapshot.hasError) {
+            print('${snapshot.error}');
+          }
+          return LinearProgressIndicator();
+        },
       ),
     );
   }
 
   Future<List<Image>> fetchTeamPhotos() async {
-    int year = new DateTime.now().year;
-    var url = Uri.parse(
-        'https://www.thebluealliance.com/api/v3/team/frc$teamNumber/media/$year');
-    final response = await http.get(url, headers: {
-      'X-TBA-Auth-Key': SecretConstants.TBA_API_KEY,
-      'accept': 'application/json'
-    });
+    Map<String, List<String>> images =
+        await TBAClient.instance.fetchTeamPhotos(teamNumber);
+    List<String> urlImages = images["url"]!;
+    List<String> b64images = images["b64"]!;
+    List<String> databaseImages =
+        await Database.instance.getTeamImages(teamNumber);
+    urlImages.addAll(databaseImages);
     List<Image> out = [];
-    if (response.statusCode == 200) {
-      List<dynamic> res = jsonDecode(response.body);
-      try {
-        //Fetching team's logo
-        out.add(
-            imageFromBase64String(res[0]['details']['base64Image'].toString()));
-      } catch (Exception) {
-        debugPrint('failed to download logo');
-      }
-
-      for (var mediaItem in res.skip(1)) {
-        try {
-          Image temp = Image.network(mediaItem['direct_url']);
-          out.add(temp);
-        } catch (Exception) {
-          try {
-            //if the photo is the logo of the team
-            print(mediaItem['details']['base64Image']);
-            out.add(imageFromBase64String(mediaItem['details']['base64Image']));
-          } catch (Exception) {}
-        }
-      }
-      return out;
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      throw Exception('Failed to load TBATeam');
+    for (String url in urlImages) {
+      out.add(Image.network(url));
     }
+    for (String b64 in b64images) {
+      out.add(imageFromBase64String(b64));
+    }
+    return out;
   }
 
   Image imageFromBase64String(String base64String) {

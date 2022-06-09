@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:scouting_application/widgets/collectors/ever_collector.dart';
+import 'package:scouting_application/widgets/menu_button.dart';
 
-class CountCollector extends StatefulWidget implements EverCollector {
-  CountCollector({Key? key, required this.title, required this.dataTag})
-      : super(key: key);
+// ignore: must_be_immutable
+class CountCollector extends EverCollector {
+  CountCollector({Key? key, required title, required dataTag})
+      : super(key: key, dataTag: dataTag, title: title);
 
   @override
   _CountCollectorState createState() => _CountCollectorState();
 
-  @override
-  String dataTag;
-  String title;
   int _value = 0;
   @override
   String getDataTag() {
@@ -32,13 +31,20 @@ class _CountCollectorState extends State<CountCollector> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        FloatingActionButton(
-            child: Text('${widget._value}'),
-            onPressed: _incrementCounter,
-            shape: CircleBorder()),
-        Text('${widget.title}')
+        Text('${widget.title} : ${widget._value}'),
+        SizedBox(width: 15),
+        MenuButton(
+          iconSize: 30,
+          padding: 1,
+          extraPadding: 1,
+          onPressed: _incrementCounter,
+          icon: Icon(Icons.add),
+          isPrimary: true,
+        ),
       ],
     );
   }

@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:holding_gesture/holding_gesture.dart';
-import 'package:scouting_application/themes/custom_themes.dart';
 import 'package:scouting_application/widgets/collectors/ever_collector.dart';
 
-class DurationCollector extends StatefulWidget implements EverCollector {
+class DurationCollector extends EverCollector {
   Icon? icon;
   double _duration = 0;
-  @override
-  String dataTag;
 
-  DurationCollector({Key? key, required this.dataTag, this.icon})
-      : super(key: key);
+  DurationCollector({Key? key, required dataTag, required title, this.icon})
+      : super(key: key, dataTag: dataTag, title: title);
   @override
   _DurationCollectorState createState() => _DurationCollectorState();
 
@@ -21,33 +18,42 @@ class DurationCollector extends StatefulWidget implements EverCollector {
 
   @override
   getValue() {
-    return _duration.ceil();
+    return "${_duration.ceil().toString()} sec";
   }
 }
 
 class _DurationCollectorState extends State<DurationCollector> {
   @override
   Widget build(BuildContext context) {
-    return HoldDetector(
-      onHold: _incrementInactiveTime,
-      holdTimeout: Duration(milliseconds: 100),
-      enableHapticFeedback: true,
-      child: CircleAvatar(
-          backgroundColor: CustomTheme.darkTheme.primaryColor,
-          radius: 40,
-          child: Column(
-            children: [
-              FittedBox(
-                child: IconButton(color: Colors.white,
-                    onPressed: () {}, icon: widget.icon ?? Icon(Icons.timer)),
-              ),
-              FittedBox(child: Text('${widget._duration.toStringAsFixed(1)}',style: TextStyle(color: Colors.white)))
-            ],
-          )),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        HoldDetector(
+          onHold: _incrementTime,
+          holdTimeout: Duration(milliseconds: 100),
+          enableHapticFeedback: true,
+          child: CircleAvatar(
+              radius: 40,
+              child: Column(
+                children: [
+                  FittedBox(
+                    child: IconButton(
+                        color: Colors.white,
+                        onPressed: () {},
+                        icon: widget.icon ?? Icon(Icons.timer)),
+                  ),
+                  FittedBox(
+                      child: Text('${widget._duration.toStringAsFixed(1)}',
+                          style: TextStyle(color: Colors.white)))
+                ],
+              )),
+        ),
+      ],
     );
   }
 
-  void _incrementInactiveTime() {
+  void _incrementTime() {
     setState(() {
       widget._duration = (widget._duration + 0.1);
     });

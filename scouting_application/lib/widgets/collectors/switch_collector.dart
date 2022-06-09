@@ -3,14 +3,12 @@ import 'package:flutter_switch/flutter_switch.dart';
 import 'package:scouting_application/themes/custom_themes.dart';
 import 'package:scouting_application/widgets/collectors/ever_collector.dart';
 
-class SwitchCollector extends StatefulWidget implements EverCollector {
-  SwitchCollector({Key? key, required this.title, required this.dataTag})
-      : super(key: key);
+class SwitchCollector extends EverCollector {
+  SwitchCollector({Key? key, required title, required dataTag})
+      : super(key: key, title: title, dataTag: dataTag);
   bool _isSwitched = false;
-  final String title;
   @override
   _SwitchCollectorState createState() => _SwitchCollectorState();
-
   @override
   getValue() {
     return _isSwitched;
@@ -20,16 +18,22 @@ class SwitchCollector extends StatefulWidget implements EverCollector {
   String getDataTag() {
     return dataTag;
   }
-
-  @override
-  String dataTag;
 }
 
 class _SwitchCollectorState extends State<SwitchCollector> {
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        Text(
+          '${widget.title}',
+          textScaleFactor: 2,
+        ),
+        SizedBox(
+          width: 20,
+        ),
         FlutterSwitch(
           width: 100.0,
           height: 55.0,
@@ -47,17 +51,15 @@ class _SwitchCollectorState extends State<SwitchCollector> {
             width: 5.0,
           ),
           activeColor: Color.fromRGBO(107, 181, 46, 0.5),
-          inactiveColor: ThemeProvider().isLightMode?Colors.white: Colors.black,
-           //Colors.white,
+          inactiveColor:
+              ThemeProvider().isLightMode ? Colors.white : Colors.black,
+          //Colors.white,
           onToggle: (val) {
             setState(() {
               widget._isSwitched = val;
             });
           },
         ),
-        Center(
-            child: Text('${widget.title}',
-                style: CustomTheme.darkTheme.textTheme.bodyText1))
       ],
     );
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:scouting_application/screens/scouting/realtime_scouting_lobby.dart';
-import 'package:scouting_application/screens/scouting/scout_general.dart';
-import 'package:scouting_application/screens/scouting/free_scouting_lobby.dart';
+import 'package:scouting_application/classes/global.dart';
+import 'package:scouting_application/screens/scouting/free_scouting.dart';
+import 'package:scouting_application/screens/scouting/realtime_scouting.dart';
 import 'package:scouting_application/widgets/menu_button.dart';
 
 class ScoutingMenu extends StatelessWidget {
@@ -15,41 +15,32 @@ class ScoutingMenu extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                MenuButton(
-                  title: 'Free',
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => FreeScoutingLobby()));
-                  },
-                ),
+                Global.instance.allowFreeScouting
+                    ? MenuButton(
+                        iconSize: MenuButton.MENU_SIZE,
+                        isPrimary: true,
+                        icon: Icon(Icons.free_cancellation),
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => FreeScouting()));
+                        },
+                      )
+                    : Text(""),
                 SizedBox(
-                  height: 5,
-                  width: 5,
+                  height: 30,
                 ),
                 MenuButton(
-                  title: 'Realtime',
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => RealtimeScoutingLobby()));
-                  },
-                ),
-                SizedBox(
-                  height: 5,
-                  width: 5,
-                ),
-                MenuButton(
-                  title: 'general',
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ScoutGeneral()));
-                  },
-                )
+                    iconSize: MenuButton.MENU_SIZE,
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => RealtimeScouting()));
+                    },
+                    isPrimary: !Global.instance.allowFreeScouting,
+                    icon: Icon(Icons.add_task))
               ]),
         ));
   }

@@ -13,13 +13,15 @@ class CustomTheme {
         brightness: Brightness.dark,
         colorScheme: ColorScheme.dark(),
         dividerColor: Colors.white,
-        primaryColor: Color.fromARGB(255, 107, 181, 46),
-        scaffoldBackgroundColor: Colors.black,
-        // fontFamily: ,
-        textTheme: TextTheme(
-            bodyText1: GoogleFonts.roboto(
-                fontWeight: FontWeight.bold)), //ThemeData.dark().textTheme,
-        iconTheme: IconThemeData(color: Colors.white70, opacity: 100),
+        primaryColor: teamColor,
+        scaffoldBackgroundColor: darkTeamColor,
+        appBarTheme: AppBarTheme(
+          color: teamColor,
+          titleTextStyle: GoogleFonts.acme(fontSize: 25),
+        ),
+        iconTheme: IconThemeData(color: teamColor),
+        progressIndicatorTheme: ProgressIndicatorThemeData(
+            linearTrackColor: darkTeamColor, color: lightTeamColor),
         buttonTheme: ButtonThemeData(
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18.0),
@@ -33,19 +35,20 @@ class CustomTheme {
         ));
   }
 
+  static const Color teamColor = Color.fromRGBO(107, 181, 46, 100);
+  static const Color lightTeamColor = Color.fromARGB(255, 199, 233, 171);
+  static const Color darkTeamColor = Color.fromARGB(200, 84, 136, 68);
   static ThemeData get lightTheme {
-    //1
-
     return ThemeData(
         brightness: Brightness.light,
         colorScheme: ColorScheme.light(),
-        primaryColor: Colors.purple,
-        scaffoldBackgroundColor: Colors.white,
-        fontFamily: 'Montserrat', //3
-        textTheme: TextTheme(
-            bodyText1: GoogleFonts.roboto(
-                fontWeight: FontWeight.bold,
-                color: Colors.black)),
+        primaryColor: teamColor,
+        scaffoldBackgroundColor: lightTeamColor,
+        appBarTheme: AppBarTheme(
+            color: teamColor, titleTextStyle: GoogleFonts.acme(fontSize: 25)),
+        iconTheme: IconThemeData(color: teamColor),
+        progressIndicatorTheme: ProgressIndicatorThemeData(
+            linearTrackColor: darkTeamColor, color: lightTeamColor),
         buttonTheme: ButtonThemeData(
           // 4
           shape:

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:scouting_application/screens/scouting/game_manager.dart';
 import 'package:scouting_application/widgets/digit_text_field.dart';
-import 'package:scouting_application/widgets/menu_button.dart';
+import 'package:scouting_application/widgets/menu_text_button.dart';
 import 'package:scouting_application/widgets/show_alert_dialog.dart';
 
-class FreeScoutingLobby extends StatefulWidget {
-  FreeScoutingLobby({Key? key}) : super(key: key);
+class FreeScouting extends StatefulWidget {
+  FreeScouting({Key? key}) : super(key: key);
 
   @override
-  _FreeScoutingLobbyState createState() => _FreeScoutingLobbyState();
+  _FreeScoutingState createState() => _FreeScoutingState();
 }
 
-class _FreeScoutingLobbyState extends State<FreeScoutingLobby> {
+class _FreeScoutingState extends State<FreeScouting> {
   final matchNumberController = TextEditingController();
   final teamNumberController = TextEditingController();
   List<bool> isSelected = [true, false];
@@ -60,8 +60,8 @@ class _FreeScoutingLobbyState extends State<FreeScoutingLobby> {
                 },
                 isSelected: isSelected,
               ),
-              MenuButton(
-                  title: 'Start',
+              SizedBox(height: 15),
+              MenuTextButton(
                   onPressed: () {
                     if (teamNumberController.text.length < 4 ||
                         matchNumberController.text.isEmpty) {
@@ -83,7 +83,8 @@ class _FreeScoutingLobbyState extends State<FreeScoutingLobby> {
                                   teamNumber: teamID,
                                   isBlueAll: isSelected[0],
                                 )));
-                  })
+                  },
+                  text: "Start")
             ],
           ),
         ));
