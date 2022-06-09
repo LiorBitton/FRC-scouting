@@ -72,11 +72,9 @@ class _EditTabState extends State<EditTab> {
 
   void _handleSave() {
     List<String> tabLayout = [];
-    print(_collectors);
     for (int i = 0; i < _collectors.length; ++i) {
       tabLayout.add(_collectors[i].toString());
     }
-    print(tabLayout);
     Database.instance.setTabLayout(widget.tabName, tabLayout);
   }
 
@@ -86,12 +84,9 @@ class _EditTabState extends State<EditTab> {
                 builder: (context) => CollectorCreator(
                     senderTag: widget.tabName.substring(0, 2).toLowerCase()))))
         as EverCollector?;
-    print(newWidget.toString());
     if (newWidget != null)
       setState(() {
         _collectors.add(newWidget);
-        print(_collectors);
-        print("added to collectors");
       });
   }
 }

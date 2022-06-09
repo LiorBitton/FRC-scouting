@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:scouting_application/classes/database.dart';
@@ -164,12 +165,14 @@ class _HomepageState extends State<Homepage> {
     try {
       tabs = await Database.instance.getTabLayout();
       saveTabsToLocal(tabs);
-    } catch (e) {
+    } catch (e, stackTrace) {
       print(e);
+      FirebaseCrashlytics.instance.recordError(e, stackTrace);
       try {
         tabs = await getTabsFromLocal();
-      } catch (e) {
+      } catch (e, stackTrace) {
         print(e);
+        FirebaseCrashlytics.instance.recordError(e, stackTrace);
       }
     }
     if (tabs.isNotEmpty) {
@@ -182,7 +185,7 @@ class _HomepageState extends State<Homepage> {
       Global.instance.generalCollectors =
           tabs["General"]!.map((e) => e.toString()).toList();
     } else {
-      SnackBar(content: Text("Could not find scouting req on device"));
+      SnackBar(content: Text("Could not find scouting req on device"));//TODO
     }
     return true;
   }
