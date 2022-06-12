@@ -39,6 +39,29 @@ class TBAClient {
 
   ///Get a list of the israeli district events
   ///returns a map with the event key as the key and event's name as the value
+  Future<Map<String, String>> fetchEverGreensEvents() async {
+    int year = new DateTime.now().year;
+    var url = Uri.parse(
+        'https://www.thebluealliance.com/api/v3/team/frc7112/events/$year/simple');
+    try {
+      final response = await http.get(url, headers: _headers);
+      Map<String, String> events = {};
+      if (response.statusCode == 200) {
+        List<dynamic> res = jsonDecode(response.body);
+        for (var event in res) {
+          String name = (event as Map<String, dynamic>)['name'];
+          String key = event['key'];
+          events[key] = name;
+        }
+      }
+      return events;
+    } catch (e) {
+      print(e);
+      FirebaseCrashlytics.instance.log("Failed to fetch Evergreens events");
+      return {};
+    }
+  }
+
   Future<Map<String, String>> fetchIsraelEvents() async {
     int year = new DateTime.now().year;
     var url = Uri.parse(
@@ -56,7 +79,8 @@ class TBAClient {
       }
       return events;
     } catch (e) {
-      FirebaseCrashlytics.instance.log("Failed to fetch Israeli events");
+      print(e);
+      FirebaseCrashlytics.instance.log("Failed to fetch Evergreens events");
       return {};
     }
   }

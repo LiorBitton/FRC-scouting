@@ -1,4 +1,3 @@
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/classes/global.dart';
@@ -9,7 +8,6 @@ import 'package:scouting_application/screens/admin/new_season_lobby.dart';
 import 'package:scouting_application/themes/custom_themes.dart';
 import 'package:settings_ui/settings_ui.dart';
 
-//TODO use TeamData[] instead of teams[]
 class AdminSettings extends StatefulWidget {
   AdminSettings({Key? key}) : super(key: key);
 
@@ -19,7 +17,7 @@ class AdminSettings extends StatefulWidget {
 
 class _AdminSettingsState extends State<AdminSettings> {
   String currentEventKey = Global.instance.currentEventKey;
-  String currentEventName = "";
+  String currentEventName = Global.instance.currentEventName;
 
   ///key = event key; value = event name
   Map<String, String> events = {};
@@ -30,14 +28,6 @@ class _AdminSettingsState extends State<AdminSettings> {
   void initState() {
     super.initState();
     futureEvents = buildEventsDropdownList();
-  }
-
-  void addAdmin(String email) async {
-    DatabaseReference ref = FirebaseDatabase.instance.ref('settings/admins');
-    DataSnapshot data = await ref.get();
-    List<dynamic> admins = (data.value as List).toList();
-    admins.add(email);
-    ref.set(admins);
   }
 
   @override
@@ -71,9 +61,10 @@ class _AdminSettingsState extends State<AdminSettings> {
                         onChanged: (val) {
                           setState(() {
                             currentEventKey = val.toString();
-                            currentEventName = events[currentEventKey] ?? "";
+                            currentEventName =
+                                events[currentEventKey] ?? "Unknown";
                           });
-                          _saveValues();
+                          _saveSelectedEvent();
                         });
                   } else if (snapshot.hasError) {}
                   return const CircularProgressIndicator();
@@ -81,40 +72,32 @@ class _AdminSettingsState extends State<AdminSettings> {
               ),
             ),
             SettingsTile(
-                title: Text("Show Data From"),
-                description: Text("Choose events to show data from."),
-                leading: Icon(Icons.leaderboard),
+                title: const Text("Show Data From"),
+                description: const Text("Choose events to show data from."),
+                leading: const Icon(Icons.leaderboard),
                 onPressed: (_) {
                   setState(() {
                     _handleChooseEvents();
                   });
                 }),
             SettingsTile.switchTile(
-              leading: Icon(Icons.event_available),
+              leading: const Icon(Icons.event_available),
               initialValue: _allowFreeScouting,
               activeSwitchColor: CustomTheme.teamColor,
               onToggle: (val) {
                 setState(() {
                   _allowFreeScouting = val;
                 });
-                _saveValues();
+                _saveAllowFreeScouting();
               },
               title: Text("Allow Free Scouting"),
               description: Text("Use this if TBA has match schedule problems."),
             )
           ]),
-          SettingsSection(title: Text("Database"), tiles: [
+          SettingsSection(title: const Text("Database"), tiles: [
             SettingsTile(
-                title: Text("Remove Teams"),
-                description: Text("Erase team's data."),
-                leading: Icon(Icons.delete_sweep),
-                onPressed: (_) {
-                  // List<String> teamsToRemove = selectTeams();
-                  // removeFromDatabase(teamsToRemove); TODO
-                }),
-            SettingsTile(
-                title: Text("Block Teams"),
-                description: Text("Hide specific teams from scouters."),
+                title: const Text("Block Teams"),
+                description: const Text("Hide specific teams from scouters."),
                 leading: Icon(Icons.block),
                 onPressed: (_) {
                   setState(() {
@@ -140,20 +123,21 @@ class _AdminSettingsState extends State<AdminSettings> {
     );
   }
 
-  void _saveValues() {
-    Database.instance
-        .setCurrentEvent(key: currentEventKey, name: currentEventName);
+  void _saveAllowFreeScouting() {
     Database.instance.setAllowFreeScouting(_allowFreeScouting);
-    Global.instance.currentEventKey = currentEventKey;
-    Global.instance.currentEventName = currentEventName;
     Global.instance.allowFreeScouting = _allowFreeScouting;
   }
 
-  void removeFromDatabase(List<String> teams) {
-    //todo implement
+  void _saveSelectedEvent() {
+    Database.instance
+        .setCurrentEvent(key: currentEventKey, name: currentEventName);
+    Global.instance.currentEventKey = currentEventKey;
+    Global.instance.currentEventName = currentEventName;
   }
+
   void _handleChooseEvents() async {
-    Map<String, String> events = await TBAClient.instance.fetchIsraelEvents();
+    Map<String, String> events =
+        await TBAClient.instance.fetchEverGreensEvents();
     events.remove(Global.instance.currentEventKey);
     final Map<String, String> alreadySelected =
         await Database.instance.getSelectedEvents();
@@ -172,8 +156,14 @@ class _AdminSettingsState extends State<AdminSettings> {
     );
   }
 
+  Future<Map<String, String>> getRelevantEvents() async {
+    Map<String, String> out = await TBAClient.instance.fetchEverGreensEvents();
+    out.addAll(await TBAClient.instance.fetchIsraelEvents());
+    return out;
+  }
+
   Future<List<DropdownMenuItem<String>>> buildEventsDropdownList() async {
-    events = await TBAClient.instance.fetchIsraelEvents();
+    events = await getRelevantEvents();
     List<DropdownMenuItem<String>> out = [];
 
     for (var eventKey in events.keys) {
@@ -218,7 +208,7 @@ class _AdminSettingsState extends State<AdminSettings> {
                 icon: Icon(Icons.check),
                 onPressed: () {
                   setState(() {
-                    addAdmin(_emailValue);
+                    Database.instance.addAdmin(_emailValue);
                     Navigator.pop(context);
                   });
                 },

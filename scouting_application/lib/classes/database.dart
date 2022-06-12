@@ -216,18 +216,12 @@ class Database {
     return tabs;
   }
 
-  Future<int> getLastTabsUpdate() async {
-    DataSnapshot snapshot = await db
-        .ref("settings/tabs/last_update")
-        .get()
-        .timeout(Duration(seconds: TIMEOUT_TIME));
-    if (!snapshot.exists) {
-      return 0;
-    }
-    return snapshot.value as int;
-  }
-
-  void setLastTabsUpdate(int millisecondsSinceEpoch) {
-    db.ref("settings/tabs/last_update").set(millisecondsSinceEpoch);
+  void addAdmin(String email) async {
+    DatabaseReference ref = FirebaseDatabase.instance.ref('settings/admins');
+    DataSnapshot data =
+        await ref.get().timeout(Duration(seconds: TIMEOUT_TIME));
+    List<dynamic> admins = (data.value as List).toList();
+    admins.add(email);
+    ref.set(admins).timeout(Duration(seconds: TIMEOUT_TIME));
   }
 }
