@@ -49,7 +49,7 @@ class _StatsLobbyState extends State<StatsLobby> {
                         onPressed: () {
                           showSearch(
                               context: context,
-                              delegate: TeamSearchDelegate(teams),
+                              delegate: TeamSearchDelegate(teamData),
                               useRootNavigator: true);
                         },
                         icon: Icon(Icons.search));
@@ -68,8 +68,8 @@ class _StatsLobbyState extends State<StatsLobby> {
                         future: readyForStart,
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
-                            return LinearProgressIndicator(
-                              value: progress / target,
+                            return Center(
+                              child: CircularProgressIndicator(),
                             );
                           } else {
                             return ListView.separated(

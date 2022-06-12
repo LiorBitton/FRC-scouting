@@ -1,11 +1,31 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:scouting_application/classes/team_data.dart';
 import 'package:scouting_application/screens/stats/team_homepage.dart';
 
 class TeamSearchDelegate extends SearchDelegate {
-  List<String> searchTerms = ['dog', 'food'];
-  TeamSearchDelegate(List<String> searchList) {
-    this.searchTerms = searchList;
+  Map<String, TeamData> searchTerms = {};
+  TeamSearchDelegate(Map<String, TeamData> searchMap) {
+    this.searchTerms = searchMap;
   }
+
+  List<String> getQueryResult() {
+    List<String> matchQuery = [];
+    for (var item in searchTerms.keys) {
+      if (item.toLowerCase().contains(query.toLowerCase())) {
+        matchQuery.add(item);
+      }
+    }
+    for (MapEntry<String, String> item
+        in searchTerms.map((key, value) => MapEntry(value.name, key)).entries) {
+      if (item.key.toLowerCase().contains(query.toLowerCase())) {
+        matchQuery.add(item.value);
+      }
+    }
+    return matchQuery;
+  }
+
   @override
   List<Widget> buildActions(BuildContext context) {
     return [
@@ -29,44 +49,64 @@ class TeamSearchDelegate extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    List<String> matchQuery = [];
-    for (var item in searchTerms) {
-      if (item.toLowerCase().contains(query.toLowerCase())) {
-        matchQuery.add(item);
-      }
-    }
+    List<String> matchQuery = getQueryResult();
     return ListView.builder(
         itemCount: matchQuery.length,
         itemBuilder: (context, index) {
-          var res = matchQuery[index];
-          return ListTile(title: Text(res));
+          var teamNum = matchQuery[index];
+          final teamData = searchTerms[teamNum]!;
+          final teamAvatar = imageFromBase64String(teamData.avatar);
+          final String teamName = teamData.getName();
+          return ListTile(
+            title: Text(teamNum),
+            subtitle: Text(teamName),
+            leading: teamAvatar ?? Icon(Icons.people),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => TeamHomepage(
+                          teamNumber: teamNum,
+                          teamName: teamName,
+                          teamAvatar: teamAvatar)));
+            },
+          );
         });
+  }
+
+  Image? imageFromBase64String(String base64String) {
+    try {
+      if (base64String == "none") return null;
+      return Image.memory(base64Decode(base64String));
+    } catch (e) {
+      return null;
+    }
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    List<String> matchQuery = [];
-    for (var item in searchTerms) {
-      if (item.toLowerCase().contains(query.toLowerCase())) {
-        matchQuery.add(item);
-      }
-    }
+    List<String> matchQuery = getQueryResult();
     return ListView.builder(
         itemCount: matchQuery.length,
         itemBuilder: (context, index) {
-          var team = matchQuery[index];
+          var teamNum = matchQuery[index];
+          final teamData = searchTerms[teamNum]!;
+          final teamAvatar = imageFromBase64String(teamData.avatar);
+          final String teamName = teamData.getName();
           return ListTile(
-              title: Text(team),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => TeamHomepage(
-                              teamNumber: team,
-                              teamAvatar: null,
-                              teamName: "", //todo
-                            )));
-              });
+            title: Text(teamNum),
+            subtitle: Text(teamName),
+            leading: teamAvatar ?? Icon(Icons.people),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => TeamHomepage(
+                          teamNumber: teamNum,
+                          teamName: teamName,
+                          teamAvatar: teamAvatar)));
+            },
+          );
         });
   }
 }
