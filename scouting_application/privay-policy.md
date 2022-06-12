@@ -1,4 +1,4 @@
-#EverScout: Privacy policy
+# EverScout: Privacy policy
 
 This is an open source Android app developed by Lior Bitton. The source code is available on GitHub under the MIT license; the app is also available on Google Play.
 
