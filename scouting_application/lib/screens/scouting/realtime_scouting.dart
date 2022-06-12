@@ -32,7 +32,7 @@ class _RealtimeScoutingState extends State<RealtimeScouting> {
     return Scaffold(
         body: CustomScrollView(slivers: [
       SliverAppBar(
-          title: Text(Global.instance.currentEventName),
+          title: Text(Global.instance.currentEventName.replaceAll("FIRST", "")),
           floating: true,
           stretch: true),
       StreamBuilder<dynamic>(

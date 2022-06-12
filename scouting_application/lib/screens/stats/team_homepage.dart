@@ -4,7 +4,9 @@ import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/screens/stats/team_events.dart';
 import 'package:scouting_application/screens/stats/team_games.dart';
 import 'package:scouting_application/screens/stats/team_photo_gallery.dart';
+import 'package:scouting_application/widgets/menu_button.dart';
 
+// ignore: must_be_immutable
 class TeamHomepage extends StatelessWidget {
   TeamHomepage(
       {Key? key,
@@ -15,13 +17,14 @@ class TeamHomepage extends StatelessWidget {
   final String teamNumber;
   final String teamName;
   final Widget? teamAvatar;
+  Map<String, String> events = {};
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: Text("Team $teamNumber")),
         body: Center(
             child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             SizedBox(height: 20),
             Wrap(
@@ -38,48 +41,63 @@ class TeamHomepage extends StatelessWidget {
                 )
               ],
             ),
-            IconButton(
-                icon: Icon(Icons.image_search),
-                iconSize: 50,
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => TeamPhotoGallery(
-                                teamNumber: teamNumber,
-                              )));
-                }),
+            SizedBox(height: 100),
             FutureBuilder(
-                future: skipTeamsEventsScreen(),
+                future: loadTeamsValidEvents(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return CircularProgressIndicator();
                   }
                   List<dynamic> res = snapshot.data as List<dynamic>;
-                  return IconButton(
-                      icon: Icon(Icons.checklist),
-                      iconSize: 50,
-                      onPressed: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) {
-                          return res[0] as bool
-                              ? TeamGames(teamID: teamNumber, eventKey: res[1])
-                              : TeamEvents(
-                                  teamID: teamNumber,
-                                );
-                        }));
-                      });
+                  return MenuButton(
+                    icon: Icon(Icons.checklist),
+                    iconSize: 50,
+                    onPressed: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return res[0] as bool
+                            ? TeamGames(teamID: teamNumber, eventKey: res[1])
+                            : TeamEvents(
+                                teamID: teamNumber,
+                                events: events,
+                              );
+                      }));
+                    },
+                    isPrimary: false,
+                  );
                 }),
+            SizedBox(height: 40),
+            MenuButton(
+              icon: Icon(Icons.image_search),
+              iconSize: 50,
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => TeamPhotoGallery(
+                              teamNumber: teamNumber,
+                            )));
+              },
+              isPrimary: false,
+            ),
           ],
         )));
   }
 
-  Future<List<dynamic>> skipTeamsEventsScreen() async {
-    Map<String, String> selectedEvents =
+  Future<List<dynamic>> loadTeamsValidEvents() async {
+    final Map<String, String> selectedEvents =
         await Database.instance.getSelectedEvents();
-
-    bool skip = selectedEvents.length == 1;
-    String key = selectedEvents.keys.first;
+    List<String> recordedEvents =
+        await Database.instance.getTeamsRecordedEventsKeys(teamNumber);
+    Map<String, String> validEvents = {};
+    for (String eventKey in recordedEvents) {
+      if (selectedEvents.keys.contains(eventKey)) {
+        validEvents.putIfAbsent(eventKey, () => selectedEvents[eventKey]!);
+      }
+    }
+    events = validEvents;
+    bool skip = validEvents.length == 1;
+    String key = validEvents.keys.first;
     return [skip, key];
   }
 }

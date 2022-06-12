@@ -91,7 +91,7 @@ class Database {
   }
 
   Future<bool> teamHasGames(String teamID, String eventKey) async {
-    final teamGamesRef = db.ref("teams/${int.parse(teamID)}/events/$eventKey");
+    final teamGamesRef = db.ref("teams/$teamID/events/$eventKey");
     bool exists = await teamGamesRef.once().then((value) {
       return value.snapshot.exists;
     });

@@ -79,7 +79,8 @@ class _TeamGamesState extends State<TeamGames> {
                                           },
                                         )
                                       : Text(""),
-                                  title: Text(gameKey),
+                                  title: Text(gameKeyToTitle(gameKey)),
+                                  subtitle: Text(gameKey),
                                   onTap: () {
                                     Navigator.push(
                                         context,
@@ -107,6 +108,24 @@ class _TeamGamesState extends State<TeamGames> {
         },
       ),
     );
+  }
+
+  String gameKeyToTitle(String gameKey) {
+    String matchNumber = gameKey.substring(gameKey.lastIndexOf("m") + 1);
+    if (gameKey.startsWith("qm")) {
+      return "Qualification $matchNumber";
+    }
+    if (gameKey.startsWith("f")) {
+      return "Final $matchNumber";
+    }
+    String setNumber = gameKey.characters.elementAt(2);
+    if (gameKey.startsWith("qf")) {
+      return "Quarterfinal $setNumber-$matchNumber";
+    }
+    if (gameKey.startsWith("sf")) {
+      return "Semifinal $setNumber-$matchNumber";
+    }
+    return " tah";
   }
 
   void handleDeleteGame(String teamKey, String gameKey) {
