@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/screens/stats/team_games.dart';
 import 'package:scouting_application/themes/custom_themes.dart';
 
@@ -10,6 +11,9 @@ class TeamEvents extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    for (String event in events.keys) {
+      Database.instance.updateEventConsistency(teamID, event);
+    }
     return Scaffold(
         appBar: AppBar(title: Text("Team $teamID Events")),
         body: ListView.separated(

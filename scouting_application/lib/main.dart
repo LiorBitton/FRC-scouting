@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:scouting_application/screens/login_page.dart';
+import 'package:scouting_application/screens/homepage.dart';
 import 'package:scouting_application/themes/custom_themes.dart';
 
 Future<void> main() async {
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
       title: 'EverScout',
       themeMode: ThemeMode.system,
       theme: CustomTheme.lightTheme,
-      home: LoginPage(),
+      home: Homepage(),
       darkTheme: CustomTheme.darkTheme,
     );
   }

@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:camera/camera.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:scouting_application/classes/secret_constants.dart';
 
 class Database {
   final FirebaseDatabase db = FirebaseDatabase.instance;
@@ -87,11 +89,11 @@ class Database {
   }
 
   void deleteGame(String teamKey, String gameKey, String eventKey) {
-    db.ref("teams/$teamKey/events/$eventKey/$gameKey").remove();
+    db.ref("teams/$teamKey/events/$eventKey/gms/$gameKey").remove();
   }
 
   Future<bool> teamHasGames(String teamID, String eventKey) async {
-    final teamGamesRef = db.ref("teams/$teamID/events/$eventKey");
+    final teamGamesRef = db.ref("teams/$teamID/events/$eventKey/gms");
     bool exists = await teamGamesRef.once().then((value) {
       return value.snapshot.exists;
     });
@@ -100,7 +102,7 @@ class Database {
 
   Stream<Map<String, dynamic>> getTeamGamesStream(
       String teamID, String eventKey) {
-    final teamGamesRef = db.ref("teams/$teamID/events/$eventKey");
+    final teamGamesRef = db.ref("teams/$teamID/events/$eventKey/gms");
     final teamGamesStream = teamGamesRef.onValue;
 
     if (teamGamesRef.path.isEmpty) {
@@ -182,7 +184,8 @@ class Database {
       final String downloadUrl = await snapshot.ref.getDownloadURL();
       final ref = FirebaseDatabase.instance.ref();
       final imageRef = ref.child('teams/${int.parse(teamID)}/images').push();
-      imageRef.set(downloadUrl);
+      imageRef.set(
+          downloadUrl.replaceAll(SecretConstants.TEAM_PHOTO_URL_PREFIX, ""));
     }
   }
 
@@ -223,5 +226,105 @@ class Database {
     List<dynamic> admins = (data.value as List).toList();
     admins.add(email);
     ref.set(admins).timeout(Duration(seconds: TIMEOUT_TIME));
+  }
+
+  Future<Map<String, dynamic>> getEventConsistency(
+      String teamID, String eventKey) async {
+    final DataSnapshot data = await db
+        .ref("teams/${int.parse(teamID)}/events/$eventKey/SD")
+        .get()
+        .timeout(Duration(seconds: TIMEOUT_TIME));
+    if (data.exists) {
+      return Map<String, dynamic>.from(data.value as Map<dynamic, dynamic>);
+    } else {
+      return {};
+    }
+  }
+
+  Future<Map<String, dynamic>> getEventAvgs(
+      String teamID, String eventKey) async {
+    final DataSnapshot data = await db
+        .ref("teams/${int.parse(teamID)}/events/$eventKey/avg")
+        .get()
+        .timeout(Duration(seconds: TIMEOUT_TIME));
+    if (data.exists) {
+      return Map<String, dynamic>.from(data.value as Map<dynamic, dynamic>);
+    } else {
+      return {};
+    }
+  }
+
+  ///Recalculates averages and standard deviation for all of the values
+  /// gathered in each game.
+  ///
+  /// The new values are uploaded to the database.
+  Future<void> updateEventConsistency(String teamID, String eventKey) async {
+    final Map<String, dynamic> games = Map<String, dynamic>.from(
+        (await db.ref("teams/${int.parse(teamID)}/events/$eventKey/gms").get())
+            .value as Map<dynamic, dynamic>);
+    final int gamesAmount = games.length;
+    if (gamesAmount < 2) return;
+    Map<String, num> avgs = _getGamesAvgs(games);
+    db
+        .ref("teams/${int.parse(teamID)}/events/$eventKey/avg")
+        .set(avgs.map((key, value) => MapEntry(key, value.toStringAsFixed(3))));
+
+    //calculate the sum of each value minus its mean squared and store in standardDeviation Map
+    //key : sum of (value - mean)^2
+    Map<String, num> standardDeviation = {};
+    for (final dynamic val in games.values) {
+      Map<String, dynamic> game = Map<String, dynamic>.from(val);
+      for (MapEntry<String, dynamic> entry in game.entries) {
+        num entryVal = 0;
+        if (entry.value.runtimeType == String) {
+          String stringVal = (entry.value as String);
+          if (stringVal.contains("sec")) {
+            entryVal = double.parse(stringVal.replaceAll(" sec", ""));
+          } else {
+            continue;
+          }
+        } else if (entry.value.runtimeType == bool) {
+          entryVal = entry.value ? 1 : 0;
+        } else {
+          entryVal = entry.value;
+        }
+        num value = pow(entryVal - avgs[entry.key]!, 2);
+        standardDeviation[entry.key] =
+            standardDeviation[entry.key] ?? 0 + value;
+      }
+    }
+    //calculate the standard deviation for each key
+    Map<String, String> out = {};
+    for (MapEntry<String, num> sum in standardDeviation.entries) {
+      out[sum.key] = sqrt(sum.value / gamesAmount).toStringAsFixed(3);
+    }
+    db.ref("teams/${int.parse(teamID)}/events/$eventKey/SD").set(out);
+  }
+
+  Map<String, num> _getGamesAvgs(Map<String, dynamic> games) {
+    Map<String, num> sums = {};
+    //Calculate the Mean of each of the values recorded for each game
+    for (final dynamic val in games.values) {
+      Map<String, dynamic> game = Map<String, dynamic>.from(val);
+      for (MapEntry<String, dynamic> entry in game.entries) {
+        num value = 0;
+        if (entry.value.runtimeType == String) {
+          String stringVal = (entry.value as String);
+          if (stringVal.contains("sec")) {
+            value = double.parse(stringVal.replaceAll(" sec", ""));
+          } else {
+            continue;
+          }
+        } else if (entry.value.runtimeType == bool) {
+          value = entry.value ? 1 : 0;
+        } else {
+          value = entry.value;
+        }
+        sums[entry.key] = (sums[entry.key] ?? 0) + value;
+      }
+    }
+    //turn sums map into averages map key:averageValue
+    sums.forEach((key, value) => sums[key] = value / games.length);
+    return sums;
   }
 }

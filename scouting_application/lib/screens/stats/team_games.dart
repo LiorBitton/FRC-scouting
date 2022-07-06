@@ -15,6 +15,19 @@ class TeamGames extends StatefulWidget {
 
 class _TeamGamesState extends State<TeamGames> {
   late List<Map<String, dynamic>> games;
+  Map<String, String> consistency = {};
+  @override
+  void initState() {
+    asyncInit();
+    super.initState();
+  }
+
+  void asyncInit() async {
+    consistency = await Database.instance
+        .getEventConsistency(widget.teamID, widget.eventKey)
+        .then((value) => Map<String, String>.from(value));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,6 +99,7 @@ class _TeamGamesState extends State<TeamGames> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) => GameData(
+                                                consistency: consistency,
                                                 teamID: widget.teamID,
                                                 data: Map<String, dynamic>.from(
                                                     (games[gameKey] as Map<

@@ -3,31 +3,38 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:scouting_application/themes/custom_themes.dart';
 
 class GameData extends StatelessWidget {
-  const GameData({Key? key, required this.teamID, required this.data})
+  const GameData(
+      {Key? key,
+      required this.teamID,
+      required this.data,
+      required this.consistency})
       : super(key: key);
   final String teamID;
   final Map<String, dynamic> data;
-  @override //todo generic display for data
+  final Map<String, dynamic> consistency;
+  @override
   Widget build(BuildContext context) {
     final List<String> dataKeys = data.keys.toList();
-    List<String> autoKeys = [];
-    List<String> teleKeys = [];
-    List<String> endKeys = [];
-    List<String> genKeys = [];
+    List<Map<String, String?>> autoKeys = [];
+    List<Map<String, String?>> teleKeys = [];
+    List<Map<String, String?>> endKeys = [];
+    List<Map<String, String?>> genKeys = [];
     for (String key in dataKeys) {
-      String valName = key.split("_")[1];
+      final String valName = key.split("_")[1];
+      final String dataToShow = "$valName : ${data[key]}";
+      final Map<String, String?> keyData = {dataToShow: consistency[key]};
       switch (key.substring(0, 2)) {
         case "au":
-          autoKeys.add("$valName : ${data[key]}");
+          autoKeys.add(keyData);
           break;
         case "te":
-          teleKeys.add("$valName : ${data[key]}");
+          teleKeys.add(keyData);
           break;
         case "en":
-          endKeys.add("$valName : ${data[key]}");
+          endKeys.add(keyData);
           break;
         case "ge":
-          genKeys.add("$valName : ${data[key]}");
+          genKeys.add(keyData);
           break;
       }
     }
@@ -51,7 +58,7 @@ class CategoryList extends StatelessWidget {
     required this.title,
   }) : super(key: key);
   final String title;
-  final List<String> data;
+  final List<Map<String, String?>> data;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -73,15 +80,20 @@ class CategoryList extends StatelessWidget {
             )
           ]),
         ),
-        for (String item in data)
+        for (Map<String, String?> item in data)
           Wrap(children: [
             Row(
               children: [
                 SizedBox(width: 10),
                 Text(
-                  item,
+                  item.keys.first,
                   textScaleFactor: 1.2,
                 ),
+                Spacer(),
+                Text(item.values.first ?? ""),
+                SizedBox(
+                  width: 10,
+                )
               ],
             ),
             const Divider(

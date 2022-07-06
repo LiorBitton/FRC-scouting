@@ -152,7 +152,8 @@ class _HomepageState extends State<Homepage> {
     Map<String, List<dynamic>> tabs = {};
     try {
       Global.instance.fromJson(await Database.instance.getSettings());
-      Global.instance.setIsAdmin(await isAdmin());
+      // Global.instance.setIsAdmin(await isAdmin());
+      Global.instance.setIsAdmin(false);
     } catch (e) {
       print(e);
       Global.instance.allowFreeScouting = true;
@@ -185,7 +186,7 @@ class _HomepageState extends State<Homepage> {
       Global.instance.generalCollectors =
           tabs["General"]!.map((e) => e.toString()).toList();
     } else {
-      SnackBar(content: Text("Could not find scouting req on device"));//TODO
+      SnackBar(content: Text("Could not find scouting req on device")); //TODO
     }
     return true;
   }

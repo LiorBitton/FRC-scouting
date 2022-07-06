@@ -78,6 +78,7 @@ class GameManager extends StatefulWidget {
             .child('teams')
             .child('$teamID/events')
             .child(Global.instance.currentEventKey)
+            .child("gms")
             .child('$matchID');
         //limit connection to an 8 seconds trial, else show QR
         await dest.set(data).then((value) {
