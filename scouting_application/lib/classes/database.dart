@@ -8,11 +8,12 @@ import 'package:scouting_application/classes/secret_constants.dart';
 
 class Database {
   final FirebaseDatabase db = FirebaseDatabase.instance;
-  Database._privateConstructor();
   static const int TIMEOUT_TIME = 5;
   static final Database _instance = Database._privateConstructor();
-
   static Database get instance => _instance;
+  Database._privateConstructor();
+//#region Settings
+  ///Set current event to scout in.
   void setCurrentEvent({required String key, String name = "none"}) {
     if (name == "none") {
       name = key;
@@ -22,21 +23,7 @@ class Database {
     db.ref("settings/data_from_events").update({key: name});
   }
 
-  Future<List<String>> getTeamsRecordedEventsKeys(String teamID) async {
-    try {
-      List<String> out = Map<String, dynamic>.from(
-              (await db.ref("teams/${int.parse(teamID)}/events").get()).value
-                  as Map<dynamic, dynamic>)
-          .keys
-          .toList();
-      print(out);
-      return out;
-    } catch (e) {
-      print(e);
-      return [];
-    }
-  }
-
+  ///Sets the passed team numbers as non - scoutable.
   void blockTeamsFromScouting(List<String> teams) async {
     DatabaseReference ref = db.ref("settings/blocked_teams");
     try {
@@ -45,6 +32,7 @@ class Database {
     await ref.set(teams);
   }
 
+  ///Returns a list of teams that were marked as blocked by an admin.
   Future<List<String>> fetchBlockedTeams() async {
     final blockedTeamsRef = db.ref('settings/blocked_teams');
     blockedTeamsRef.keepSynced(true);
@@ -61,6 +49,106 @@ class Database {
     return blockedList;
   }
 
+  ///Sets whether free scouting is allowed for all users.
+  void setAllowFreeScouting(bool allow) {
+    db.ref('settings/allow_free_scouting').set(allow);
+  }
+
+  ///Get events that were selected by an admin to show data in stats screens
+  ///
+  ///returns a map key = eventKey;value = eventName;
+  Future<Map<String, String>> getSelectedEvents() async {
+    final ref = db.ref("settings/data_from_events");
+    try {
+      Map<String, String> events = Map<String, String>.from(
+          (await ref.get()).value as Map<dynamic, dynamic>);
+      return events;
+    } catch (e) {
+      print(e);
+      return {};
+    }
+  }
+
+  ///Sets the events from which data will be shown in stats screens.
+  void selectEvents(Map<String, String> events) {
+    db.ref("settings/data_from_events").set(events);
+  }
+
+  ///Sets tab layout for the specified tab name
+  void setTabLayout(String tabName, List<String> tabLayout) {
+    db.ref("settings/tabs/$tabName").set(tabLayout);
+  }
+
+  ///Returns the tab layout as saved in the database.
+  Future<Map<String, List<dynamic>>> getTabLayout() async {
+    DataSnapshot snapshot = await db
+        .ref("settings/tabs")
+        .get()
+        .timeout(Duration(seconds: TIMEOUT_TIME));
+    if (!snapshot.exists) {
+      return {};
+    }
+    Map<String, List<dynamic>> tabs = Map<String, List<dynamic>>.from(
+        snapshot.value as Map<dynamic, dynamic>);
+    return tabs;
+  }
+
+  ///Checks if a user is an admin, returns true/false correspondingly.
+  Future<bool> isAdmin(String email) async {
+    DataSnapshot val = await db
+        .ref('settings/admins')
+        .get()
+        .timeout(Duration(seconds: TIMEOUT_TIME));
+    return (val.value as List<Object?>).contains(email);
+  }
+
+  ///Adds admin by email, no checks are done on the String passed.
+  void addAdmin(String email) async {
+    DatabaseReference ref = FirebaseDatabase.instance.ref('settings/admins');
+    DataSnapshot data =
+        await ref.get().timeout(Duration(seconds: TIMEOUT_TIME));
+    List<dynamic> admins = (data.value as List).toList();
+    admins.add(email);
+    ref.set(admins).timeout(Duration(seconds: TIMEOUT_TIME));
+  }
+
+  ///Returns the settings from the database, If the settings don't exist, it creates default settings.
+  Future<Map<String, dynamic>> getSettings() async {
+    final DatabaseReference ref = db.ref("settings");
+    final DataSnapshot snapshot =
+        await ref.get().timeout(Duration(seconds: TIMEOUT_TIME));
+    if (snapshot.exists) {
+      return Map<String, dynamic>.from(snapshot.value as Map<dynamic, dynamic>);
+    } else {
+      Map<String, dynamic> defaultSettings = {
+        "admins": ["liorb5000@gmail.com"],
+        "allow_free_scouting": false,
+        "current_event": {"key": "none", "name": "none"},
+        "data_from_events": {}
+      };
+      ref.set(defaultSettings);
+      return defaultSettings;
+    }
+  }
+
+//#endregion
+//#region Teams&Games
+  ///Returns the keys of the events that exist for the specified team.
+  Future<List<String>> getTeamsRecordedEventsKeys(String teamID) async {
+    try {
+      List<String> out = Map<String, dynamic>.from(
+              (await db.ref("teams/${int.parse(teamID)}/events").get()).value
+                  as Map<dynamic, dynamic>)
+          .keys
+          .toList();
+      return out;
+    } catch (e) {
+      print(e);
+      return [];
+    }
+  }
+
+  ///Returns a stream of the teams that are being scouted at the moment.
   Stream<List<String>> getScoutedTeamsStream() {
     final scoutedTeamsRef = db.ref("sync/currently_scouted");
     final scoutedTeamsStream = scoutedTeamsRef.onValue;
@@ -76,22 +164,12 @@ class Database {
     return outStream;
   }
 
-  void setAllowFreeScouting(bool allow) {
-    db.ref('settings/allow_free_scouting').set(allow);
-  }
-
-  Future<bool> isAdmin(String email) async {
-    DataSnapshot val = await db
-        .ref('settings/admins')
-        .get()
-        .timeout(Duration(seconds: TIMEOUT_TIME));
-    return (val.value as List<Object?>).contains(email);
-  }
-
+  ///Delete game data from the database.
   void deleteGame(String teamKey, String gameKey, String eventKey) {
     db.ref("teams/$teamKey/events/$eventKey/gms/$gameKey").remove();
   }
 
+  ///Checks if a team has games, returns true if it has and false otherwise.
   Future<bool> teamHasGames(String teamID, String eventKey) async {
     final teamGamesRef = db.ref("teams/$teamID/events/$eventKey/gms");
     bool exists = await teamGamesRef.once().then((value) {
@@ -100,6 +178,7 @@ class Database {
     return exists;
   }
 
+  ///Returns a stream of a games for a team.
   Stream<Map<String, dynamic>> getTeamGamesStream(
       String teamID, String eventKey) {
     final teamGamesRef = db.ref("teams/$teamID/events/$eventKey/gms");
@@ -120,29 +199,9 @@ class Database {
     return outStream;
   }
 
-  void notifyScoutingFinished(String teamID) {
-    db.ref('sync/currently_scouted/$teamID').remove();
-  }
-
-  ///Get events that were selected by an admin to show data in stats screens
+  ///Marks team as currently scouted in the database
   ///
-  ///returns a map key = eventKey;value = eventName;
-  Future<Map<String, String>> getSelectedEvents() async {
-    final ref = db.ref("settings/data_from_events");
-    try {
-      Map<String, String> events = Map<String, String>.from(
-          (await ref.get()).value as Map<dynamic, dynamic>);
-      return events;
-    } catch (e) {
-      print(e);
-      return {};
-    }
-  }
-
-  void selectEvents(Map<String, String> events) {
-    db.ref("settings/data_from_events").set(events);
-  }
-
+  ///Returns true if the team is not being scouted at the moment, and false otherwise
   Future<bool> notifyStartScouting(String teamID) async {
     final dest = db.ref("sync/currently_scouted/$teamID");
     bool exists = await dest.once().then((DatabaseEvent snapshot) {
@@ -156,24 +215,14 @@ class Database {
     }
   }
 
-  Future<Map<String, dynamic>> getSettings() async {
-    final DatabaseReference ref = db.ref("settings");
-    final DataSnapshot snapshot =
-        await ref.get().timeout(Duration(seconds: TIMEOUT_TIME));
-    if (snapshot.exists) {
-      return Map<String, dynamic>.from(snapshot.value as Map<dynamic, dynamic>);
-    } else {
-      Map<String, dynamic> defaultSettings = {
-        "admins": ["liorb5000@gmail.com"],
-        "allow_free_scouting": false,
-        "current_event": {"key": "none", "name": "none"},
-        "data_from_events": {}
-      };
-      ref.set(defaultSettings);
-      return defaultSettings;
-    }
+  ///Marks team as not being scouted at the moment.
+  void notifyScoutingFinished(String teamID) {
+    db.ref('sync/currently_scouted/$teamID').remove();
   }
 
+  ///Uploads an image of the specified team.
+  ///
+  ///The image can be retrieved by using getTeamImages(String teamID)
   Future uploadImage(XFile? imageFile, String teamID) async {
     if (imageFile == null) return;
     File file = File(imageFile.path);
@@ -189,6 +238,7 @@ class Database {
     }
   }
 
+  ///Returns urls for the photos of the specified team that were uploaded by users.
   Future<List<String>> getTeamImages(String teamID) async {
     DataSnapshot snapshot = await db
         .ref("teams/${int.parse(teamID)}/images")
@@ -199,35 +249,22 @@ class Database {
     }
     Map<String, String> images =
         Map<String, String>.from(snapshot.value as Map<dynamic, dynamic>);
-    return images.values.toList();
+    return images.values
+        .map((e) => "${SecretConstants.TEAM_PHOTO_URL_PREFIX}$e")
+        .toList();
   }
 
-  void setTabLayout(String tabName, List<String> tabLayout) {
-    db.ref("settings/tabs/$tabName").set(tabLayout);
-  }
-
-  Future<Map<String, List<dynamic>>> getTabLayout() async {
-    DataSnapshot snapshot = await db
-        .ref("settings/tabs")
-        .get()
+  ///Uploads a game with the specified attributes.
+  Future<void> uploadGame(Map<String, dynamic> gameData, String teamID,
+      String eventKey, String gameID) async {
+    db
+        .ref("teams/$teamID/events/$eventKey/gms/$gameID")
+        .set(gameData)
         .timeout(Duration(seconds: TIMEOUT_TIME));
-    if (!snapshot.exists) {
-      return {};
-    }
-    Map<String, List<dynamic>> tabs = Map<String, List<dynamic>>.from(
-        snapshot.value as Map<dynamic, dynamic>);
-    return tabs;
   }
 
-  void addAdmin(String email) async {
-    DatabaseReference ref = FirebaseDatabase.instance.ref('settings/admins');
-    DataSnapshot data =
-        await ref.get().timeout(Duration(seconds: TIMEOUT_TIME));
-    List<dynamic> admins = (data.value as List).toList();
-    admins.add(email);
-    ref.set(admins).timeout(Duration(seconds: TIMEOUT_TIME));
-  }
-
+  //#endregion
+//#region analysis
   Future<Map<String, dynamic>> getEventConsistency(
       String teamID, String eventKey) async {
     final DataSnapshot data = await db
@@ -241,6 +278,13 @@ class Database {
     }
   }
 
+  ///Returns the average of each parameter collected in the game
+  ///
+  ///This function returns a Map<String,dynamic> in which
+  ///
+  ///keys - the parameter names
+  ///
+  ///values - the corresponding average values as Strings(#.##)
   Future<Map<String, dynamic>> getEventAvgs(
       String teamID, String eventKey) async {
     final DataSnapshot data = await db
@@ -328,16 +372,6 @@ class Database {
     return sums;
   }
 
-  Future<void> uploadGame(Map<String, dynamic> gameData, String teamID,
-      String eventKey, String gameID) async {
-    final dest = db
-        .ref()
-        .child('teams')
-        .child('$teamID/events')
-        .child(eventKey)
-        .child("gms")
-        .child(gameID)
-        .set(gameData)
-        .timeout(Duration(seconds: TIMEOUT_TIME));
-  }
+//#endregion
+
 }
