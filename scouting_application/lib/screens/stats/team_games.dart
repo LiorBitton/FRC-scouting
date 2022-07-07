@@ -16,6 +16,7 @@ class TeamGames extends StatefulWidget {
 class _TeamGamesState extends State<TeamGames> {
   late List<Map<String, dynamic>> games;
   Map<String, String> consistency = {};
+  Map<String, String> avgs = {};
   @override
   void initState() {
     asyncInit();
@@ -25,6 +26,9 @@ class _TeamGamesState extends State<TeamGames> {
   void asyncInit() async {
     consistency = await Database.instance
         .getEventConsistency(widget.teamID, widget.eventKey)
+        .then((value) => Map<String, String>.from(value));
+    avgs = await Database.instance
+        .getEventAvgs(widget.teamID, widget.eventKey)
         .then((value) => Map<String, String>.from(value));
   }
 
@@ -99,11 +103,15 @@ class _TeamGamesState extends State<TeamGames> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) => GameData(
-                                                consistency: consistency,
-                                                teamID: widget.teamID,
-                                                data: Map<String, dynamic>.from(
-                                                    (games[gameKey] as Map<
-                                                        dynamic, dynamic>)))));
+                                                  consistency: consistency,
+                                                  teamID: widget.teamID,
+                                                  data:
+                                                      Map<String, dynamic>.from(
+                                                          (games[gameKey]
+                                                              as Map<dynamic,
+                                                                  dynamic>)),
+                                                  avgs: avgs,
+                                                )));
                                   },
                                 );
                               },

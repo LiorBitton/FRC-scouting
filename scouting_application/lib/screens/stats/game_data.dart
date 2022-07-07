@@ -7,11 +7,13 @@ class GameData extends StatelessWidget {
       {Key? key,
       required this.teamID,
       required this.data,
-      required this.consistency})
+      required this.consistency,
+      required this.avgs})
       : super(key: key);
   final String teamID;
   final Map<String, dynamic> data;
   final Map<String, dynamic> consistency;
+  final Map<String, dynamic> avgs;
   @override
   Widget build(BuildContext context) {
     final List<String> dataKeys = data.keys.toList();
@@ -20,9 +22,15 @@ class GameData extends StatelessWidget {
     List<Map<String, String?>> endKeys = [];
     List<Map<String, String?>> genKeys = [];
     for (String key in dataKeys) {
+      if (key == "bluAll") continue;
       final String valName = key.split("_")[1];
       final String dataToShow = "$valName : ${data[key]}";
-      final Map<String, String?> keyData = {dataToShow: consistency[key]};
+      Map<String, String?> keyData = {
+        dataToShow: "${avgs[key] ?? ""} | ${consistency[key] ?? ""}"
+      };
+      if (avgs[key] == null && consistency[key] == null) {
+        keyData = {dataToShow: ""};
+      }
       switch (key.substring(0, 2)) {
         case "au":
           autoKeys.add(keyData);

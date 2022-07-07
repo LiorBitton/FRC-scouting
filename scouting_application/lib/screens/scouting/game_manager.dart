@@ -67,32 +67,22 @@ class GameManager extends StatefulWidget {
     for (EverCollector collector in dataCollectors) {
       data.putIfAbsent(collector.getDataTag(), () => collector.getValue());
     }
-    data.putIfAbsent('is_blue_alliance', () => isBlueAlliance);
+    data.putIfAbsent('bluAll', () => isBlueAlliance);
     if (Global.instance.offlineEvent) {
       displayDataAsQR(context, data, matchID, teamID.toString());
     } else {
       try {
-        final fb = FirebaseDatabase.instance;
-        final ref = fb.ref();
-        final dest = ref
-            .child('teams')
-            .child('$teamID/events')
-            .child(Global.instance.currentEventKey)
-            .child("gms")
-            .child('$matchID');
-        //limit connection to an 8 seconds trial, else show QR
-        await dest.set(data).then((value) {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => Homepage()));
-        }).timeout(Duration(seconds: 8), onTimeout: () {
-          displayDataAsQR(context, data, matchID, teamID.toString());
-        });
+        await Database.instance.uploadGame(
+            data, teamID.toString(), Global.instance.currentEventKey, matchID);
+        Database.instance.updateEventConsistency(
+            teamID.toString(), Global.instance.currentEventKey);
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Homepage()));
       } catch (e) {
         print(e);
         displayDataAsQR(context, data, matchID, teamID.toString());
       }
     }
-
     reset();
   }
 

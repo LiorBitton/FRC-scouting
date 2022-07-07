@@ -262,12 +262,12 @@ class Database {
     final Map<String, dynamic> games = Map<String, dynamic>.from(
         (await db.ref("teams/${int.parse(teamID)}/events/$eventKey/gms").get())
             .value as Map<dynamic, dynamic>);
+    final int trunc = 2;
     final int gamesAmount = games.length;
     if (gamesAmount < 2) return;
     Map<String, num> avgs = _getGamesAvgs(games);
-    db
-        .ref("teams/${int.parse(teamID)}/events/$eventKey/avg")
-        .set(avgs.map((key, value) => MapEntry(key, value.toStringAsFixed(3))));
+    db.ref("teams/${int.parse(teamID)}/events/$eventKey/avg").set(
+        avgs.map((key, value) => MapEntry(key, value.toStringAsFixed(trunc))));
 
     //calculate the sum of each value minus its mean squared and store in standardDeviation Map
     //key : sum of (value - mean)^2
@@ -296,7 +296,7 @@ class Database {
     //calculate the standard deviation for each key
     Map<String, String> out = {};
     for (MapEntry<String, num> sum in standardDeviation.entries) {
-      out[sum.key] = sqrt(sum.value / gamesAmount).toStringAsFixed(3);
+      out[sum.key] = sqrt(sum.value / gamesAmount).toStringAsFixed(trunc);
     }
     db.ref("teams/${int.parse(teamID)}/events/$eventKey/SD").set(out);
   }
@@ -326,5 +326,18 @@ class Database {
     //turn sums map into averages map key:averageValue
     sums.forEach((key, value) => sums[key] = value / games.length);
     return sums;
+  }
+
+  Future<void> uploadGame(Map<String, dynamic> gameData, String teamID,
+      String eventKey, String gameID) async {
+    final dest = db
+        .ref()
+        .child('teams')
+        .child('$teamID/events')
+        .child(eventKey)
+        .child("gms")
+        .child(gameID)
+        .set(gameData)
+        .timeout(Duration(seconds: TIMEOUT_TIME));
   }
 }
