@@ -12,7 +12,7 @@ class Database {
   static final Database _instance = Database._privateConstructor();
   static Database get instance => _instance;
   Database._privateConstructor();
-//#region Settings
+  //#region Settings
   ///Set current event to scout in.
   void setCurrentEvent({required String key, String name = "none"}) {
     if (name == "none") {
@@ -131,8 +131,10 @@ class Database {
     }
   }
 
-//#endregion
+  //=============================================================================
+  //#endregion
 //#region Teams&Games
+//=============================================================================
   ///Returns the keys of the events that exist for the specified team.
   Future<List<String>> getTeamsRecordedEventsKeys(String teamID) async {
     try {
@@ -263,8 +265,10 @@ class Database {
         .timeout(Duration(seconds: TIMEOUT_TIME));
   }
 
-  //#endregion
+//=============================================================================
+//#endregion
 //#region analysis
+//=============================================================================
   Future<Map<String, dynamic>> getEventConsistency(
       String teamID, String eventKey) async {
     final DataSnapshot data = await db
@@ -371,7 +375,7 @@ class Database {
     sums.forEach((key, value) => sums[key] = value / games.length);
     return sums;
   }
-
+//=============================================================================
 //#endregion
 
 }
