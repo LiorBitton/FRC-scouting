@@ -148,7 +148,7 @@ class _HomepageState extends State<Homepage> {
   }
 
   Future<bool> initGlobal() async {
-    if (Global.instance.offlineEvent) return true;
+    // if (Global.instance.offlineEvent) return true;
     Map<String, List<dynamic>> tabs = {};
     try {
       Global.instance.fromJson(await Database.instance.getSettings());
