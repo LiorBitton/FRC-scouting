@@ -113,7 +113,7 @@ class _RealtimeScoutingState extends State<RealtimeScouting> {
 
   Container? getMatchContainer(Map<String, dynamic> match) {
     if (match["winning_alliance"] != "" &&
-        (match["alliances"]["red"]["score"] == -1 ||
+        !(match["alliances"]["red"]["score"] == -1 ||
             match["alliances"]["red"]["score"] == null))
       return null; //dont show match if already played
     List<dynamic> blueAlliance = match['alliances']['blue']['team_keys'];
