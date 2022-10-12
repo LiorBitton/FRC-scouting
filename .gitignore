@@ -26,3 +26,4 @@ scouting_application/desktop_client/teams.json
 scouting_application/desktop_client/credentials.json
 .vscode/settings.json
 scouting_application/lib/classes/secret_constants.dart
+scouting_application/android/app/upload-keystore.jks
