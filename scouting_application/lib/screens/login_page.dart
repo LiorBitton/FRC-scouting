@@ -19,7 +19,7 @@ class _LoginPageState extends State<LoginPage> {
       if (user == null) {
       } else {
         Future.delayed(
-            Duration(seconds: 3),
+            Duration(seconds: 1),
             () => Navigator.push(
                 context, MaterialPageRoute(builder: (context) => Homepage())));
       }

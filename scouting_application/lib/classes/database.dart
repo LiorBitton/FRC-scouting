@@ -8,7 +8,7 @@ import 'package:scouting_application/classes/secret_constants.dart';
 
 class Database {
   final FirebaseDatabase db = FirebaseDatabase.instance;
-  static const int TIMEOUT_TIME = 5;
+  static const int TIMEOUT_TIME = 30;
   static final Database _instance = Database._privateConstructor();
   static Database get instance => _instance;
   Database._privateConstructor();
