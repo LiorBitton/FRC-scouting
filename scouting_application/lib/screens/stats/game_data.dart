@@ -24,7 +24,14 @@ class GameData extends StatelessWidget {
     for (String key in dataKeys) {
       if (key == "bluAll") continue;
       final String valName = key.split("_")[1];
-      final String dataToShow = "$valName : ${data[key]}";
+      String textValue = "";
+      if (data[key].runtimeType == false.runtimeType) {
+        assert(data[key].runtimeType == false.runtimeType);
+        textValue = data[key] ? "✔" : "✘";
+      } else {
+        textValue = data[key].toString();
+      }
+      final String dataToShow = "$valName : $textValue";
       Map<String, String?> keyData = {
         dataToShow: "${avgs[key] ?? ""} | ${consistency[key] ?? ""}"
       };
