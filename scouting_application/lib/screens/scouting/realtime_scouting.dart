@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:scouting_application/classes/database.dart';
@@ -74,14 +75,40 @@ class _RealtimeScoutingState extends State<RealtimeScouting> {
     try {
       matches = await TBAClient.instance
           .fetchMatchesByEvent(Global.instance.currentEventKey);
-    } catch (e) {
-      print(e);
-      // Navigator.pop(context);
+    } catch (e, s) {
+      FirebaseCrashlytics.instance.recordError(e, s);
       Global.instance.allowFreeScouting = true;
-      // Global.instance.offlineEvent = true;
       matches = [];
     }
-    (matches as List<dynamic>).sort((a, b) {
+    if ((matches as List<dynamic>).contains(0)) {
+      //handle no matches
+      FirebaseCrashlytics.instance
+          .log("Matches are not posted yet, notifying user.");
+      return SliverList(
+        delegate: SliverChildBuilderDelegate(
+          ((context, index) {
+            return Center(child: const Text("Matches are not posted yet."));
+          }),
+          childCount: 1,
+        ),
+      );
+    }
+    if ((matches).contains(1)) {
+      //handle connection problem
+      FirebaseCrashlytics.instance
+          .log("Connection problem fetching event matches, notifying user.");
+      return SliverList(
+        delegate: SliverChildBuilderDelegate(
+          ((context, index) {
+            return Center(
+                child:
+                    const Text("Connection problem fetching event matches."));
+          }),
+          childCount: 1,
+        ),
+      );
+    }
+    (matches).sort((a, b) {
       //yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]
       String aKey = a["key"];
       String bKey = b["key"];
@@ -101,6 +128,19 @@ class _RealtimeScoutingState extends State<RealtimeScouting> {
       Container? matchCont = getMatchContainer(tempMatch);
       if (matchCont != null) content.add(matchCont);
     }
+    if (matches.isEmpty) {
+      TimeOfDay t = TimeOfDay.now();
+      FirebaseCrashlytics.instance
+          .log("${t.toString()} : event matches have ended, notifying user");
+      return SliverList(
+        delegate: SliverChildBuilderDelegate(
+          ((context, index) {
+            return Text("Event ended, contact admin if this is a mistake.");
+          }),
+          childCount: 1,
+        ),
+      );
+    }
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         ((context, index) {
@@ -112,9 +152,10 @@ class _RealtimeScoutingState extends State<RealtimeScouting> {
   }
 
   Container? getMatchContainer(Map<String, dynamic> match) {
-    if (match["winning_alliance"] != "" &&
-        !(match["alliances"]["red"]["score"] == -1 ||
-            match["alliances"]["red"]["score"] == null))
+    if ((match["alliances"]["red"]["score"] != null && //Red team has scored
+            match["alliances"]["red"]["score"] >= 0) ||
+        (match["alliances"]["blue"]["score"] != null && //Blue team has scored
+            match["alliances"]["blue"]["score"] >= 0))
       return null; //dont show match if already played
     List<dynamic> blueAlliance = match['alliances']['blue']['team_keys'];
     List<dynamic> redAlliance = match['alliances']['red']['team_keys'];
