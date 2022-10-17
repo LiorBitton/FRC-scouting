@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_database/firebase_database.dart'; //TODO related to next todo
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:scouting_application/classes/global.dart';
@@ -203,6 +203,7 @@ class _StatsLobbyState extends State<StatsLobby> {
     if (teamsTemp.isEmpty) {
       //If no connection to TBA
       //Show all teams info in Database
+      //TODO replace with Database class function that returns all of the teams
       var ref = FirebaseDatabase.instance.ref('teams');
       try {
         // DataSnapshot snapshot =

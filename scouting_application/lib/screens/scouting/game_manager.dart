@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/classes/global.dart';
@@ -254,16 +253,15 @@ class _GameManagerState extends State<GameManager> {
     if (Global.instance.offlineEvent) return true;
     return await Database.instance
         .notifyStartScouting(widget.teamNumber.toString())
-        .onError((error, stackTrace) => true);
+        .onError((exception, stack) {
+      Database.instance.log(
+          'Error notifying sync while scouting ${widget.teamNumber.toString()}.');
+      Database.instance.recordError(exception, stack);
+      return false;
+    });
   }
 
   void _notifyScoutingFinished() {
-    final fb = FirebaseDatabase.instance;
-    final ref = fb.ref();
-    ref
-        .child('sync')
-        .child('currently_scouted')
-        .child(widget.teamNumber.toString())
-        .remove();
+    Database.instance.notifyScoutingFinished(widget.teamNumber.toString());
   }
 }

@@ -2,8 +2,10 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:camera/camera.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:scouting_application/classes/secret_constants.dart';
 
 class Database {
@@ -375,7 +377,17 @@ class Database {
     sums.forEach((key, value) => sums[key] = value / games.length);
     return sums;
   }
+
 //=============================================================================
 //#endregion
+  //#region logging
+  void log(String message) {
+    TimeOfDay t = TimeOfDay.now();
+    FirebaseCrashlytics.instance.log('${t.toString()} : $message');
+  }
 
+  void recordError(dynamic exception, StackTrace? stack) {
+    FirebaseCrashlytics.instance.recordError(exception, stack);
+  }
+  //#endregion
 }

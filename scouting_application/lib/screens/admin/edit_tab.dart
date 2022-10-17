@@ -3,6 +3,7 @@ import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/screens/admin/collector_creator.dart';
 import 'package:scouting_application/widgets/collectors/ever_collector.dart';
 import 'package:scouting_application/widgets/menu_button.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class EditTab extends StatefulWidget {
   EditTab({Key? key, required this.tabName}) : super(key: key);
@@ -76,6 +77,15 @@ class _EditTabState extends State<EditTab> {
       tabLayout.add(_collectors[i].toString());
     }
     Database.instance.setTabLayout(widget.tabName, tabLayout);
+    Fluttertoast.showToast(
+        msg: "Saved Layout",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        textColor: Colors.white,
+        fontSize: 16.0);
+    Database.instance.log(
+        'Saved new tab layout for ${widget.tabName}| ${tabLayout.toString()}.');
   }
 
   void _handleNewCollector() async {

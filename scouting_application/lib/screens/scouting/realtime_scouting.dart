@@ -1,4 +1,3 @@
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:scouting_application/classes/database.dart';
@@ -76,14 +75,13 @@ class _RealtimeScoutingState extends State<RealtimeScouting> {
       matches = await TBAClient.instance
           .fetchMatchesByEvent(Global.instance.currentEventKey);
     } catch (e, s) {
-      FirebaseCrashlytics.instance.recordError(e, s);
+      Database.instance.recordError(e, s);
       Global.instance.allowFreeScouting = true;
       matches = [];
     }
     if ((matches as List<dynamic>).contains(0)) {
       //handle no matches
-      FirebaseCrashlytics.instance
-          .log("Matches are not posted yet, notifying user.");
+      Database.instance.log("Matches are not posted yet, notifying user.");
       return SliverList(
         delegate: SliverChildBuilderDelegate(
           ((context, index) {
@@ -95,7 +93,7 @@ class _RealtimeScoutingState extends State<RealtimeScouting> {
     }
     if ((matches).contains(1)) {
       //handle connection problem
-      FirebaseCrashlytics.instance
+      Database.instance
           .log("Connection problem fetching event matches, notifying user.");
       return SliverList(
         delegate: SliverChildBuilderDelegate(
@@ -129,9 +127,7 @@ class _RealtimeScoutingState extends State<RealtimeScouting> {
       if (matchCont != null) content.add(matchCont);
     }
     if (matches.isEmpty) {
-      TimeOfDay t = TimeOfDay.now();
-      FirebaseCrashlytics.instance
-          .log("${t.toString()} : event matches have ended, notifying user");
+      Database.instance.log("event matches have ended, notifying user");
       return SliverList(
         delegate: SliverChildBuilderDelegate(
           ((context, index) {

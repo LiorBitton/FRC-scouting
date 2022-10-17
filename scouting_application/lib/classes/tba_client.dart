@@ -1,18 +1,19 @@
 import 'dart:convert';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/classes/secret_constants.dart';
 
 class TBAClient {
-  TBAClient._privateConstructor();
-  static final TBAClient _instance = TBAClient._privateConstructor();
+  final int year;
+  final String TEAM_NUMBER = "7112";
+  TBAClient._privateConstructor(this.year);
+  static final TBAClient _instance =
+      TBAClient._privateConstructor(new DateTime.now().year);
   static TBAClient get instance => _instance;
   final _headers = {
     'X-TBA-Auth-Key': SecretConstants.TBA_API_KEY,
     'accept': 'application/json'
   };
-  final String TEAM_NUMBER = "7112";
   Future<List<String>> fetchTeamsInEvent(String eventKey) async {
     var url = Uri.parse(
         'https://www.thebluealliance.com/api/v3/event/$eventKey/teams/simple');
@@ -27,19 +28,20 @@ class TBAClient {
           teams.add(teamKey);
         }
       } else {
-        FirebaseCrashlytics.instance
+        Database.instance
             .log("did not recieve a 200 response for teams in $eventKey");
       }
       return teams;
-    } catch (e) {
-      throw e;
+    } catch (exception, stack) {
+      Database.instance.log('unknown error in fetchTeamsInEvent($eventKey).');
+      Database.instance.recordError(exception, stack);
+      return [];
     }
   }
 
   ///Get a list of the events that EverGreen is enrolled in
   ///returns a map with the event key as the key and event's name as the value
   Future<Map<String, String>> fetchEverGreensEvents() async {
-    int year = new DateTime.now().year;
     var url = Uri.parse(
         'https://www.thebluealliance.com/api/v3/team/frc$TEAM_NUMBER/events/$year/simple');
     try {
@@ -54,15 +56,14 @@ class TBAClient {
         }
       }
       return events;
-    } catch (e) {
-      print(e);
-      FirebaseCrashlytics.instance.log("Failed to fetch Evergreens events.");
+    } catch (exception, stack) {
+      Database.instance.log('Failed to fetch Evergreens events.');
+      Database.instance.recordError(exception, stack);
       return {};
     }
   }
 
   Future<Map<String, String>> fetchIsraelEvents() async {
-    int year = new DateTime.now().year;
     var url = Uri.parse(
         'https://www.thebluealliance.com/api/v3/district/${year}isr/events/simple');
     try {
@@ -77,9 +78,9 @@ class TBAClient {
         }
       }
       return events;
-    } catch (e) {
-      print(e);
-      FirebaseCrashlytics.instance.log("Failed to fetch Israel events");
+    } catch (exception, stack) {
+      Database.instance.log("Failed to fetch Israel events");
+      Database.instance.recordError(exception, stack);
       return {};
     }
   }
@@ -100,16 +101,13 @@ class TBAClient {
         res = jsonDecode(response.body);
         if (res.isEmpty) {
           //No matches are posted for the selected event;
-          TimeOfDay time = TimeOfDay.now();
-          FirebaseCrashlytics.instance.log(
-              "No matches were posted for event $eventKey at ${time.toString()}");
+          Database.instance.log("No matches were posted for event $eventKey.");
           return [0];
         }
       }
-    } catch (e) {
-      TimeOfDay time = TimeOfDay.now();
-      FirebaseCrashlytics.instance.log(
-          'Error downloading matches for event :$eventKey at ${time.toString()}');
+    } catch (e, s) {
+      Database.instance.log('Error downloading matches for event :$eventKey.');
+      Database.instance.recordError(e, s);
       return [1];
     }
     return res;
@@ -125,17 +123,14 @@ class TBAClient {
         nickname = jsonDecode(response.body)["nickname"];
       }
       return nickname;
-    } catch (e) {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
-      FirebaseCrashlytics.instance
-          .log('Failed to load Team $teamNumber nickname');
+    } catch (exception, stack) {
+      Database.instance.log('Failed to load Team $teamNumber nickname');
+      Database.instance.recordError(exception, stack);
       return "";
     }
   }
 
   Future<Map<String, List<String>>> fetchTeamPhotos(String teamID) async {
-    int year = new DateTime.now().year;
     var url = Uri.parse(
         'https://www.thebluealliance.com/api/v3/team/frc$teamID/media/$year');
     try {
@@ -158,15 +153,15 @@ class TBAClient {
         }
       }
       return {"url": urlImages, "b64": b64images};
-    } catch (e) {
-      FirebaseCrashlytics.instance.log('Failed to load TBATeam');
+    } catch (exception, stack) {
+      Database.instance.log('Failed to load TBATeam');
+      Database.instance.recordError(exception, stack);
       return {};
     }
   }
 
   //Returns a base64 String that represents the team's avatar
   Future<String> fetchTeamLogoAsString(String teamNumber) async {
-    int year = new DateTime.now().year;
     var url = Uri.parse(
         'https://www.thebluealliance.com/api/v3/team/frc$teamNumber/media/$year');
     final response = await http.get(url, headers: _headers);
@@ -179,9 +174,9 @@ class TBAClient {
             // print("saved $teamNumber photo to json");
             return b64logo;
           }
-        } catch (exception) {
-          print(exception);
-          print('failed to download logo of $teamNumber');
+        } catch (exception, stack) {
+          Database.instance.log('failed to download logo of $teamNumber');
+          Database.instance.recordError(exception, stack);
           return "";
         }
       }

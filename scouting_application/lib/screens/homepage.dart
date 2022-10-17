@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:scouting_application/classes/database.dart';
@@ -166,14 +165,12 @@ class _HomepageState extends State<Homepage> {
     try {
       tabs = await Database.instance.getTabLayout();
       saveTabsToLocal(tabs);
-    } catch (e, stackTrace) {
-      print(e);
-      FirebaseCrashlytics.instance.recordError(e, stackTrace);
+    } catch (exception, stack) {
+      Database.instance.recordError(exception, stack);
       try {
         tabs = await getTabsFromLocal();
-      } catch (e, stackTrace) {
-        print(e);
-        FirebaseCrashlytics.instance.recordError(e, stackTrace);
+      } catch (exception, stackTrace) {
+        Database.instance.recordError(exception, stackTrace);
       }
     }
     if (tabs.isNotEmpty) {
