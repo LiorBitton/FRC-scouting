@@ -126,12 +126,13 @@ class _RealtimeScoutingState extends State<RealtimeScouting> {
       Container? matchCont = getMatchContainer(tempMatch);
       if (matchCont != null) content.add(matchCont);
     }
-    if (matches.isEmpty) {
+    if (content.isEmpty) {
       Database.instance.log("event matches have ended, notifying user");
       return SliverList(
         delegate: SliverChildBuilderDelegate(
           ((context, index) {
-            return Text("Event ended, contact admin if this is a mistake.");
+            return Center(
+                child: Text("Event ended, no more matches to scout."));
           }),
           childCount: 1,
         ),
