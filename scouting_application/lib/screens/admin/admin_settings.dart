@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/classes/global.dart';
@@ -30,6 +32,7 @@ class _AdminSettingsState extends State<AdminSettings> {
     futureEvents = buildEventsDropdownList();
   }
 
+  bool firstLoad = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,6 +57,16 @@ class _AdminSettingsState extends State<AdminSettings> {
                 future: futureEvents,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
+                    if (firstLoad) {
+                      firstLoad = false;
+                      if (!snapshot.data!.contains(currentEventKey)) {
+                        int idx = 0;
+                        for (DropdownMenuItem<String> item in snapshot.data!) {
+                          print((idx).toString() + item.value!);
+                        }
+                        currentEventKey = snapshot.data![0].value ?? "";
+                      }
+                    }
                     return DropdownButton(
                         iconSize: 0,
                         value: currentEventKey,
