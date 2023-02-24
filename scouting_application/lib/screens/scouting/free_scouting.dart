@@ -71,8 +71,7 @@ class _FreeScoutingState extends State<FreeScouting> {
                       });
                       return;
                     }
-
-                    String matchKey = (matchNumberController.text);
+                    String matchKey = "rf" + (matchNumberController.text);
                     int teamID = int.parse(teamNumberController.text);
 
                     Navigator.push(

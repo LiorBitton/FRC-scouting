@@ -31,6 +31,8 @@ class _StatsLobbyState extends State<StatsLobby> {
     try {
       readyForStart = createCache();
     } catch (e) {}
+    //TODO use isolate.spawn() with a function to download all of the images on the first run
+    // even better, display the page while images are being downloaded
   }
 
   @override

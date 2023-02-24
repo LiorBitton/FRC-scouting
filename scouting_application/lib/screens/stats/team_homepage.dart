@@ -59,6 +59,16 @@ class TeamHomepage extends StatelessWidget {
                     return CircularProgressIndicator();
                   }
                   List<dynamic> res = snapshot.data as List<dynamic>;
+                  if (res[1] == "ERROR") {
+                    return Text(
+                      "no games available",
+                      maxLines: 1,
+                      softWrap: true,
+                      // style: GoogleFonts.acme(fontSize: 25, color: Colors.white),
+                      // textScaleFactor: 2,
+                    );
+                  }
+
                   return MenuButton(
                     icon: Icon(Icons.checklist),
                     iconSize: 50,
@@ -99,11 +109,18 @@ class TeamHomepage extends StatelessWidget {
         await Database.instance.getSelectedEvents();
     List<String> recordedEvents =
         await Database.instance.getTeamsRecordedEventsKeys(teamNumber);
+
+    if (recordedEvents.isEmpty) {
+      return [false, "ERROR"];
+    }
     Map<String, String> validEvents = {};
     for (String eventKey in recordedEvents) {
       if (selectedEvents.keys.contains(eventKey)) {
         validEvents.putIfAbsent(eventKey, () => selectedEvents[eventKey]!);
       }
+    }
+    if (validEvents.keys.isEmpty) {
+      return [false, "ERROR"];
     }
     events = validEvents;
     for (String event in validEvents.keys) {
