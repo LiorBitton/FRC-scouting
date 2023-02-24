@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/screens/homepage.dart';
@@ -164,13 +165,32 @@ class GameManager extends StatefulWidget {
   _GameManagerState createState() => _GameManagerState();
 }
 
-class _GameManagerState extends State<GameManager> {
+class _GameManagerState extends State<GameManager> with WidgetsBindingObserver {
   late Future<bool> futureScoutingOccupied;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     futureScoutingOccupied = _notifyScoutingTeam();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused) {
+      _notifyScoutingFinished();
+      Fluttertoast.showToast(msg: "Im paused");
+    }
+    // if (state == AppLifecycleState.inactive) {
+    //   print("\n\n\nim inactive yall\n\n\n");}
+    else if (state == AppLifecycleState.detached) {}
   }
 
   @override
@@ -196,13 +216,16 @@ class _GameManagerState extends State<GameManager> {
                         actions: [
                           IconButton(
                               onPressed: () {
-                                GameManager.reset();
-                                _notifyScoutingFinished();
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => Homepage()));
+                                exitScouting(context);
                               },
+                              // {
+                              //   GameManager.reset();
+                              //   _notifyScoutingFinished();
+                              //   Navigator.push(
+                              //       context,
+                              //       MaterialPageRoute(
+                              //           builder: (context) => Homepage()));
+                              // },
                               icon: Icon(Icons.exit_to_app))
                         ],
                         automaticallyImplyLeading: false,
@@ -247,6 +270,13 @@ class _GameManagerState extends State<GameManager> {
                 children: [CircularProgressIndicator(), Text("Loading...")]),
           ));
         }));
+  }
+
+  void exitScouting(BuildContext context) {
+    GameManager.reset();
+    _notifyScoutingFinished();
+    Navigator.pushAndRemoveUntil(context,
+        MaterialPageRoute(builder: (context) => Homepage()), (a) => false);
   }
 
   Future<bool> _notifyScoutingTeam() async {

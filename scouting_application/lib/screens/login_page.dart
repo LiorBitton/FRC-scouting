@@ -18,10 +18,12 @@ class _LoginPageState extends State<LoginPage> {
     auth.authStateChanges().listen((User? user) {
       if (user == null) {
       } else {
-        Future.delayed(
-            Duration(seconds: 1),
-            () => Navigator.push(
-                context, MaterialPageRoute(builder: (context) => Homepage())));
+        Future.delayed(Duration.zero, () {
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => Homepage()),
+              (_) => false);
+        });
       }
     });
   }
