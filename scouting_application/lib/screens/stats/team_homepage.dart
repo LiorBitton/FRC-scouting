@@ -4,6 +4,7 @@ import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/screens/stats/team_events.dart';
 import 'package:scouting_application/screens/stats/team_games.dart';
 import 'package:scouting_application/screens/stats/team_photo_gallery.dart';
+import 'package:scouting_application/screens/stats/team_stats.dart';
 import 'package:scouting_application/widgets/menu_button.dart';
 
 // ignore: must_be_immutable
@@ -42,16 +43,17 @@ class TeamHomepage extends StatelessWidget {
               ],
             ),
             SizedBox(height: 100),
-            // MenuButton(
-            //     onPressed: () {
-            //       Navigator.push(
-            //           context,
-            //           MaterialPageRoute(
-            //               builder: (context) => TeamStats(teamID: teamNumber)));
-            //     },
-            //     isPrimary: true,
-            //     icon: Icon(Icons.auto_graph_rounded)),
-            // SizedBox(height: 100),
+            MenuButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => TeamStats(teamID: teamNumber)));
+                },
+                isPrimary: false,
+                iconSize: 50,
+                icon: Icon(Icons.auto_graph_rounded)),
+            SizedBox(height: 100),
             FutureBuilder(
                 future: loadTeamsValidEvents(),
                 builder: (context, snapshot) {

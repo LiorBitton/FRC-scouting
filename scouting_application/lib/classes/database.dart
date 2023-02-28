@@ -310,8 +310,12 @@ class Database {
   /// The new values are uploaded to the database.
   Future<void> updateEventConsistency(String teamID, String eventKey) async {
     final Map<String, dynamic> games = Map<String, dynamic>.from(
-        (await db.ref("teams/${int.parse(teamID)}/events/$eventKey/gms").get())
-            .value as Map<dynamic, dynamic>);
+        ((await db.ref("teams/${int.parse(teamID)}/events/$eventKey/gms").get())
+                .value ??
+            {"NULL": "NULL"}) as Map<dynamic, dynamic>);
+    if (games.containsKey("NULL")) {
+      return;
+    }
     final int trunc = 2;
     final int gamesAmount = games.length;
     if (gamesAmount < 2) return;
