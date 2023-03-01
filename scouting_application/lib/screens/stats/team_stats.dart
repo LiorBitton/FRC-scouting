@@ -55,25 +55,30 @@ class TeamStats extends StatelessWidget {
           },
         )
       ]),
-      body: FutureBuilder(
-          future: getStats(),
-          builder: (context, snapshot) {
-            List<Map<String, String>> keys = [
-              {"": ""}
-            ];
-            if (snapshot.hasData) {
-              keys = List<Map<String, String>>.from(snapshot.data as dynamic);
-              if (keys.length == 1) {
-                if (keys[0].containsKey("")) {
-                  return Text(
-                      "No data found, click the button in the top right to request data from Peleg");
+      body: ListView(
+        children: [
+          FutureBuilder(
+              future: getStats(),
+              builder: (context, snapshot) {
+                List<Map<String, String>> keys = [
+                  {"": ""}
+                ];
+                if (snapshot.hasData) {
+                  keys =
+                      List<Map<String, String>>.from(snapshot.data as dynamic);
+                  if (keys.length == 1) {
+                    if (keys[0].containsKey("")) {
+                      return Text(
+                          "No data found, click the button in the top right to request data from Peleg");
+                    }
+                  }
+                  return CategoryList(data: keys, title: "stats");
+                } else {
+                  return CircularProgressIndicator();
                 }
-              }
-              return CategoryList(data: keys, title: "stats");
-            } else {
-              return CircularProgressIndicator();
-            }
-          }),
+              }),
+        ],
+      ),
     );
   }
 }
