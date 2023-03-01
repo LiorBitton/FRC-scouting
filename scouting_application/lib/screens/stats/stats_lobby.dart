@@ -209,9 +209,9 @@ class _StatsLobbyState extends State<StatsLobby> {
       var ref = FirebaseDatabase.instance.ref('teams');
       try {
         // DataSnapshot snapshot =
-        await ref.get().then((snapshot) {
-          if (snapshot.exists) {
-            var data = snapshot.value;
+        await ref.once().then((dbEvent) {
+          if (dbEvent.snapshot.exists) {
+            var data = dbEvent.snapshot.value;
             final info =
                 Map<String, dynamic>.from((data as Map<dynamic, dynamic>));
             teams = info.keys.toList();
