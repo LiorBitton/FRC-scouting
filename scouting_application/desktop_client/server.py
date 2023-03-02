@@ -111,4 +111,33 @@ def update_team_analytics_listener(event):
 	print('Update completed')
 	update_team_analytics_ref.set('0')
 
-update_team_analytics_ref.listen(update_team_analytics_listener)
+def add_custom_stats(teamKey,eventKey):
+	
+	#get all team games in current event
+	games = db.reference(f"teams/{teamKey}/events/{eventKey}/gms").get()
+	# calculate stats(whatever you want/strategy team requests)
+	new_stats = {"food_eaten":"Hamburger"}
+	
+	# upload to firebase - it will be displayed for the users
+	db.reference(f"teams/{teamKey}/events/{eventKey}/custom").set(new_stats)
+
+	pass
+# https://firebase.google.com/static/docs/reference/admin/python/firebase_admin.db#event
+# event.data
+# event.path
+# event.event_type
+def handleStatsRequest(event):
+	if event.event_type == "put" and event.path =="/":
+		return
+	if event.event_type !="put":
+		return
+	# parse eventKey and teamKey from the event
+	eventKey = event.data
+	teamKey = event.path.replace("/","")
+	# reply to the request
+	add_custom_stats(teamKey,eventKey)
+	# delete the request for team data update
+	db.reference(f"listeners/update_team_stats/{teamKey}").delete()
+
+db.reference("listeners/update_team_stats/").listen(handleStatsRequest)
+# update_team_analytics_ref.listen(update_team_analytics_listener)
