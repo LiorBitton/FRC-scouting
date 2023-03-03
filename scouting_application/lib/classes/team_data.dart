@@ -1,5 +1,4 @@
 class TeamData {
-  String name;
   String getName() {
     return name;
   }
@@ -7,6 +6,8 @@ class TeamData {
   void setName(String nickname) {
     name = nickname;
   }
+
+  String name;
 
   ///base64 avatar image
   String avatar;
@@ -36,7 +37,7 @@ class TeamData {
       );
     } catch (e) {
       print(e);
-      return TeamData(avatar: "", name: "failed");
+      return TeamData(avatar: "", name: "");
     }
   }
 }

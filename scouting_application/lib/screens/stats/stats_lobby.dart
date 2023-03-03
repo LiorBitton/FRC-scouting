@@ -24,12 +24,12 @@ class _StatsLobbyState extends State<StatsLobby> {
 
   int progress = 0;
   int target = 1;
-  late Future<String> readyForStart;
+  late Future<bool> readyForStart;
   @override
   void initState() {
     super.initState();
     try {
-      readyForStart = createCache();
+      createCache();
     } catch (e) {}
     //TODO use isolate.spawn() with a function to download all of the images on the first run
     // even better, display the page while images are being downloaded
@@ -41,7 +41,7 @@ class _StatsLobbyState extends State<StatsLobby> {
         appBar: AppBar(
           title: Text('Stats'),
           actions: [
-            FutureBuilder<String>(
+            FutureBuilder<bool>(
                 future: readyForStart,
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
@@ -64,52 +64,48 @@ class _StatsLobbyState extends State<StatsLobby> {
             Expanded(
               child: SingleChildScrollView(
                 physics: ScrollPhysics(),
-                child: Column(
-                  children: [
-                    FutureBuilder<String>(
-                        future: readyForStart,
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          } else {
-                            return ListView.separated(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: teamData.length,
-                              itemBuilder: (context, index) {
-                                String team = teamData.keys.elementAt(index);
-                                String teamName = teamData[team]!.getName();
-                                Widget? teamAvatar = imageFromBase64String(
-                                    teamData[team]!.getAvatar());
-                                return ListTile(
-                                  title: Text(team),
-                                  subtitle: Text(teamName),
-                                  leading: teamAvatar ?? Icon(Icons.people),
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => TeamHomepage(
-                                                teamNumber: team,
-                                                teamName: teamName,
-                                                teamAvatar: teamAvatar)));
-                                  },
-                                );
-                              },
-                              separatorBuilder:
-                                  (BuildContext context, int index) {
-                                return const Divider(
-                                  color: CustomTheme.teamColor, // Colors.black,
-                                  thickness: 3,
-                                );
+                child: Column(children: [
+                  FutureBuilder<List<ListTile>>(
+                      future: createCache(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return CircularProgressIndicator();
+                        }
+                        List<ListTile> tiles = snapshot.data as List<ListTile>;
+                        return ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: teamData.length,
+                          itemBuilder: (context, index) {
+                            return tiles[index];
+                            String team = teamData.keys.elementAt(index);
+                            String teamName = teamData[team]!.getName();
+                            Widget? teamAvatar = imageFromBase64String(
+                                teamData[team]!.getAvatar());
+                            return ListTile(
+                              title: Text(team),
+                              subtitle: Text(teamName),
+                              leading: teamAvatar ?? Icon(Icons.people),
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => TeamHomepage(
+                                            teamNumber: team,
+                                            teamName: teamName,
+                                            teamAvatar: teamAvatar)));
                               },
                             );
-                          }
-                        })
-                  ],
-                ),
+                          },
+                          separatorBuilder: (BuildContext context, int index) {
+                            return const Divider(
+                              color: CustomTheme.teamColor, // Colors.black,
+                              thickness: 3,
+                            );
+                          },
+                        );
+                      })
+                ]),
               ),
             ),
           ],
@@ -120,9 +116,9 @@ class _StatsLobbyState extends State<StatsLobby> {
     if (teamData.containsKey(teamNumber)) {
       try {
         String b64logo = teamData[teamNumber]!.getAvatar();
-        if (b64logo == "none") {
+        if (b64logo == "") {
           //if team didnt upload an avatar
-          return "none";
+          return "";
         }
         if (b64logo != "") {
           //if avatar exists in cache
@@ -139,7 +135,7 @@ class _StatsLobbyState extends State<StatsLobby> {
 
   Image? imageFromBase64String(String base64String) {
     try {
-      if (base64String == "none") return null;
+      if (base64String == "") return null;
       return Image.memory(base64Decode(base64String));
     } catch (e) {
       return null;
@@ -190,7 +186,7 @@ class _StatsLobbyState extends State<StatsLobby> {
     file.writeAsStringSync(json.encode(teamData));
   }
 
-  Future<String> createCache() async {
+  Future<List<ListTile>> createCache() async {
     await loadCache();
     List<String> teamsTemp = [];
     try {
@@ -228,17 +224,72 @@ class _StatsLobbyState extends State<StatsLobby> {
     } else {
       teams = teamsTemp;
     }
+    List<ListTile> tiles = [];
+
     teams.sort((a, b) => int.parse(a).compareTo(int.parse(b)));
+    teams.remove("0");
+    teams.remove("9999");
     target = teams.length;
     for (String team in teams) {
-      String name = await fetchTeamNickname(team);
-      String avatar = await fetchTeamLogoAsString(team);
-      teamData.putIfAbsent(team, () => TeamData(name: name, avatar: avatar));
-      setState(() {
-        progress++;
-      });
+      ListTile tile = ListTile(
+        title: Text(team),
+        subtitle: FutureBuilder<String>(
+            future: fetchTeamNickname(team),
+            builder: (context, snapshot) {
+              if (snapshot.hasData &&
+                  snapshot.data != null &&
+                  snapshot.data is String) {
+                if (teamData.containsKey(team)) {}
+                return Text(snapshot.data.toString());
+              } else {
+                return Text("");
+              }
+            }),
+        leading: FutureBuilder<String>(
+            future: fetchTeamNickname(team),
+            builder: (context, snapshot) {
+              if (snapshot.hasData &&
+                  snapshot.data != null &&
+                  snapshot.data is String) {
+                String avatar = snapshot.data.toString();
+                //add teamAvatar to cache
+                if (teamData.containsKey(team)) {
+                  if (teamData[team]!.getAvatar() == "") {
+                    teamData[team]!.setAvatar(avatar);
+                  }
+                }
+                Widget? avatarWidget = imageFromBase64String(avatar);
+                return avatarWidget ?? Icon(Icons.people);
+              } else {
+                return Icon(Icons.people);
+              }
+            }),
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => TeamHomepage(
+                      teamNumber: team,
+                      teamName: teamData[team]!.getName(),
+                      teamAvatar:
+                          imageFromBase64String(teamData[team]!.getAvatar()) ??
+                              Icon(Icons.people))));
+        },
+      );
+      tiles.add(tile);
+      // String name = await fetchTeamNickname(team);
+      // String avatar = await fetchTeamLogoAsString(team);
+      // teamData.putIfAbsent(team, () => TeamData(name: name, avatar: avatar));
+      // setState(() {
+      //   progress++;
+      // });
     }
     saveCache();
-    return "okay";
+    readyForStart = func();
+    return tiles;
+  }
+
+  Future<bool> func() async {
+    return true;
   }
 }

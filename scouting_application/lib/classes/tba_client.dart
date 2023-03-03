@@ -164,26 +164,29 @@ class TBAClient {
   Future<String> fetchTeamLogoAsString(String teamNumber) async {
     var url = Uri.parse(
         'https://www.thebluealliance.com/api/v3/team/frc$teamNumber/media/$year');
-    final response = await http.get(url, headers: _headers);
-    if (response.statusCode == 200) {
-      List<dynamic> res = jsonDecode(response.body);
-      for (dynamic media in res) {
-        try {
-          if (media["type"] == "avatar") {
-            String b64logo = res[0]['details']['base64Image'].toString();
-            // print("saved $teamNumber photo to json");
-            return b64logo;
+    try {
+      final response = await http.get(url, headers: _headers);
+      if (response.statusCode == 200) {
+        List<dynamic> res = jsonDecode(response.body);
+        for (dynamic media in res) {
+          try {
+            if (media["type"] == "avatar") {
+              String b64logo = res[0]['details']['base64Image'].toString();
+              // print("saved $teamNumber photo to json");
+              return b64logo;
+            }
+          } catch (exception, stack) {
+            // Database.instance.log('failed to download logo of $teamNumber');
+            // Database.instance.recordError(exception, stack);
           }
-        } catch (exception, stack) {
-          Database.instance.log('failed to download logo of $teamNumber');
-          Database.instance.recordError(exception, stack);
-          return "";
         }
+        return "";
       }
-      return "none";
-    } else {
-      // If the server did not return a 200 OK response,
-      throw Exception('Failed to load Team $teamNumber image');
+    } catch (exception, stack) {
+      Database.instance.log('Error fetching team logo');
+      Database.instance.recordError(exception, stack);
+      return "";
     }
+    return "";
   }
 }
