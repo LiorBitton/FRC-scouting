@@ -23,8 +23,10 @@ class MenuTextButton extends StatelessWidget {
                   fontSize: 26)),
         ),
         style: ButtonStyle(
-            backgroundColor:
-                MaterialStateProperty.all<Color>((CustomTheme.teamColor)),
+            backgroundColor: MaterialStateProperty.all<Color>(
+                (onPressed != null)
+                    ? (CustomTheme.teamColor)
+                    : (Color.fromARGB(255, 156, 156, 156))),
             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(14.0),
