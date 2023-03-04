@@ -1,10 +1,20 @@
+//TODO
+// -Allow users to star a chart type, each time they will enter this screen,
+// show their favorite graphs
+// -comparison between teams?
+//
+
+//
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:scouting_application/classes/global.dart';
+import 'package:scouting_application/themes/custom_themes.dart';
 import 'package:scouting_application/widgets/collectors/dropdown_collector.dart';
 import 'package:scouting_application/widgets/menu_button.dart';
 import 'package:scouting_application/widgets/menu_text_button.dart';
+import 'dart:math';
 
 class GraphMaker extends StatefulWidget {
   GraphMaker({Key? key, required this.teamID}) : super(key: key);
@@ -16,7 +26,9 @@ class GraphMaker extends StatefulWidget {
 class _GraphMakerState extends State<GraphMaker> {
   String y_value = "1";
   String x_value = "1";
-  Widget graph = new Text("");
+  bool isDarkMode = false;
+  bool shouldDrawGraph = false;
+  List<LineChart> graph = [];
   bool initted = false;
   late Map<String, List<dynamic>> dataByKeys;
   Future<Map<String, dynamic>> getData(String teamKey) async {
@@ -57,13 +69,20 @@ class _GraphMakerState extends State<GraphMaker> {
   }
 
   Future<List<String>> getGraphOptions() async {
-    if (initted) return List<String>.from(dataByKeys.keys);
+    if (initted) {
+      List<String> ret = List<String>.from(dataByKeys.keys);
+      ret.add("none");
+
+      return ret;
+    }
+
     dataByKeys = genListsFromData(await getData(widget.teamID));
     List<String> res = List<String>.from(dataByKeys.keys);
     if (res.length > 0) {
-      x_value = res[0];
-      y_value = res[0];
+      x_value = "none";
+      y_value = "none";
     }
+    res.add("none");
     initted = true;
     return res;
   }
@@ -76,98 +95,183 @@ class _GraphMakerState extends State<GraphMaker> {
     super.initState();
   }
 
-  //TODO add none to dropdowns
+  String gamePartToPartName(String part) {
+    switch (part) {
+      case "en":
+        return "==Endgame==";
+      case "te":
+        return "==Teleop==";
+      case "au":
+        return "==Auto==";
+      case "ge":
+        return "==General==";
+    }
+    return "";
+  }
+
   @override
   Widget build(BuildContext context) {
+    var brightness = MediaQuery.of(context).platformBrightness;
+    isDarkMode = brightness == Brightness.dark;
     return Scaffold(
         appBar: AppBar(title: Text("Team ${widget.teamID} Graphs")),
-        body: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+        body: Container(
+          child: Container(
+            child: Column(
               children: [
-                FutureBuilder<List<String>>(
-                    future: getGraphOptions(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return CircularProgressIndicator();
-                      }
-                      List<DropdownMenuItem<String>> items = [];
-                      List<String> valueKeys = snapshot.data as List<String>;
-                      for (String key in valueKeys) {
-                        items.add(DropdownMenuItem(
-                          child: Text(key),
-                          value: key,
-                        ));
-                      }
+                Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        FutureBuilder<List<String>>(
+                            future: getGraphOptions(),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return CircularProgressIndicator();
+                              }
+                              List<DropdownMenuItem<String>> items = [];
+                              List<String> valueKeys =
+                                  snapshot.data as List<String>;
+                              valueKeys.sort();
+                              valueKeys.remove("bluAll");
+                              String prefix = "";
 
-                      return Column(children: [
-                        Row(
-                          children: [
-                            Text("X:"),
-                            DropdownButton(
-                              value: x_value,
-                              items: items,
-                              onChanged: (val) {
-                                if (val is String) {
-                                  print(val);
-                                  setState(() {
-                                    x_value = val;
-                                  });
+                              for (String key in valueKeys) {
+                                String displayName = key;
+                                String gamePartPrefix = key.split("_")[0];
+                                if (gamePartPrefix != prefix) {
+                                  String partName =
+                                      gamePartToPartName(gamePartPrefix);
+                                  if (partName != "") {
+                                    items.add(DropdownMenuItem(
+                                      child: Text(partName),
+                                      enabled: false,
+                                      value: null,
+                                    ));
+                                    prefix = gamePartPrefix;
+                                  }
                                 }
-                              },
-                            ),
-                          ],
+                                displayName =
+                                    displayName.replaceFirst(prefix + "_", "");
+                                items.add(DropdownMenuItem(
+                                  child: Text(displayName),
+                                  value: key,
+                                ));
+                              }
+
+                              return Column(children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    DropdownButton(
+                                      value: x_value,
+                                      items: items,
+                                      iconEnabledColor: Colors.cyan,
+                                      iconSize: 32.0,
+                                      onChanged: (val) {
+                                        if (val is String) {
+                                          if (x_value != val)
+                                            shouldDrawGraph = true;
+                                          setState(() {
+                                            x_value = val;
+                                          });
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    DropdownButton(
+                                      value: y_value,
+                                      iconSize: 32.0,
+                                      iconEnabledColor: Colors.purple,
+                                      items: items,
+                                      onChanged: (val) {
+                                        if (val is String) {
+                                          setState(() {
+                                            if (y_value != val)
+                                              shouldDrawGraph = true;
+                                            y_value = val;
+                                          });
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                )
+                              ]);
+                            }),
+                      ],
+                    ),
+                    MenuTextButton(
+                        onPressed: shouldDrawGraph
+                            ? () {
+                                setState(
+                                  () {
+                                    print("drawing");
+                                    drawGraph();
+                                    shouldDrawGraph = false;
+                                  },
+                                );
+                              }
+                            : null,
+                        text: "Draw Graph"),
+                  ],
+                ),
+                graph.length == 0
+                    ? Text("")
+                    : Expanded(
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          physics: ClampingScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            return Container(
+                                child: Padding(
+                                    padding: const EdgeInsets.only(
+                                      right: 12,
+                                      left: 6,
+                                      top: 10,
+                                      bottom: 10,
+                                    ),
+                                    child: graph[index]),
+                                margin: EdgeInsetsDirectional.fromSTEB(
+                                    10, 10, 10, 10),
+                                height: 250,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(30),
+                                  color: isDarkMode
+                                      ? Colors.grey[900]!
+                                      : Colors.white24,
+                                  // boxShadow: [
+                                  //   BoxShadow(
+                                  //       //bottom shadow
+                                  //       color: isDarkMode
+                                  //           ? Colors.grey[800]!
+                                  //           : Colors.grey[600]!,
+                                  //       blurRadius: isDarkMode ? 2 : 15,
+                                  //       offset: const Offset(4, 4),
+                                  //       spreadRadius: isDarkMode ? 0.01 : 1),
+                                  //   BoxShadow(
+                                  //       //top shadow
+                                  //       color: isDarkMode
+                                  //           ? Colors.grey[400]!
+                                  //           : Colors.white,
+                                  //       blurRadius: isDarkMode ? 0 : 02,
+                                  //       offset: const Offset(-4, -4),
+                                  //       spreadRadius: isDarkMode ? 0.03 : 1)
+                                  // ],
+                                ));
+                          },
+                          itemCount: graph.length,
                         ),
-                        Row(
-                          children: [
-                            Text("Y:"),
-                            DropdownButton(
-                              value: y_value,
-                              items: items,
-                              onChanged: (val) {
-                                if (val is String) {
-                                  print(val);
-                                  setState(() {
-                                    y_value = val;
-                                  });
-                                }
-                              },
-                            ),
-                          ],
-                        )
-                      ]);
-                    }),
+                      ),
               ],
             ),
-            MenuTextButton(
-                onPressed: () {
-                  print("drawing..");
-                  setState(
-                    () {
-                      drawGraph();
-                    },
-                  );
-                },
-                text: "Draw Graph"),
-            (graph.runtimeType != Text)
-                ? Stack(
-                    children: <Widget>[
-                      AspectRatio(
-                        aspectRatio: 1.70,
-                        child: Padding(
-                            padding: const EdgeInsets.only(
-                              right: 18,
-                              left: 12,
-                              top: 24,
-                              bottom: 12,
-                            ),
-                            child: graph),
-                      ),
-                    ],
-                  )
-                : Text("")
-          ],
+          ),
         ));
   }
 
@@ -198,33 +302,44 @@ class _GraphMakerState extends State<GraphMaker> {
   }
 
   void drawGraph() {
-    print("how");
     if (dataByKeys == null) {
       print("keys null");
       return;
     }
-    if (!dataByKeys.containsKey(x_value) || !dataByKeys.containsKey(y_value)) {
-      print("values not exeise");
+    if (!dataByKeys.containsKey(x_value) && !dataByKeys.containsKey(y_value)) {
+      print("values do not exist");
       return;
     }
-    print(x_value);
-    print(y_value);
-    List<dynamic> x_data = dataByKeys[x_value]!;
-    List<dynamic> y_data = dataByKeys[y_value]!;
-    if (x_data.length < 2 || y_data.length < 2) {
+    List<dynamic> x_data = [];
+    List<dynamic> y_data = [];
+    if (x_value != "none" && dataByKeys.containsKey(x_value)) {
+      x_data = dataByKeys[x_value]!;
+    }
+    if (y_value != "none" && dataByKeys.containsKey(y_value)) {
+      y_data = dataByKeys[y_value]!;
+    }
+    if (x_data.length < 2 && y_data.length < 2) {
       print("not enough data");
       return;
     }
-    Type? x_type = x_data[0].runtimeType == x_data[1].runtimeType
-        ? x_data[0].runtimeType
-        : null;
-    Type? y_type = y_data[0].runtimeType == y_data[1].runtimeType
-        ? y_data[0].runtimeType
-        : null;
-    if (x_type == null || y_type == null) {
+    Type? x_type = null;
+    Type? y_type = null;
+    if (x_data.length >= 2) {
+      x_type = x_data[0].runtimeType == x_data[1].runtimeType
+          ? x_data[0].runtimeType
+          : null;
+    }
+    if (y_data.length >= 2) {
+      y_type = y_data[0].runtimeType == y_data[1].runtimeType
+          ? y_data[0].runtimeType
+          : null;
+    }
+    if (x_type == null && y_type == null) {
       print("type mismatch");
       return;
     }
+    List<String> x_hints = [];
+    List<String> y_hints = [];
     List<double> x_final_values = [];
     //figure the types
     for (dynamic value in x_data) {
@@ -249,16 +364,27 @@ class _GraphMakerState extends State<GraphMaker> {
         y_final_values.add(value);
       }
     }
-    print("=======");
-    print(x_final_values);
-    print(y_final_values);
+    String graphName = "";
+    bool addedFirst = false;
+
+    if (x_value != "none") {
+      String formatted = x_value;
+      String rem = x_value.split("_")[0];
+      formatted = formatted.replaceFirst(rem + "_", "");
+      graphName += formatted;
+      addedFirst = true;
+    }
+    if (y_value != "none") {
+      String formatted = y_value;
+      String rem = y_value.split("_")[0];
+      formatted = formatted.replaceFirst(rem + "_", "");
+      graphName += addedFirst ? (" & " + formatted) : formatted;
+    }
     setState(() {
-      print("in graph");
-      graph = LineChart(createGraph(x_final_values, y_final_values));
+      graph.insert(
+          0, LineChart(createGraph(x_final_values, y_final_values, graphName)));
     });
   }
-
-  void createGrap2h(List<double> x, List<double> y) {}
 
   void x_callback(String? val) {
     if (val is String) {
@@ -278,8 +404,8 @@ class _GraphMakerState extends State<GraphMaker> {
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
-      fontWeight: FontWeight.bold,
-      fontSize: 16,
+      fontWeight: FontWeight.w400,
+      fontSize: 15,
     );
 
     return SideTitleWidget(
@@ -290,26 +416,56 @@ class _GraphMakerState extends State<GraphMaker> {
 
   Widget leftTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
-      fontWeight: FontWeight.bold,
+      fontWeight: FontWeight.w400,
       fontSize: 15,
     );
 
     return Text(value.toInt().toString(),
-        style: style, textAlign: TextAlign.left);
+        style: style, textAlign: TextAlign.center);
   }
 
   List<Color> gradientColors = [
     AppColors.contentColorCyan,
     AppColors.contentColorBlue,
   ];
-  LineChartData createGraph(List<double> x, List<double> y) {
-    List<FlSpot> points = [];
+  LineChartData createGraph(List<double> x, List<double> y, String graphName,
+      {List<String> xhints = const [], List<String> yhints = const []}) {
+    List<FlSpot> pointsX = [];
+    List<FlSpot> pointsY = [];
+    bool hasXHints = xhints.length != 0;
+    bool hasYHints = yhints.length != 0;
+    double maxY = 0;
     for (int i = 0; i < x.length; i++) {
-      print(x[i].toString() + "," + y[i].toString());
-      points.add(new FlSpot(i.toDouble(), y[i]));
+      if (x[i] > maxY) {
+        maxY = x[i];
+      }
+
+      pointsX.add(new FlSpot(i.toDouble(), x[i]));
     }
+    for (int i = 0; i < y.length; i++) {
+      if (y[i] > maxY) {
+        maxY = y[i];
+      }
+      pointsY.add(new FlSpot(i.toDouble(), y[i]));
+    }
+    ++maxY;
+    double maxLength = max(x.length, y.length).toDouble();
     return LineChartData(
-      lineTouchData: LineTouchData(enabled: false),
+      lineTouchData: LineTouchData(
+          enabled: true,
+          touchTooltipData: LineTouchTooltipData(
+              tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
+              getTooltipItems: hasXHints
+                  ? (touches) {
+                      List<LineTooltipItem> res = [];
+                      for (LineBarSpot barSpot in touches) {
+                        print(barSpot.spotIndex);
+                        res.add(LineTooltipItem(xhints[barSpot.spotIndex],
+                            TextStyle(color: Colors.white)));
+                      }
+                      return res;
+                    }
+                  : null)),
       gridData: FlGridData(
         show: true,
         drawHorizontalLine: true,
@@ -347,7 +503,25 @@ class _GraphMakerState extends State<GraphMaker> {
           ),
         ),
         topTitles: AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
+          axisNameWidget: Container(
+              child: Padding(
+            padding: const EdgeInsets.only(
+              right: 12,
+              left: 12,
+              top: 10,
+              bottom: 10,
+            ),
+            child: Text(
+              graphName,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                overflow: TextOverflow.fade,
+                fontSize: 18,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          )),
+          axisNameSize: 80,
         ),
         rightTitles: AxisTitles(
           sideTitles: SideTitles(showTitles: false),
@@ -358,50 +532,86 @@ class _GraphMakerState extends State<GraphMaker> {
         border: Border.all(color: const Color(0xff37434d)),
       ),
       minX: 0,
-      maxX: points.length.toDouble(),
+      maxX: maxLength,
       minY: 0,
-      maxY: 6,
+      maxY: maxY,
       lineBarsData: [
-        LineChartBarData(
-          spots: points,
-          // spots: const [
-          //   FlSpot(0, 3.44),
-          //   FlSpot(2.6, 3.44),
-          //   FlSpot(4.9, 3.44),
-          //   FlSpot(6.8, 3.44),
-          //   FlSpot(8, 3.44),
-          //   FlSpot(9.5, 3.44),
-          //   FlSpot(11, 3.44),
-          // ],
-          isCurved: true,
-          gradient: LinearGradient(
-            colors: [
-              ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                  .lerp(0.2)!,
-              ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                  .lerp(0.2)!,
-            ],
-          ),
-          barWidth: 5,
-          isStrokeCapRound: true,
-          dotData: FlDotData(
-            show: false,
-          ),
-          belowBarData: BarAreaData(
-            show: true,
-            gradient: LinearGradient(
-              colors: [
-                ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                    .lerp(0.2)!
-                    .withOpacity(0.1),
-                ColorTween(begin: gradientColors[0], end: gradientColors[1])
-                    .lerp(0.2)!
-                    .withOpacity(0.1),
-              ],
-            ),
-          ),
-        ),
+        getBarData(pointsX),
+        getBarData(pointsY),
+        // LineChartBarData(
+        //   spots: pointsX,
+        //   isCurved: true,
+        //   gradient: LinearGradient(
+        //     colors: [
+        //       ColorTween(begin: gradientColors[0], end: gradientColors[1])
+        //           .lerp(0.2)!,
+        //       ColorTween(begin: gradientColors[0], end: gradientColors[1])
+        //           .lerp(0.2)!,
+        //     ],
+        //   ),
+        //   barWidth: 5,
+        //   isStrokeCapRound: true,
+        //   dotData: FlDotData(
+        //     show: false,
+        //   ),
+        //   belowBarData: BarAreaData(
+        //     show: true,
+        //     gradient: LinearGradient(
+        //       colors: [
+        //         ColorTween(begin: gradientColors[0], end: gradientColors[1])
+        //             .lerp(0.2)!
+        //             .withOpacity(0.1),
+        //         ColorTween(begin: gradientColors[0], end: gradientColors[1])
+        //             .lerp(0.2)!
+        //             .withOpacity(0.1),
+        //       ],
+        //     ),
+        //   ),
+        // ),
       ],
+    );
+  }
+
+  int count = 0;
+  LineChartBarData getBarData(List<FlSpot> points) {
+    List<Color> colors = [];
+    if (count == 0) {
+      colors = [
+        ColorTween(begin: Colors.cyan, end: Colors.cyan).lerp(0.2)!,
+        ColorTween(begin: Colors.cyan, end: Colors.cyan).lerp(0.2)!
+      ];
+    } else {
+      colors = [
+        ColorTween(begin: Colors.purple, end: Colors.purple).lerp(0.2)!,
+        ColorTween(begin: Colors.purple, end: Colors.purple).lerp(0.2)!
+      ];
+      count = -1;
+    }
+    ++count;
+    return LineChartBarData(
+      spots: points,
+      isCurved: false,
+      gradient: LinearGradient(
+        colors: colors,
+      ),
+      barWidth: 5,
+      isStrokeCapRound: true,
+      dotData: FlDotData(
+        show: false,
+      ),
+      // belowBarData: BarAreaData(
+      //   show: true,
+      //   gradient: LinearGradient(
+      //     colors: [
+      //       ColorTween(begin: gradientColors[0], end: gradientColors[1])
+      //           .lerp(0.2)!
+      //           .withOpacity(0.1),
+      //       ColorTween(begin: gradientColors[0], end: gradientColors[1])
+      //           .lerp(0.2)!
+      //           .withOpacity(0.1),
+      //     ],
+      //   ),
+      // ),
     );
   }
 }
