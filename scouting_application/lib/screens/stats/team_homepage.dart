@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:scouting_application/classes/database.dart';
+import 'package:scouting_application/screens/stats/graph_maker.dart';
 import 'package:scouting_application/screens/stats/team_events.dart';
 import 'package:scouting_application/screens/stats/team_games.dart';
 import 'package:scouting_application/screens/stats/team_photo_gallery.dart';
@@ -42,7 +43,7 @@ class TeamHomepage extends StatelessWidget {
                 )
               ],
             ),
-            SizedBox(height: 100),
+            SizedBox(height: 40),
             MenuButton(
                 onPressed: () {
                   Navigator.push(
@@ -53,7 +54,19 @@ class TeamHomepage extends StatelessWidget {
                 isPrimary: false,
                 iconSize: 50,
                 icon: Icon(Icons.auto_graph_rounded)),
-            SizedBox(height: 100),
+            SizedBox(height: 40),
+            MenuButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              GraphMaker(teamID: teamNumber)));
+                },
+                isPrimary: false,
+                iconSize: 50,
+                icon: Icon(Icons.ssid_chart)),
+            SizedBox(height: 40),
             FutureBuilder(
                 future: loadTeamsValidEvents(),
                 builder: (context, snapshot) {

@@ -105,7 +105,8 @@ class CategoryList extends StatelessWidget {
                   textScaleFactor: 1.2,
                 ),
                 Spacer(),
-                Text(item.values.first ?? ""),
+                Text(item.values.first ?? "",
+                    style: TextStyle(overflow: TextOverflow.ellipsis)),
                 SizedBox(
                   width: 10,
                 )

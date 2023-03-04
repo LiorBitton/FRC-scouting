@@ -158,18 +158,19 @@ class _RealtimeScoutingState extends State<RealtimeScouting> {
     List<dynamic> blueAlliance = match['alliances']['blue']['team_keys'];
     List<dynamic> redAlliance = match['alliances']['red']['team_keys'];
     //If an alliance in the match is not detemined yet, abort creation of the container
-    int count=0;
-    for(String teamKey in redAlliance){
-      if (teamKey == "frc0"){
-      ++count;}
+    int count = 0;
+    for (String teamKey in redAlliance) {
+      if (teamKey == "frc0") {
+        ++count;
+      }
     }
-    if (count == 3)return null;
-    for(String teamKey in blueAlliance){
-      if (teamKey == "frc0"){
-      ++count;}
+    if (count == 3) return null;
+    for (String teamKey in blueAlliance) {
+      if (teamKey == "frc0") {
+        ++count;
+      }
     }
-    if (count == 3)
-    return null;
+    if (count == 3) return null;
     List<TeamButton> blueButtons = [];
     List<TeamButton> redButtons = [];
 
