@@ -1,8 +1,12 @@
 //TODO add caching mechanism for event matches
 // add an option to request the new match schedule
 // this should prevent 15mb of requests per event(team-wise)
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/classes/global.dart';
 import 'package:scouting_application/classes/tba_client.dart';
@@ -71,16 +75,59 @@ class _RealtimeScoutingState extends State<RealtimeScouting> {
     blockedTeams.addAll(tempBlockedTeams);
   }
 
+  final String MATCHES_FILE = "matches.json";
+  final String LATEST_FETCH = "fetchtime.txt";
+  final int MAX_TIME = 1800000; //refresh cache every 30 mins
+  Future<List<dynamic>> loadMatches() async {
+    String fileName = MATCHES_FILE;
+    var dir = await getApplicationDocumentsDirectory();
+    File timestamp_file = File(dir.path + '/' + LATEST_FETCH);
+    if (!timestamp_file.existsSync()) {
+      return [];
+    }
+
+    int cacheTime = int.parse(timestamp_file.readAsStringSync());
+    int currTime = DateTime.now().millisecondsSinceEpoch;
+    if (cacheTime + MAX_TIME < currTime) {
+      return [];
+    }
+    File file = File(dir.path + '/' + fileName);
+    if (!file.existsSync()) {
+      print("does not exist, returning");
+      return [];
+    }
+    var jsonData = file.readAsStringSync();
+    var jsonResponse = jsonDecode(jsonData);
+    List<dynamic> matches = List<dynamic>.from(jsonResponse);
+    return matches ?? [];
+  }
+
+  Future<void> saveMatches(List<dynamic>? matches) async {
+    String fileName = MATCHES_FILE;
+    var dir = await getApplicationDocumentsDirectory();
+    File file = File(dir.path + '/' + fileName);
+    file.writeAsStringSync(json.encode(matches));
+    File timestamp = File(dir.path + '/' + LATEST_FETCH);
+    int time = DateTime.now().millisecondsSinceEpoch;
+    timestamp.writeAsStringSync(time.toString());
+  }
+
   Future<SliverList> createUI() async {
     List<Container> content = [];
-    dynamic matches;
-    try {
-      matches = await TBAClient.instance
-          .fetchMatchesByEvent(Global.instance.currentEventKey);
-    } catch (e, s) {
-      Database.instance.recordError(e, s);
-      Global.instance.allowFreeScouting = true;
-      matches = [];
+    dynamic matches = await loadMatches();
+    if (matches == null || matches.length == 0) {
+      try {
+        print("from tba");
+        matches = await TBAClient.instance
+            .fetchMatchesByEvent(Global.instance.currentEventKey);
+        saveMatches(matches);
+      } catch (e, s) {
+        Database.instance.recordError(e, s);
+        Global.instance.allowFreeScouting = true;
+        matches = [];
+      }
+    } else {
+      print("from cache");
     }
     if ((matches as List<dynamic>).contains(0)) {
       //handle no matches
