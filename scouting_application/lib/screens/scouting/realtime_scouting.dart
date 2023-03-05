@@ -1,6 +1,8 @@
-//TODO add caching mechanism for event matches
+//TODO
 // add an option to request the new match schedule
+// - https://stackoverflow.com/questions/57985618/how-to-refresh-currently-active-page-in-flutter
 // this should prevent 15mb of requests per event(team-wise)
+// add self refresh feature
 import 'dart:io';
 
 import 'package:flutter/material.dart';
