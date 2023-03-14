@@ -77,6 +77,9 @@ class _AdminSettingsState extends State<AdminSettings> {
                             currentEventName =
                                 events[currentEventKey] ?? "Unknown";
                           });
+                          Global.instance.currentEventKey = val.toString();
+                          Global.instance.currentEventName =
+                              events[currentEventKey] ?? "Unknown";
                           _saveSelectedEvent();
                         });
                   } else if (snapshot.hasError) {}

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:core';
+import 'dart:developer';
 import 'dart:io';
 import 'package:firebase_database/firebase_database.dart'; //TODO related to next todo
 import 'package:flutter/material.dart';
@@ -22,8 +23,6 @@ class _StatsLobbyState extends State<StatsLobby> {
   Map<String, TeamData> teamData = {};
   bool nicknamesLoaded = false;
 
-  int progress = 0;
-  int target = 1;
   late Future<String> readyForStart;
   @override
   void initState() {
@@ -161,19 +160,31 @@ class _StatsLobbyState extends State<StatsLobby> {
     }
   }
 
+  final String fileName = 'teamData.json';
+
   ///loads data from cache into teamData{}. creates a new file if cache file doesnt exist
   Future<void> loadCache() async {
     if (nicknamesLoaded) return;
     nicknamesLoaded = true;
     String fileName = 'teamData.json';
-    var dir = await getTemporaryDirectory();
-
+    final Directory dir = await getApplicationDocumentsDirectory();
     File file = File(dir.path + '/' + fileName);
+
     if (!file.existsSync()) {
-      // print("creating file");
       file = await file.create();
       await saveCache();
     }
+    File timestampFile = File(dir.path + '/' + ts_file);
+    if (timestampFile.existsSync()) {
+      String cache_time_str = timestampFile.readAsStringSync().split("\n")[0];
+      String cached_event = timestampFile.readAsStringSync().split("\n")[1];
+      if (cached_event != Global.instance.currentEventKey) {
+        return;
+      }
+      int cacheTime = int.parse(cache_time_str);
+      int currTime = DateTime.now().millisecondsSinceEpoch;
+    }
+
     var jsonData = file.readAsStringSync();
     var jsonResponse = jsonDecode(jsonData);
     Map<String, dynamic> out =
@@ -184,32 +195,80 @@ class _StatsLobbyState extends State<StatsLobby> {
   }
 
   Future<void> saveCache() async {
-    String fileName = 'teamData.json';
-    var dir = await getTemporaryDirectory();
+    var dir = await getApplicationDocumentsDirectory();
     File file = File(dir.path + '/' + fileName);
     file.writeAsStringSync(json.encode(teamData));
   }
 
+  Future<List<String>> fetchTeamsFromTBA(String eventKey) {
+    return TBAClient.instance.fetchTeamsInEvent(eventKey);
+  }
+
+  final String teamsFile = "teams.json";
+  final String ts_file = "teams_ts.txt";
+  final int MAX_TIME = 3600000; //refresh cache every 1 hour
+  Future<List<String>> getTeamsInEvent(String eventKey) async {
+    final Directory dir = await getApplicationDocumentsDirectory();
+    List<String> teams = [];
+    //Get Teams from memory
+    File tsfile = File(dir.path + '/' + ts_file);
+    if (tsfile.existsSync()) {
+      String cache_time_str = tsfile.readAsStringSync().split("\n")[0];
+      String cached_event = tsfile.readAsStringSync().split("\n")[1];
+      log(eventKey + ":" + cached_event);
+
+      int cacheTime = int.parse(cache_time_str);
+      int currTime = DateTime.now().millisecondsSinceEpoch;
+      File file = File(dir.path + '/' + teamsFile);
+      //if cache is fresh and the cache is for the required event and the cache data file exists
+      if (cacheTime + MAX_TIME >= currTime &&
+          eventKey == cached_event &&
+          file.existsSync()) {
+        //read the cache data file and return its contents
+        var jsonData = file.readAsStringSync();
+        var jsonResponse = jsonDecode(jsonData);
+        List<String> out = List<String>.from(jsonResponse as List<dynamic>);
+        if (out.isNotEmpty) {
+          log("from cache");
+          return out;
+        }
+      }
+    }
+    //else(if there is no valid cache)
+    teams = await fetchTeamsFromTBA(eventKey);
+    if (teams.isNotEmpty) {
+      File tsfile = File(dir.path + '/' + ts_file);
+      int time = DateTime.now().millisecondsSinceEpoch;
+      tsfile.writeAsStringSync(time.toString() + "\n" + eventKey);
+      File file = File(dir.path + '/' + teamsFile);
+      file.writeAsStringSync(json.encode(teams));
+      log("from TBA");
+      return teams;
+    }
+    return [];
+  }
+
   Future<String> createCache() async {
     await loadCache();
-    List<String> teamsTemp = [];
-    try {
-      teamsTemp = await TBAClient.instance
-          .fetchTeamsInEvent(Global.instance.currentEventKey)
-          .timeout(const Duration(seconds: 5), onTimeout: () {
-        return [];
-      });
-    } catch (e) {
-      print("I caught an error look: \n $e");
-    }
+
+    List<String> teamsTemp =
+        await getTeamsInEvent(Global.instance.currentEventKey);
+    // try {
+    //   teamsTemp = await TBAClient.instance
+    //       .fetchTeamsInEvent(Global.instance.currentEventKey)
+    //       .timeout(const Duration(seconds: 5), onTimeout: () {
+    //     return [];
+    //   });
+    // } catch (e) {
+    //   print("I caught an error look: \n $e");
+    // }
     if (teamsTemp.isEmpty) {
       //If no connection to TBA
       //Show all teams info in Database
       //TODO replace with Database class function that returns all of the teams
       var ref = FirebaseDatabase.instance.ref('teams');
       try {
-        // DataSnapshot snapshot =
-        await ref.once().then((dbEvent) {
+        ref.once().then((dbEvent) {
           if (dbEvent.snapshot.exists) {
             var data = dbEvent.snapshot.value;
             final info =
@@ -229,14 +288,10 @@ class _StatsLobbyState extends State<StatsLobby> {
       teams = teamsTemp;
     }
     teams.sort((a, b) => int.parse(a).compareTo(int.parse(b)));
-    target = teams.length;
     for (String team in teams) {
       String name = await fetchTeamNickname(team);
       String avatar = await fetchTeamLogoAsString(team);
       teamData.putIfAbsent(team, () => TeamData(name: name, avatar: avatar));
-      setState(() {
-        progress++;
-      });
     }
     saveCache();
     return "okay";
