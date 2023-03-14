@@ -183,6 +183,8 @@ class _StatsLobbyState extends State<StatsLobby> {
       }
       int cacheTime = int.parse(cache_time_str);
       int currTime = DateTime.now().millisecondsSinceEpoch;
+    } else {
+      return;
     }
 
     var jsonData = file.readAsStringSync();
@@ -229,7 +231,6 @@ class _StatsLobbyState extends State<StatsLobby> {
         var jsonResponse = jsonDecode(jsonData);
         List<String> out = List<String>.from(jsonResponse as List<dynamic>);
         if (out.isNotEmpty) {
-          log("from cache");
           return out;
         }
       }
@@ -242,7 +243,7 @@ class _StatsLobbyState extends State<StatsLobby> {
       tsfile.writeAsStringSync(time.toString() + "\n" + eventKey);
       File file = File(dir.path + '/' + teamsFile);
       file.writeAsStringSync(json.encode(teams));
-      log("from TBA");
+
       return teams;
     }
     return [];
