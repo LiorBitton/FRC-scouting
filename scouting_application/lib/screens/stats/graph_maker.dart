@@ -24,8 +24,9 @@ class GraphMaker extends StatefulWidget {
 }
 
 class _GraphMakerState extends State<GraphMaker> {
-  String y_value = "1";
-  String x_value = "1";
+  String y_value = "none";
+  String x_value = "none";
+  bool hasData = false;
   bool isDarkMode = false;
   bool shouldDrawGraph = false;
   List<LineChart> graph = [];
@@ -72,7 +73,6 @@ class _GraphMakerState extends State<GraphMaker> {
     if (initted) {
       List<String> ret = List<String>.from(dataByKeys.keys);
       ret.add("none");
-
       return ret;
     }
 
@@ -133,6 +133,15 @@ class _GraphMakerState extends State<GraphMaker> {
                               List<DropdownMenuItem<String>> items = [];
                               List<String> valueKeys =
                                   snapshot.data as List<String>;
+                              if (valueKeys == null || valueKeys.length <= 1) {
+                                return Center(
+                                  child: Text(
+                                    "No data for this team, try again later",
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                );
+                              }
+                              hasData = true;
                               valueKeys.sort();
                               valueKeys.remove("bluAll");
                               String prefix = "";
@@ -207,19 +216,20 @@ class _GraphMakerState extends State<GraphMaker> {
                             }),
                       ],
                     ),
-                    MenuTextButton(
-                        onPressed: shouldDrawGraph
-                            ? () {
-                                setState(
-                                  () {
-                                    print("drawing");
-                                    drawGraph();
-                                    shouldDrawGraph = false;
-                                  },
-                                );
-                              }
-                            : null,
-                        text: "Draw Graph"),
+                    hasData
+                        ? MenuTextButton(
+                            onPressed: shouldDrawGraph
+                                ? () {
+                                    setState(
+                                      () {
+                                        drawGraph();
+                                        shouldDrawGraph = false;
+                                      },
+                                    );
+                                  }
+                                : null,
+                            text: "Draw Graph")
+                        : Text(""),
                   ],
                 ),
                 graph.length == 0
