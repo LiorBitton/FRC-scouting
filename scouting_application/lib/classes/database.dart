@@ -66,7 +66,6 @@ class Database {
           (await ref.get()).value as Map<dynamic, dynamic>);
       return events;
     } catch (e) {
-      print(e);
       return {};
     }
   }
@@ -147,7 +146,6 @@ class Database {
           .toList();
       return out;
     } catch (e) {
-      print(e);
       return [];
     }
   }

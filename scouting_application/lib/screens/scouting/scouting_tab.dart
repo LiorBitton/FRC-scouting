@@ -42,7 +42,7 @@ class _ScoutingTabState extends State<ScoutingTab>
       // Fluttertoast.showToast(msg: "Im paused");
     }
     // if (state == AppLifecycleState.inactive) {
-    //   print("\n\n\nim inactive yall\n\n\n");}
+    //   }
     else if (state == AppLifecycleState.detached) {}
   }
 

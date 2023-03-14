@@ -49,9 +49,7 @@ class TeamPhotoGallery extends StatelessWidget {
                 );
               },
             );
-          } else if (snapshot.hasError) {
-            print('${snapshot.error}');
-          }
+          } else if (snapshot.hasError) {}
           return LinearProgressIndicator();
         },
       ),

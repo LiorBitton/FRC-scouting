@@ -154,7 +154,6 @@ class _HomepageState extends State<Homepage> {
       // Global.instance.setIsAdmin(await isAdmin());
       Global.instance.setIsAdmin(false);
     } catch (e) {
-      print(e);
       Global.instance.allowFreeScouting = true;
       Global.instance.isAdmin = false;
       Global.instance.currentEventKey = "";
@@ -196,9 +195,7 @@ class _HomepageState extends State<Homepage> {
     try {
       String out = jsonEncode(tabs);
       file.writeAsString(out);
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
   }
 
   Future<Map<String, List<dynamic>>> getTabsFromLocal() async {
@@ -211,7 +208,6 @@ class _HomepageState extends State<Homepage> {
           jsonDecode(await file.readAsString()) as Map<String, dynamic>);
       return res;
     } catch (e) {
-      print(e);
       return {};
     }
   }

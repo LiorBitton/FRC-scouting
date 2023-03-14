@@ -35,7 +35,6 @@ class TeamData {
         avatar: json['avatar'],
       );
     } catch (e) {
-      print(e);
       return TeamData(avatar: "", name: "failed");
     }
   }

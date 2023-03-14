@@ -26,17 +26,13 @@ class Global {
       Map<String, String> relevant = {};
       try {
         relevant = Map<String, String>.from(json["data_from_events"]);
-      } catch (e) {
-        print(e);
-      }
+      } catch (e) {}
       _instance = Global._constructor(
           allowFreeScouting: json["allow_free_scouting"],
           currentEventKey: json["current_event"]["key"],
           currentEventName: json["current_event"]["name"],
           relevantEvents: relevant);
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
   }
 
   void setIsAdmin(bool isAdmin) {

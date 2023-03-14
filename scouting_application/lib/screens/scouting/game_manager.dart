@@ -79,7 +79,6 @@ class GameManager extends StatefulWidget {
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => Homepage()));
       } catch (e) {
-        print(e);
         displayDataAsQR(context, data, matchID, teamID.toString());
       }
     }
@@ -136,7 +135,6 @@ class GameManager extends StatefulWidget {
     //title;dataTag;type;option1,option2,option3(only for dropdown)
     final List<String> split = collector.split(";");
     if (split.length != 4 && split.length != 3) {
-      print("error occured with $collector translation");
       return null;
     }
     final String title = split[0];
@@ -189,7 +187,7 @@ class _GameManagerState extends State<GameManager> with WidgetsBindingObserver {
       Fluttertoast.showToast(msg: "Im paused");
     }
     // if (state == AppLifecycleState.inactive) {
-    //   print("\n\n\nim inactive yall\n\n\n");}
+    //   }
     else if (state == AppLifecycleState.detached) {}
   }
 

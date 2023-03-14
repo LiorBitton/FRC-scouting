@@ -171,7 +171,7 @@ class TBAClient {
         try {
           if (media["type"] == "avatar") {
             String b64logo = res[0]['details']['base64Image'].toString();
-            // print("saved $teamNumber photo to json");
+            //
             return b64logo;
           }
         } catch (exception, stack) {

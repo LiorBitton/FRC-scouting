@@ -61,9 +61,7 @@ class _AdminSettingsState extends State<AdminSettings> {
                       firstLoad = false;
                       if (!snapshot.data!.contains(currentEventKey)) {
                         int idx = 0;
-                        for (DropdownMenuItem<String> item in snapshot.data!) {
-                          print((idx).toString() + item.value!);
-                        }
+                        for (DropdownMenuItem<String> item in snapshot.data!) {}
                         currentEventKey = snapshot.data![0].value ?? "";
                       }
                     }

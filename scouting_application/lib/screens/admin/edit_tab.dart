@@ -65,7 +65,7 @@ class _EditTabState extends State<EditTab> {
 
   void _swap(int newidx, oldidx) {
     newidx = newidx.clamp(0, _collectors.length - 1);
-    print(newidx);
+
     EverCollector temp = _collectors[newidx];
     _collectors[newidx] = _collectors[oldidx];
     _collectors[oldidx] = temp;

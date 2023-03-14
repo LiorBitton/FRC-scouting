@@ -28,7 +28,6 @@ class TeamStats extends StatelessWidget {
       }
       return keys;
     } catch (exception, stack) {
-      print("error");
       Database.instance.log('error getting custom information');
       Database.instance.recordError(exception, stack);
       return [

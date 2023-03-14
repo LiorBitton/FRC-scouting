@@ -126,7 +126,7 @@ class _StatsLobbyState extends State<StatsLobby> {
         }
         if (b64logo != "") {
           //if avatar exists in cache
-          // print("loaded $teamNumber photo from json");
+          //
           return b64logo;
         }
       } catch (e) {}
@@ -170,7 +170,7 @@ class _StatsLobbyState extends State<StatsLobby> {
 
     File file = File(dir.path + '/' + fileName);
     if (!file.existsSync()) {
-      // print("creating file");
+      //
       file = await file.create();
       await saveCache();
     }
@@ -199,9 +199,7 @@ class _StatsLobbyState extends State<StatsLobby> {
           .timeout(const Duration(seconds: 5), onTimeout: () {
         return [];
       });
-    } catch (e) {
-      print("I caught an error look: \n $e");
-    }
+    } catch (e) {}
     if (teamsTemp.isEmpty) {
       //If no connection to TBA
       //Show all teams info in Database
@@ -223,7 +221,7 @@ class _StatsLobbyState extends State<StatsLobby> {
       } catch (e) {
         //If no connection from Database and TBA
         // for(String team in teamData.keys)
-        print("no connection at all");
+
       }
     } else {
       teams = teamsTemp;
