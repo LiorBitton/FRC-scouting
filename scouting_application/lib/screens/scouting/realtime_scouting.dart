@@ -57,9 +57,7 @@ class _RealtimeScoutingState extends State<RealtimeScouting> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return snapshot.data!;
-                } else if (snapshot.hasError) {
-                  print('${snapshot.error}');
-                }
+                } else if (snapshot.hasError) {}
                 return SliverList(
                     delegate: SliverChildBuilderDelegate(((context, index) {
                   if (index == 0)
@@ -79,7 +77,7 @@ class _RealtimeScoutingState extends State<RealtimeScouting> {
 
   final String MATCHES_FILE = "matches.json";
   final String LATEST_FETCH = "fetchtime.txt";
-  final int MAX_TIME = 1800000; //refresh cache every 30 mins
+  final int MAX_TIME = 600000; //refresh cache every 10 mins
   Future<List<dynamic>> loadMatches() async {
     String fileName = MATCHES_FILE;
     var dir = await getApplicationDocumentsDirectory();
@@ -95,7 +93,6 @@ class _RealtimeScoutingState extends State<RealtimeScouting> {
     }
     File file = File(dir.path + '/' + fileName);
     if (!file.existsSync()) {
-      print("does not exist, returning");
       return [];
     }
     var jsonData = file.readAsStringSync();
@@ -119,7 +116,6 @@ class _RealtimeScoutingState extends State<RealtimeScouting> {
     dynamic matches = await loadMatches();
     if (matches == null || matches.length == 0) {
       try {
-        print("from tba");
         matches = await TBAClient.instance
             .fetchMatchesByEvent(Global.instance.currentEventKey);
         saveMatches(matches);
@@ -128,9 +124,7 @@ class _RealtimeScoutingState extends State<RealtimeScouting> {
         Global.instance.allowFreeScouting = true;
         matches = [];
       }
-    } else {
-      print("from cache");
-    }
+    } else {}
     if ((matches as List<dynamic>).contains(0)) {
       //handle no matches
       Database.instance.log("Matches are not posted yet, notifying user.");
