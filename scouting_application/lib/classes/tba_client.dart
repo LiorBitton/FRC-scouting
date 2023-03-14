@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:scouting_application/classes/database.dart';
 import 'package:scouting_application/classes/secret_constants.dart';
@@ -32,6 +33,8 @@ class TBAClient {
             .log("did not recieve a 200 response for teams in $eventKey");
       }
       return teams;
+    } on OSError {
+      return [];
     } catch (exception, stack) {
       Database.instance.log('unknown error in fetchTeamsInEvent($eventKey).');
       Database.instance.recordError(exception, stack);
